@@ -36,7 +36,7 @@ export const UserProvider = ({ children }) => {
       setBtnLoading(false);
       navigate(getDashboardPath(data.user.role));
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Login failed");
       setBtnLoading(false);
     }
   }
@@ -88,7 +88,7 @@ export const UserProvider = ({ children }) => {
       navigate("/verify/"+token);
       
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Registration failed");
       setBtnLoading(false);
     }
   }
@@ -99,13 +99,48 @@ export const UserProvider = ({ children }) => {
       const { data } = await axios.post(`/api/user/verifyOtp/${token}`, {
         otp,
       });
+
+      const role = data?.user?.role;
+
+      // Registration completed.
       toast.success(data.message);
-      setUser(data.user);
-      setIsAuth(true);
+
+      if (role === "role1" || role === "role4") {
+        // Auto-login for role1 and role4 after verification.
+        setUser(data.user);
+        setIsAuth(true);
+        setBtnLoading(false);
+        navigate(getDashboardPath(role));
+        return;
+      }
+
+      // If role2 or role3, explicitly inform about admin verification.
+      if (role === "role2" || role === "role3") {
+        toast.info(
+          "Your account is pending admin verification. You cannot login until an admin approves your account."
+        );
+      }
+
       setBtnLoading(false);
-      navigate(getDashboardPath(data.user.role));
+      // Redirect to login for roles that are not auto-logged-in.
+      navigate("/login");
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Verification failed");
+      setBtnLoading(false);
+    }
+  }
+
+  async function logoutUser(navigate) {
+    setBtnLoading(true);
+    try {
+      await axios.get("/api/user/logout");
+      setUser([]);
+      setIsAuth(false);
+      toast.success("Logged out successfully");
+      setBtnLoading(false);
+      navigate("/login");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Logout failed");
       setBtnLoading(false);
     }
   }
@@ -144,6 +179,7 @@ export const UserProvider = ({ children }) => {
         resetUser,
         verify,
         fetchUser,
+        logoutUser,
       }}
     >
       {children}

@@ -22,6 +22,17 @@ const schema = new mongoose.Schema(
       default: "role1",
       required: true,
     },
+
+    // Roles 2 and 3 require admin verification.
+    // Role 4 acts as admin. Role 1 is a regular user.
+    isVerified: {
+      type: Boolean,
+      default: function () {
+        // By default, auto-verify role1 (regular) and role4 (admin).
+        // Roles 2 and 3 will remain unverified until an admin approves.
+        return this.role === "role1" || this.role === "role4";
+      },
+    },
   },
   {
     timestamps: true,

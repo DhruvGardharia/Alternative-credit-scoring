@@ -100,22 +100,35 @@ export const verifyOtpAndRegister = TryCatch(async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-   
+    // Determine verification status based on role:
+    // - role4 is admin -> verified
+    // - role1 is regular -> verified
+    // - role2 and role3 require admin verification
+    const isVerified =
+      tempUser.role === "role1" || tempUser.role === "role4";
+
     const hashPassword = await bcrypt.hash(tempUser.password, 10);
     const user = await User.create({
       name: tempUser.name,
       email,
       password: hashPassword,
       role: tempUser.role,
+      isVerified,
     });
 
     delete TEMP_USERS[email]; //
 
-    generateToken(user, res);
+    // Auto-login only for role1 and role4 (admin). Roles 2/3 remain pending.
+    if (isVerified) {
+      generateToken(user, res);
+    }
 
     res.status(201).json({
       user,
-      message: "User registered successfully",
+      message:
+        isVerified
+          ? "User registered successfully. You are now logged in."
+          : "User registered successfully. You cannot login until an admin verifies your account.",
     });
   } catch (error) {
     console.error("Token verification failed:", error);
@@ -138,11 +151,19 @@ export const loginUser=TryCatch(async(req,res)=>{
 
 
     if(!comaparePassword){
-        return res.status(400).json({
-            message:"Email or Password Incorrect.",
-        });
+      return res.status(400).json({
+          message:"Email or Password Incorrect.",
+      });
 
     }
+
+    // Enforce admin verification for role2 and role3
+    if ((user.role === "role2" || user.role === "role3") && !user.isVerified) {
+      return res.status(403).json({
+        message: "Your account is pending admin verification. You cannot login until an admin approves your account.",
+      });
+    }
+
     generateToken(user,res);
 
 
@@ -279,4 +300,76 @@ export const logOutUser=TryCatch(async(req,res)=>{
     res.json({
         message:"Logged out successfully",
     });
+});
+
+// ADMIN: Get all unverified role2 and role3 users
+export const getPendingUsers = TryCatch(async (req, res) => {
+  const pendingUsers = await User.find({
+    role: { $in: ["role2", "role3"] },
+    isVerified: false,
+  }).select("-password");
+
+  res.json(pendingUsers);
+});
+
+// ADMIN: Approve a pending user (set isVerified = true)
+export const approveUser = TryCatch(async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (!["role2", "role3"].includes(user.role)) {
+    return res
+      .status(400)
+      .json({ message: "Only role2 and role3 users require admin verification" });
+  }
+
+  if (user.isVerified) {
+    return res.status(400).json({ message: "User is already verified" });
+  }
+
+  user.isVerified = true;
+  await user.save();
+
+  res.json({
+    message: "User approved successfully",
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+    },
+  });
+});
+
+// ADMIN: Reject a pending user (remove them)
+export const rejectUser = TryCatch(async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (!["role2", "role3"].includes(user.role)) {
+    return res
+      .status(400)
+      .json({ message: "Only role2 and role3 users can be rejected from this view" });
+  }
+
+  if (user.isVerified) {
+    return res
+      .status(400)
+      .json({ message: "Cannot reject an already verified user" });
+  }
+
+  await user.deleteOne();
+
+  res.json({
+    message: "User rejected and removed successfully",
+  });
 });

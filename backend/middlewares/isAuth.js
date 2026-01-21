@@ -25,3 +25,19 @@ export const isAuth = async (req, res, next) => {
     });
   }
 };
+
+// Admin-only guard: allows only role4 (admin) to proceed.
+export const isAdmin = (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "role4") {
+      return res.status(403).json({
+        message: "Access denied. Admin privileges required.",
+      });
+    }
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      message: "Access denied. Admin privileges required.",
+    });
+  }
+};

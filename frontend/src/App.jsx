@@ -12,6 +12,7 @@ import Role2Dashboard from "./pages/Role2Dashboard";
 import Role3Dashboard from "./pages/Role3Dashboard";
 import Role4Dashboard from "./pages/Role4Dashboard";
 import Landing from "./pages/Landing";
+import AdminVerification from "./pages/AdminVerification";
 
 const getDashboardPath = (role) => {
   switch (role) {
@@ -127,6 +128,14 @@ const App = () => {
               element={
                 <RoleRoute allowedRoles={["role4"]}>
                   <Role4Dashboard />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/verification"
+              element={
+                <RoleRoute allowedRoles={["role4"]}>
+                  <AdminVerification />
                 </RoleRoute>
               }
             />
