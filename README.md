@@ -30,13 +30,13 @@ It’s ideal for hackathons where you want to spin up a user-register/login app 
 
 
 ## 📦 Required env
--PORT= 
--MONGO_URL=
--JWT_SEC=
--Cloud_Api=
--Cloud_Secret=
--Cloud_Name=
--CLOUDINARY_URL=
--MY_GMAIL=
--MY_PASS=
+PORT= 
+MONGO_URL=
+JWT_SEC=
+Cloud_Api=
+Cloud_Secret=
+Cloud_Name=
+CLOUDINARY_URL=
+MY_GMAIL=
+MY_PASS=
 
