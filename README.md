@@ -22,7 +22,7 @@ It’s ideal for hackathons where you want to spin up a user-register/login app 
 
 ✔ Modular frontend + backend  
 ✔ Authentication routes (e.g., register, login)  
-✔ Deployable to platforms like Render, Vercel or Heroku  
+✔ Deployable to platforms like Render
 ✔ Ready for extension (APIs, database, UI pages)  
 ✔ Easy to copy and customize for your own project
 ✔ Mulitrole support
