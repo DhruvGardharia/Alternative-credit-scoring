@@ -158,9 +158,14 @@ export const getExpenseStats = TryCatch(async (req, res) => {
     stats.byPaymentMethod[exp.paymentMethod] = (stats.byPaymentMethod[exp.paymentMethod] || 0) + exp.amount;
   });
 
-  // Daily average
+  // Daily average (only counting days with transactions)
   const days = Math.ceil((Date.now() - startDate) / (1000 * 60 * 60 * 24));
-  stats.dailyAverage = stats.totalAmount / days;
+  const daysWithTransactions = new Set(expenses.map(e => new Date(e.date).toDateString())).size;
+  stats.dailyAverage = daysWithTransactions > 0 ? stats.totalAmount / daysWithTransactions : 0;
+  
+  // Add additional fields for frontend compatibility
+  stats.totalExpenses = stats.totalAmount;
+  stats.categoryBreakdown = stats.byCategory;
 
   res.json({
     success: true,

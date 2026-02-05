@@ -46,19 +46,20 @@ const Login = () => {
     }
     
     return (
-        <div className='min-h-screen flex items-center justify-center bg-gray-50'>
-            <div className='p-8 rounded-lg shadow-lg w-full max-w-md bg-white border border-gray-200'>
+        <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 py-12 px-4'>
+            <div className='p-5 rounded-2xl shadow-2xl w-full max-w-sm bg-white'>
                 <div className="flex items-center justify-center space-x-2 mb-2">
-                    <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-900" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
                             <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd"/>
                         </svg>
                     </div>
-                    <span className='text-xl font-bold text-blue-900'>CreditFlow</span>
+                    <span className='text-lg font-bold text-gray-800'>CreditFlow</span>
                 </div>
                 
-                <h2 className='text-2xl font-bold text-blue-900 text-center mb-6'>Welcome Back</h2>
+                <h2 className='text-lg font-bold text-gray-900 text-center mb-1'>Welcome Back</h2>
+                <p className='text-xs text-gray-600 text-center mb-4'>Login to access your dashboard</p>
                 
                 {formError && (
                     <div className='mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm'>
@@ -67,7 +68,7 @@ const Login = () => {
                 )}
                 
                 <form onSubmit={submitHandler}>
-                    <div className='mb-4'>
+                    <div className='mb-2.5'>
                         <label htmlFor="email" className='block text-xs font-semibold text-gray-700 mb-1'>
                             Email Address
                         </label>
@@ -77,12 +78,12 @@ const Login = () => {
                             required 
                             type="email" 
                             id='email' 
-                            className='w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-gray-700 focus:border-blue-900 focus:outline-none text-sm' 
+                            className='w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 focus:border-blue-900 focus:ring-1 focus:ring-blue-900 focus:outline-none text-sm' 
                             placeholder='you@example.com'
                         />
                     </div>
                     
-                    <div className='mb-4'>
+                    <div className='mb-2.5'>
                         <label htmlFor="password" className='block text-xs font-semibold text-gray-700 mb-1'>
                             Password
                         </label>
@@ -93,7 +94,7 @@ const Login = () => {
                                 required 
                                 type={showPassword ? "text" : "password"} 
                                 id='password' 
-                                className='w-full px-3 py-2 pr-10 border-2 border-blue-200 rounded-lg text-gray-700 focus:border-blue-900 focus:outline-none text-sm' 
+                                className='w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg text-gray-700 focus:border-blue-900 focus:ring-1 focus:ring-blue-900 focus:outline-none text-sm' 
                                 placeholder='Enter password'
                             />
                             <button
@@ -115,21 +116,21 @@ const Login = () => {
                         </div>
                     </div>
                     
-                    <div className='flex items-center justify-between mb-6'>
+                    <div className='flex items-center justify-between mb-4'>
                         <div className='flex items-center'>
                             <input 
                                 type="checkbox" 
                                 id="remember" 
-                                className='h-4 w-4 text-blue-900 focus:ring-blue-900 border-gray-300 rounded'
+                                className='h-3.5 w-3.5 text-blue-900 focus:ring-blue-900 border-gray-300 rounded'
                                 checked={rememberMe}
                                 onChange={() => setRememberMe(!rememberMe)}
                             />
-                            <label htmlFor="remember" className='ml-2 block text-sm text-gray-700'>
+                            <label htmlFor="remember" className='ml-2 block text-xs text-gray-700'>
                                 Remember me
                             </label>
                         </div>
                         <div>
-                            <Link to="/forgot" className='text-sm font-medium text-blue-900 hover:text-blue-700'>
+                            <Link to="/forgot" className='text-xs font-medium text-purple-700 hover:text-purple-900'>
                                 Forgot password?
                             </Link>
                         </div>
@@ -137,23 +138,31 @@ const Login = () => {
                     
                     <button 
                         type='submit' 
-                        className='w-full py-2.5 rounded-lg shadow text-sm font-medium text-white bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-900 transition flex items-center justify-center'
+                        className='w-full py-2.5 rounded-lg shadow-md text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition transform hover:-translate-y-0.5 flex items-center justify-center'
                         disabled={btnLoading}
                     >
                         {btnLoading ? <LoadingAnimation /> : "Sign In"}
                     </button>
                 </form>
                 
-                <div className='mt-6 text-center'>
-                    <p className='text-sm text-gray-600'>
+                <div className='mt-4 text-center'>
+                    <p className='text-xs text-gray-600'>
                         Don't have an account?{' '}
-                        <Link to="/register" className='font-medium text-blue-900 hover:text-blue-700'>
+                        <Link to="/register" className='font-semibold text-purple-700 hover:text-purple-900'>
                             Create an account
                         </Link>
                     </p>
                 </div>
+                
+                <div className='mt-3 pt-3 border-t border-gray-200 text-center'>
+                    <Link to="/" className='text-xs text-gray-500 hover:text-purple-700 flex items-center justify-center gap-1'>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Home
+                    </Link>
+                </div>
             </div>
-            
         </div>
     )
 }

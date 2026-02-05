@@ -15,6 +15,9 @@ export default function Role1Dashboard() {
   const [uploadLoading, setUploadLoading] = useState(false);
   const [creditData, setCreditData] = useState(null);
   const [financialSummary, setFinancialSummary] = useState(null);
+  const [savingsGoal, setSavingsGoal] = useState(10000);
+  const [showEditGoal, setShowEditGoal] = useState(false);
+  const [tempGoal, setTempGoal] = useState(10000);
   
   const [newExpense, setNewExpense] = useState({
     category: "food",
@@ -23,6 +26,25 @@ export default function Role1Dashboard() {
     date: new Date().toISOString().split('T')[0],
     paymentMethod: "cash",
   });
+
+  const addSampleExpenses = async () => {
+    const sampleExpenses = [
+      { category: "food", amount: 250, description: "Lunch at cafe", date: new Date().toISOString().split('T')[0], paymentMethod: "upi" },
+      { category: "transport", amount: 150, description: "Cab ride", date: new Date(Date.now() - 86400000).toISOString().split('T')[0], paymentMethod: "cash" },
+      { category: "utilities", amount: 500, description: "Mobile recharge", date: new Date(Date.now() - 172800000).toISOString().split('T')[0], paymentMethod: "card" },
+      { category: "entertainment", amount: 300, description: "Movie ticket", date: new Date(Date.now() - 259200000).toISOString().split('T')[0], paymentMethod: "upi" },
+    ];
+
+    try {
+      for (const expense of sampleExpenses) {
+        await axios.post("/api/expenses", expense);
+      }
+      fetchExpenses();
+      fetchStats();
+    } catch (error) {
+      console.error("Error adding sample expenses:", error);
+    }
+  };
 
   const categories = ["food", "transport", "utilities", "entertainment", "healthcare", "education", "other"];
   const paymentMethods = ["cash", "card", "upi", "other"];
@@ -610,7 +632,7 @@ export default function Role1Dashboard() {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-blue-900">₹{stats?.totalExpenses?.toLocaleString() || 0}</div>
+            <div className="text-2xl font-bold text-blue-900">₹{(stats?.totalExpenses || expenses.reduce((sum, e) => sum + e.amount, 0))?.toLocaleString()}</div>
           </div>
           
           <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-yellow-400 hover:shadow-lg transition">
@@ -633,14 +655,38 @@ export default function Role1Dashboard() {
             <div className="text-2xl font-bold text-blue-900">₹{stats?.dailyAverage?.toFixed(0) || 0}</div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-purple-500 hover:shadow-lg transition">
+          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-purple-500 hover:shadow-lg transition cursor-pointer" onClick={() => { setShowEditGoal(true); setTempGoal(savingsGoal); }}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-gray-600">Savings Goal</span>
               <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-blue-900">₹10,000</div>
+            <div className="text-2xl font-bold text-blue-900 mb-2">₹{savingsGoal.toLocaleString()}</div>
+            
+            {/* Calculate savings (income - expenses if we have financial data, or estimate) */}
+            {(() => {
+              const totalExpenses = stats?.totalExpenses || expenses.reduce((sum, e) => sum + e.amount, 0);
+              const estimatedIncome = financialSummary?.averageMonthlyIncome || (totalExpenses > 0 ? totalExpenses * 1.5 : 15000);
+              const savedAmount = Math.max(0, estimatedIncome - totalExpenses);
+              const progressPercent = Math.min(100, (savedAmount / savingsGoal) * 100);
+              
+              return (
+                <>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs text-gray-600">Saved: ₹{savedAmount.toLocaleString()}</span>
+                    <span className="text-xs font-bold text-purple-600">{progressPercent.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${progressPercent}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Click to edit goal</p>
+                </>
+              );
+            })()}
           </div>
         </div>
 
@@ -668,6 +714,95 @@ export default function Role1Dashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Savings Goal Edit Modal */}
+        {showEditGoal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowEditGoal(false)}>
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-xl font-bold text-blue-900">Edit Savings Goal</h3>
+                <button onClick={() => setShowEditGoal(false)} className="text-gray-400 hover:text-gray-600">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Monthly Savings Target</label>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setTempGoal(Math.max(1000, tempGoal - 1000))}
+                    className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-2xl font-bold text-gray-700 transition"
+                  >
+                    -
+                  </button>
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      value={tempGoal}
+                      onChange={(e) => setTempGoal(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-full text-center text-3xl font-bold text-blue-900 border-2 border-purple-200 rounded-lg py-3 focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setTempGoal(tempGoal + 1000)}
+                    className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-2xl font-bold text-gray-700 transition"
+                  >
+                    +
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-2 mt-4">
+                  {[5000, 10000, 20000, 50000].map(amount => (
+                    <button
+                      key={amount}
+                      onClick={() => setTempGoal(amount)}
+                      className={`py-2 rounded-lg text-sm font-medium transition ${
+                        tempGoal === amount 
+                          ? 'bg-purple-600 text-white' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      ₹{(amount/1000)}k
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-purple-50 rounded-lg p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-purple-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
+                  </svg>
+                  <div>
+                    <p className="text-xs text-gray-700 leading-relaxed">
+                      Set a realistic monthly savings goal based on your income and expenses. Track your progress and adjust as needed.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowEditGoal(false)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setSavingsGoal(tempGoal);
+                    setShowEditGoal(false);
+                  }}
+                  className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium shadow-md transition"
+                >
+                  Save Goal
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -771,11 +906,26 @@ export default function Role1Dashboard() {
         {/* Expenses List */}
         <div className="bg-white rounded-lg shadow-md p-5">
           {expenses.length === 0 ? (
-            <div className="text-center py-8">
-              <svg className="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center py-10">
+              <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <p className="text-base text-gray-500">No expenses yet. Add your first expense!</p>
+              <p className="text-lg font-semibold text-gray-700 mb-2">No expenses tracked yet</p>
+              <p className="text-sm text-gray-500 mb-6">Start tracking your daily expenses to manage your finances better</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <button
+                  onClick={() => setShowAddExpense(true)}
+                  className="px-6 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium shadow transition text-sm"
+                >
+                  Add Your First Expense
+                </button>
+                <button
+                  onClick={addSampleExpenses}
+                  className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium shadow-sm transition text-sm border border-gray-300"
+                >
+                  Load Sample Data
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-3">
