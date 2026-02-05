@@ -5,9 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Role1Dashboard from "./pages/Role1Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
-import Role2Dashboard from "./pages/Role2Dashboard";
-import Role3Dashboard from "./pages/Role3Dashboard";
-import Role4Dashboard from "./pages/Role4Dashboard";
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -49,30 +47,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/role2"
-          element={
-            <ProtectedRoute>
-              <Role2Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/role3"
-          element={
-            <ProtectedRoute>
-              <Role3Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/role4"
-          element={
-            <ProtectedRoute>
-              <Role4Dashboard />
-            </ProtectedRoute>
-          }
-        />
+
       </Routes>
     </BrowserRouter>
   );
