@@ -1,34 +1,29 @@
 import express from "express";
 import {
-  approveUser,
-  forgetPassword,
-  getPendingUsers,
-  loginUser,
-  logOutUser,
-  myProfile,
-  registerWithOtp,
-  rejectUser,
-  resetPassword,
-  userProfile,
-  verifyOtpAndRegister,
+  getUserById,
+  getAllUsers,
+  uploadBankStatement,
+  getFinancialSummary,
+  generateCreditScore,
+  getCreditScore,
+  getUserProfile,
 } from "../controllers/userController.js";
-import { isAdmin, isAuth } from "../middlewares/isAuth.js";
+import { upload } from "../middlewares/multer.js";
+import { isAuth } from "../middlewares/isAuth.js";
 
 const router = express.Router();
 
-router.post("/register", registerWithOtp);
-router.post("/verifyOtp/:token", verifyOtpAndRegister);
-router.post("/login", loginUser);
-router.post("/forget", forgetPassword);
-router.post("/reset-password/:token", resetPassword);
-router.get("/logout", isAuth, logOutUser);
-router.get("/me", isAuth, myProfile);
+// Protected user routes
+router.get("/all", isAuth, getAllUsers);
+router.get("/:id", isAuth, getUserById);
+router.get("/profile/:userId", isAuth, getUserProfile);
 
-// Admin-only routes for handling pending role2/role3 users
-router.get("/pending", isAuth, isAdmin, getPendingUsers);
-router.patch("/:id/approve", isAuth, isAdmin, approveUser);
-router.delete("/:id/reject", isAuth, isAdmin, rejectUser);
+// Bank statement routes
+router.post("/upload-statement", isAuth, upload.single("bankStatement"), uploadBankStatement);
+router.get("/financial-summary/:userId", isAuth, getFinancialSummary);
 
-router.get("/:id", isAuth, userProfile);
+// Credit score routes
+router.post("/generate-score", isAuth, generateCreditScore);
+router.get("/credit-score/:userId", isAuth, getCreditScore);
 
 export default router;

@@ -28,8 +28,12 @@ app.use(cookieParser());
 
 
 import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import expenseRoutes from './routes/expenseRoutes.js';
 
-app.use('/api/user', userRoutes);  
+app.use('/api/user', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/expenses', expenseRoutes);  
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "/frontend/dist")));

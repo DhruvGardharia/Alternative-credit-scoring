@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { UserData } from '../context/UserContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { LoadingAnimation } from '../components/Loading'
-import { motion } from 'framer-motion'
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -14,13 +13,9 @@ const Register = () => {
     })
     const [showPassword, setShowPassword] = useState(false)
     const [formError, setFormError] = useState("")
-    const [passwordStrength, setPasswordStrength] = useState(0)
     
     const { registerUser, btnLoading } = UserData()
     const navigate = useNavigate()
-
-    
-  
     
     const handleChange = (e) => {
         const { id, value } = e.target
@@ -28,24 +23,6 @@ const Register = () => {
             ...prev,
             [id]: value
         }))
-        
-        if (id === 'password') {
-            checkPasswordStrength(value)
-        }
-    }
-    
-    const checkPasswordStrength = (password) => {
-        let strength = 0
-        
-        // Length check
-        if (password.length >= 8) strength += 1
-        
-        // Character variety checks
-        if (/[A-Z]/.test(password)) strength += 1
-        if (/[0-9]/.test(password)) strength += 1
-        if (/[^A-Za-z0-9]/.test(password)) strength += 1
-        
-        setPasswordStrength(strength)
     }
     
     const submitHandler = (e) => {
@@ -53,7 +30,6 @@ const Register = () => {
         
         const { name, email, password, role } = formData
         
-        // Enhanced validation
         if (!name.trim() || !email.trim() || !password.trim()) {
             setFormError("Please fill in all fields")
             return
@@ -73,36 +49,124 @@ const Register = () => {
         registerUser(name, email, password, role, navigate)
     }
     
-    // Animation variants
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: { 
-            opacity: 1,
-            transition: { 
-                duration: 0.5,
-                when: "beforeChildren",
-                staggerChildren: 0.1
-            }
-        }
-    }
-    
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: { y: 0, opacity: 1 }
-    }
-    
-    // Password strength indicator colors
-    const strengthColors = [
-        'bg-red-500', // Very weak
-        'bg-orange-500', // Weak
-        'bg-yellow-500', // Medium
-        'bg-green-400', // Good
-        'bg-green-600'  // Strong
-    ]
-    
     return (
-        <div className='min-h-screen flex items-center justify-center bg-gradient-to-b from-black to-gray-900 p-4'>
-            <motion.div 
+        <div className='min-h-screen flex items-center justify-center bg-gray-50 p-4'>
+            <div className='p-8 rounded-lg shadow-lg w-full max-w-md bg-white border border-gray-200'>
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                    <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-900" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+                            <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd"/>
+                        </svg>
+                    </div>
+                    <span className='text-xl font-bold text-blue-900'>CreditFlow</span>
+                </div>
+                
+                <h2 className='text-2xl font-bold text-blue-900 text-center mb-6'>Create Account</h2>
+                
+                {formError && (
+                    <div className='mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm' role="alert">
+                        {formError}
+                    </div>
+                )}
+                
+                <form onSubmit={submitHandler}>
+                    <div className='mb-4'>
+                        <label htmlFor="name" className='block text-xs font-semibold text-gray-700 mb-1'>
+                            Full Name
+                        </label>
+                        <input 
+                            value={formData.name} 
+                            onChange={handleChange} 
+                            required 
+                            type="text" 
+                            id='name' 
+                            className='w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-gray-700 focus:border-blue-900 focus:outline-none text-sm' 
+                            placeholder='John Doe'
+                        />
+                    </div>
+
+                    <div className='mb-4'>
+                        <label htmlFor="role" className='block text-xs font-semibold text-gray-700 mb-1'>
+                            I am a
+                        </label>
+                        <select
+                            id="role"
+                            value={formData.role}
+                            onChange={handleChange}
+                            className='w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-gray-700 focus:border-blue-900 focus:outline-none text-sm'
+                        >
+                            <option value="role1">Gig Worker</option>
+                            <option value="role2">Freelancer</option>
+                            <option value="role3">Self-Employed</option>
+                            <option value="role4">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div className='mb-4'>
+                        <label htmlFor="email" className='block text-xs font-semibold text-gray-700 mb-1'>
+                            Email Address
+                        </label>
+                        <input 
+                            value={formData.email} 
+                            onChange={handleChange} 
+                            required 
+                            type="email" 
+                            id='email' 
+                            className='w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-gray-700 focus:border-blue-900 focus:outline-none text-sm' 
+                            placeholder='you@example.com'
+                        />
+                    </div>
+                    
+                    <div className='mb-6'>
+                        <label htmlFor="password" className='block text-xs font-semibold text-gray-700 mb-1'>
+                            Password
+                        </label>
+                        <div className='relative'>
+                            <input 
+                                value={formData.password} 
+                                onChange={handleChange} 
+                                required 
+                                type={showPassword ? "text" : "password"} 
+                                id='password' 
+                                className='w-full px-3 py-2 pr-10 border-2 border-blue-200 rounded-lg text-gray-700 focus:border-blue-900 focus:outline-none text-sm' 
+                                placeholder='Minimum 6 characters'
+                            />
+                            <div 
+                                className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? 
+                                    <FaEyeSlash className='text-gray-500 hover:text-gray-700' /> : 
+                                    <FaEye className='text-gray-500 hover:text-gray-700' />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        type='submit' 
+                        className='w-full py-2.5 rounded-lg shadow text-sm font-medium text-white bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-900 transition flex items-center justify-center'
+                        disabled={btnLoading}
+                    >
+                        {btnLoading ? <LoadingAnimation /> : "Create Account"}
+                    </button>
+                </form>
+                
+                <div className='mt-6 text-center'>
+                    <p className='text-sm text-gray-600'>
+                        Already have an account?{' '}
+                        <Link to="/login" className='font-medium text-blue-900 hover:text-blue-700'>
+                            Sign in
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default Register 
                 className='p-8 rounded-lg shadow-lg w-full max-w-md backdrop-blur-sm bg-opacity-80 bg-[#1A1A1D] border border-gray-800'
                 initial="hidden"
                 animate="visible"

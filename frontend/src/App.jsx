@@ -1,17 +1,78 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Onboarding from "./pages/Onboarding";
-import UploadStatement from "./pages/UploadStatement";
-import Dashboard from "./pages/Dashboard";
-import CreditResult from "./pages/CreditResult";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import Landing from "./pages/Landing";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Role1Dashboard from "./pages/Role1Dashboard";
+import CreditAnalysis from "./pages/CreditAnalysis";
+import Role2Dashboard from "./pages/Role2Dashboard";
+import Role3Dashboard from "./pages/Role3Dashboard";
+import Role4Dashboard from "./pages/Role4Dashboard";
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+  
+  return user ? children : <Navigate to="/login" />;
+};
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Onboarding />} />
-        <Route path="/upload/:userId" element={<UploadStatement />} />
-        <Route path="/dashboard/:userId" element={<Dashboard />} />
-        <Route path="/credit-result/:userId" element={<CreditResult />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        
+        {/* Protected Dashboard Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Role1Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/credit-analysis"
+          element={
+            <ProtectedRoute>
+              <CreditAnalysis />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/role2"
+          element={
+            <ProtectedRoute>
+              <Role2Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/role3"
+          element={
+            <ProtectedRoute>
+              <Role3Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/role4"
+          element={
+            <ProtectedRoute>
+              <Role4Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
