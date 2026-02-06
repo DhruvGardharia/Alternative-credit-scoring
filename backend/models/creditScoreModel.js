@@ -20,6 +20,15 @@ const creditScoreSchema = new mongoose.Schema(
     },
     eligibleCreditAmount: { type: Number, required: true },
     explanation: [String], // Human-readable decision factors
+    // Enhanced metrics (new fields appended)
+    advancedMetrics: {
+      incomeVolatility: { type: Number, default: 0 },
+      incomeVolatilityBand: { type: String, enum: ["Low", "Medium", "High"], default: "Low" },
+      netCashFlowRatio: { type: Number, default: 0 },
+      cashFlowBand: { type: String, enum: ["Positive", "Neutral", "Negative"], default: "Neutral" },
+      expenseShockMonths: { type: Number, default: 0 },
+      expenseShockBand: { type: String, enum: ["None", "Occasional", "Frequent"], default: "None" }
+    },
     calculatedAt: { type: Date, default: Date.now }
   },
   { timestamps: true }
