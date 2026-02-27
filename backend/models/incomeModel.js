@@ -19,7 +19,8 @@ const incomeSchema = new mongoose.Schema(
     // Platform Details
     platform: {
       type: String,
-      enum: ["uber", "ola", "swiggy", "zomato", "rapido", "dunzo", "zepto", "other"],
+      enum: ["uber", "ola", "rapido", "swiggy", "zomato", "zepto", "blinkit", "dunzo", 
+             "fiverr", "upwork", "freelancer", "urbanCompany", "meesho", "other"],
       required: true
     },
 

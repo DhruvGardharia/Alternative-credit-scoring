@@ -31,10 +31,22 @@ import authRoutes from "./routes/authRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import taxRoutes from "./routes/taxRoutes.js";
 
+import platformRoutes from './routes/platformRoutes.js';
+import statementRoutes from './routes/statementRoutes.js';
+import incomeRoutes from './routes/incomeRoutes.js';
+import summaryRoutes from './routes/summaryRoutes.js';
+
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/tax", taxRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/platform', platformRoutes);
+app.use('/api/statement', statementRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/summary', summaryRoutes);  
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "/frontend/dist")));

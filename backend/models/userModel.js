@@ -15,26 +15,24 @@ const userSchema = new mongoose.Schema(
     
     // Platform Connections (for API integration)
     connectedPlatforms: {
-      uber: {
-        connected: { type: Boolean, default: false },
-        token: String,
-        lastSync: Date
-      },
-      ola: {
-        connected: { type: Boolean, default: false },
-        token: String,
-        lastSync: Date
-      },
-      swiggy: {
-        connected: { type: Boolean, default: false },
-        token: String,
-        lastSync: Date
-      },
-      zomato: {
-        connected: { type: Boolean, default: false },
-        token: String,
-        lastSync: Date
-      }
+      // Ride Platforms
+      uber: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      ola: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      rapido: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      
+      // Delivery Platforms
+      swiggy: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      zomato: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      zepto: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      blinkit: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      dunzo: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      
+      // Freelance Platforms
+      fiverr: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      upwork: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      freelancer: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      urbanCompany: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date },
+      meesho: { connected: { type: Boolean, default: false }, workType: String, lastSync: Date }
     }
   },
   { timestamps: true }
