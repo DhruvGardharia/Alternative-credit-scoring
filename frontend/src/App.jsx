@@ -3,8 +3,9 @@ import { useAuth } from "./context/AuthContext";
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import Role1Dashboard from "./pages/Role1Dashboard";
+import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
+import TaxSummary from "./pages/TaxSummary";
 
 
 // Protected Route Component
@@ -44,6 +45,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <CreditAnalysis />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tax-summary"
+          element={
+            <ProtectedRoute>
+              <TaxSummary />
             </ProtectedRoute>
           }
         />

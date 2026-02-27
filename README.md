@@ -2,7 +2,7 @@
 
 A ready-to-use fullstack web application template for hackathon projects — with separate **frontend** and **backend**, user authentication, and deployable as a modern web app.
 
-**Live Demo:** https://hackathon-template-nj8k.onrender.com/
+**Live Demo:** https://alternative-credit-scoring.onrender.com/
 
 ---
 
