@@ -1,4 +1,6 @@
 import { UserFinancialSummary } from "../models/financialSummary.js";
+import { Income } from "../models/incomeModel.js";
+import { Expense } from "../models/expenseModel.js";
 import { calculateAnnualTaxSummary } from "../services/tax/taxCalculator.js";
 import { generateTaxSummaryPdf } from "../services/tax/taxPdfGenerator.js";
 
@@ -22,6 +24,18 @@ const buildTaxSummaryInput = (financialSummary = {}) => ({
   categorizedExpenses: financialSummary.expensesByCategory ?? {},
 });
 
+const getTransactionCounts = async (userId) => {
+  try {
+    const [incomeCount, expenseCount] = await Promise.all([
+      Income.countDocuments({ userId, status: "completed" }),
+      Expense.countDocuments({ userId }),
+    ]);
+    return { incomeCount, expenseCount, total: incomeCount + expenseCount };
+  } catch {
+    return { incomeCount: 0, expenseCount: 0, total: 0 };
+  }
+};
+
 export const getAnnualTaxSummary = async (req, res) => {
   try {
     const userId = getUserIdFromRequest(req);
@@ -44,12 +58,18 @@ export const getAnnualTaxSummary = async (req, res) => {
 
     const summary = summaryDoc.toObject ? summaryDoc.toObject() : summaryDoc;
     const taxSummary = calculateAnnualTaxSummary(buildTaxSummaryInput(summary));
+    const transactionCounts = await getTransactionCounts(userId);
 
     return res.status(200).json({
       success: true,
       data: {
         taxSummary,
-        financialSummary: summary,
+        financialSummary: {
+          ...summary,
+          totalTransactions: transactionCounts.total,
+          creditTransactions: transactionCounts.incomeCount,
+          debitTransactions: transactionCounts.expenseCount,
+        },
       },
     });
   } catch (error) {
@@ -83,8 +103,16 @@ export const downloadTaxSummaryPdf = async (req, res) => {
 
     const summary = summaryDoc.toObject ? summaryDoc.toObject() : summaryDoc;
     const taxSummary = calculateAnnualTaxSummary(buildTaxSummaryInput(summary));
+    const transactionCounts = await getTransactionCounts(userId);
 
-    const pdfStream = generateTaxSummaryPdf(taxSummary, summary, req.user);
+    const enrichedSummary = {
+      ...summary,
+      totalTransactions: transactionCounts.total,
+      creditTransactions: transactionCounts.incomeCount,
+      debitTransactions: transactionCounts.expenseCount,
+    };
+
+    const pdfStream = generateTaxSummaryPdf(taxSummary, enrichedSummary, req.user);
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
