@@ -9,18 +9,48 @@ export default function CreditAnalysis() {
   const location = useLocation();
   const { creditData, financialSummary } = location.state || {};
 
+  // Helper function to safely get values with defaults
+  const safeGet = (value, defaultValue = 0) => {
+    if (value === null || value === undefined || isNaN(value) || !isFinite(value)) {
+      return defaultValue;
+    }
+    return value;
+  };
+
+  // Extract values safely from financialSummary and creditData
+  const monthlyIncome = safeGet(financialSummary?.monthlyAvgIncome || financialSummary?.averageMonthlyIncome, 30000);
+  
+  const totalIncome = safeGet(financialSummary?.totalIncome, monthlyIncome * 3);
+  const totalExpenses = safeGet(financialSummary?.totalExpenses,monthlyIncome * 1.2);
+  const expenseRatio = safeGet(totalIncome > 0 ? totalExpenses / totalIncome : 0, 0.4);
+  
+  // Try to get consistency from creditData metrics or calculate from financial summary
+  const consistencyScore = safeGet(
+    creditData?.metrics?.incomeConsistency?.value ||
+    creditData?.metrics?.avgMonthlyIncome?.score ||
+    financialSummary?.incomeConsistencyScore,
+    75
+  );
+
+  // Active work days - estimate from data
+  const workDays = safeGet(
+    creditData?.metrics?.activeWorkDays?.value ||
+    financialSummary?.activeWorkDays,
+    22
+  );
+
   // What-If Simulation State
-  const [simulatedIncome, setSimulatedIncome] = useState(financialSummary?.averageMonthlyIncome || 30000);
-  const [simulatedExpenses, setSimulatedExpenses] = useState((financialSummary?.averageMonthlyIncome || 30000) * (financialSummary?.expenseToIncomeRatio || 0.4));
-  const [simulatedWorkDays, setSimulatedWorkDays] = useState(financialSummary?.activeWorkDays || 20);
+  const [simulatedIncome, setSimulatedIncome] = useState(monthlyIncome);
+  const [simulatedExpenses, setSimulatedExpenses] = useState(monthlyIncome * expenseRatio);
+  const [simulatedWorkDays, setSimulatedWorkDays] = useState(workDays);
 
   useEffect(() => {
-    if (financialSummary) {
-      setSimulatedIncome(financialSummary.averageMonthlyIncome || 30000);
-      setSimulatedExpenses((financialSummary.averageMonthlyIncome || 30000) * (financialSummary.expenseToIncomeRatio || 0.4));
-      setSimulatedWorkDays(financialSummary.activeWorkDays || 20);
+    if (financialSummary || creditData) {
+      setSimulatedIncome(monthlyIncome);
+      setSimulatedExpenses(monthlyIncome * expenseRatio);
+      setSimulatedWorkDays(workDays);
     }
-  }, [financialSummary]);
+  }, [financialSummary, creditData]);
 
   useEffect(() => {
     if (!creditData || !financialSummary) {
@@ -42,8 +72,11 @@ export default function CreditAnalysis() {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 75) return 'text-green-600';
-    if (score >= 50) return 'text-yellow-600';
+    // Score is on 0-1000 scale — normalize to 0-100 for color thresholds
+    const normalizedScore = score > 100 ? (score / 1000) * 100 : score;
+    
+    if (normalizedScore >= 75) return 'text-green-600';
+    if (normalizedScore >= 50) return 'text-yellow-600';
     return 'text-red-600';
   };
 
@@ -68,19 +101,19 @@ export default function CreditAnalysis() {
   const simulatedCreditAmount = Math.round((simulatedScore / 100) * 200000);
   const scoreChange = simulatedScore - (creditData?.score || 0);
 
-  // Prepare chart data
-  const scoreBreakdownData = financialSummary ? [
-    { name: 'Income Consistency', value: Math.round(financialSummary.incomeConsistencyScore || 0), color: '#1e3a8a' },
-    { name: 'Work Days', value: Math.round((financialSummary.activeWorkDays / 30) * 100), color: '#fbbf24' },
-    { name: 'Expense Control', value: Math.round((1 - (financialSummary.expenseToIncomeRatio || 0)) * 100), color: '#10b981' },
-    { name: 'Balance Stability', value: Math.round(((creditData?.score || 0) / 100) * 80), color: '#8b5cf6' }
-  ] : [];
+  // Prepare chart data with safe values
+  const scoreBreakdownData = [
+    { name: 'Income Consistency', value: Math.round(safeGet(consistencyScore, 0)), color: '#1e3a8a' },
+    { name: 'Work Days', value: Math.round(safeGet((workDays / 30) * 100, 0)), color: '#fbbf24' },
+    { name: 'Expense Control', value: Math.round(safeGet((1 - expenseRatio) * 100, 50)), color: '#10b981' },
+    { name: 'Balance Stability', value: Math.round(safeGet(((creditData?.score || creditData?.creditScore || 50) / 100) * 80, 40)), color: '#8b5cf6' }
+  ];
 
-  const incomeExpenseData = financialSummary ? [
-    { month: 'Month 1', income: financialSummary.averageMonthlyIncome * 0.9, expenses: financialSummary.averageMonthlyIncome * financialSummary.expenseToIncomeRatio * 0.85 },
-    { month: 'Month 2', income: financialSummary.averageMonthlyIncome * 0.95, expenses: financialSummary.averageMonthlyIncome * financialSummary.expenseToIncomeRatio * 0.9 },
-    { month: 'Month 3', income: financialSummary.averageMonthlyIncome, expenses: financialSummary.averageMonthlyIncome * financialSummary.expenseToIncomeRatio }
-  ] : [];
+  const incomeExpenseData = [
+    { month: 'Month 1', income: monthlyIncome * 0.9, expenses: monthlyIncome * expenseRatio * 0.85 },
+    { month: 'Month 2', income: monthlyIncome * 0.95, expenses: monthlyIncome * expenseRatio * 0.9 },
+    { month: 'Month 3', income: monthlyIncome, expenses: monthlyIncome * expenseRatio }
+  ];
 
   // Categorize factors
   const categorizeFactors = () => {
@@ -214,12 +247,12 @@ export default function CreditAnalysis() {
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
               <div className="text-center md:text-left">
                 <div className="text-sm font-semibold text-gray-600 mb-2">Your Credit Score</div>
-                <div className={`text-6xl font-bold ${getScoreColor(creditData.score)} mb-2`}>
-                  {creditData.score}
+                <div className={`text-6xl font-bold ${getScoreColor(creditData.creditScore || creditData.score || 0)} mb-2`}>
+                  {Math.round(safeGet(creditData.creditScore || creditData.score, 0))}
                 </div>
-                <div className="text-xs text-gray-500">out of 100</div>
+                <div className="text-xs text-gray-500">out of 850</div>
                 <div className={`inline-block mt-3 px-4 py-1 rounded-full border text-sm font-semibold ${getRiskColor(creditData.riskLevel)}`}>
-                  {creditData.riskLevel} Risk
+                  {creditData.riskLevel || 'Medium'} Risk
                 </div>
               </div>
               <div className="flex-1 w-full">
@@ -272,7 +305,7 @@ export default function CreditAnalysis() {
                 <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-gray-900">₹{financialSummary.averageMonthlyIncome?.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-gray-900">₹{Math.round(monthlyIncome).toLocaleString()}</div>
             <div className="text-xs text-gray-500 mt-1">Average per month</div>
           </div>
 
@@ -283,7 +316,7 @@ export default function CreditAnalysis() {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{financialSummary.incomeConsistencyScore}%</div>
+            <div className="text-2xl font-bold text-gray-900">{Math.round(consistencyScore)}%</div>
             <div className="text-xs text-gray-500 mt-1">Income reliability</div>
           </div>
 
@@ -294,7 +327,7 @@ export default function CreditAnalysis() {
                 <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{financialSummary.activeWorkDays}</div>
+            <div className="text-2xl font-bold text-gray-900">{Math.round(workDays)}</div>
             <div className="text-xs text-gray-500 mt-1">Days per month</div>
           </div>
 
@@ -306,7 +339,7 @@ export default function CreditAnalysis() {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{(financialSummary.expenseToIncomeRatio * 100).toFixed(0)}%</div>
+            <div className="text-2xl font-bold text-gray-900">{(expenseRatio * 100).toFixed(0)}%</div>
             <div className="text-xs text-gray-500 mt-1">Of total income</div>
           </div>
         </div>

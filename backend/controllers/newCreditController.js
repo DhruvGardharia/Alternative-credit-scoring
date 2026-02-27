@@ -14,6 +14,7 @@ import {
 import { Expense } from "../models/expenseModel.js";
 import { Income } from "../models/incomeModel.js";
 import { BankStatement } from "../models/bankStatementModel.js";
+import { FinancialSummary } from "../models/financialSummary.js";
 
 /**
  * Helper: Convert expenses to standardized transaction format
@@ -219,6 +220,9 @@ export const getCreditScore = async (req, res) => {
       });
     }
 
+    // Get financial summary
+    const financialSummary = await FinancialSummary.findOne({ userId }).lean();
+
     // Get risk analysis
     const riskAnalysis = getRiskAnalysis(
       creditProfile.creditScore,
@@ -226,11 +230,22 @@ export const getCreditScore = async (req, res) => {
       creditProfile.metrics
     );
 
+    // Calculate additional useful metrics (0-1000 scale → max ₹1,00,000 eligible)
+    const eligibleCreditAmount = Math.round((creditProfile.creditScore / 1000) * 100000);
+    const monthlyEMICapacity = financialSummary?.monthlyAvgIncome 
+      ? Math.round(financialSummary.monthlyAvgIncome * 0.4) // 40% of monthly income
+      : 0;
+
     res.status(200).json({
       success: true,
       data: {
         ...creditProfile,
-        riskAnalysis
+        riskAnalysis,
+        financialSummary: financialSummary || {},
+        eligibleCreditAmount,
+        monthlyEMICapacity,
+        score: creditProfile.creditScore, // Alias for easier access
+        riskLevel: riskAnalysis.riskLevel
       }
     });
 

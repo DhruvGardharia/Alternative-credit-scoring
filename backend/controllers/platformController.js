@@ -145,7 +145,47 @@ export const getConnectedPlatforms = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/platform/disconnect
+ * Disconnect user from a platform
+ */
+export const disconnectPlatform = async (req, res) => {
+  try {
+    const { userId, platform } = req.body;
+
+    if (!userId || !platform) {
+      return res.status(400).json({
+        success: false,
+        error: "userId and platform are required"
+      });
+    }
+
+    // Update user's connected platforms
+    const updateKey = `connectedPlatforms.${platform.toLowerCase()}`;
+    await User.findByIdAndUpdate(userId, {
+      [updateKey]: {
+        connected: false,
+        workType: null,
+        lastSync: null
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Disconnected from ${platform}`
+    });
+
+  } catch (error) {
+    console.error("Disconnect platform error:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
 export default {
   connectPlatform,
-  getConnectedPlatforms
+  getConnectedPlatforms,
+  disconnectPlatform
 };

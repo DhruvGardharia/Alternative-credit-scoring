@@ -41,7 +41,7 @@ const incomeSchema = new mongoose.Schema(
     // Transaction Details
     category: {
       type: String,
-      enum: ["ride", "delivery", "bonus", "incentive", "tip", "other"],
+      enum: ["ride", "delivery", "bonus", "incentive", "tip", "salary", "upi", "cash_withdrawal", "food", "transport", "utilities", "rent", "other"],
       default: "other"
     },
 
@@ -65,7 +65,7 @@ const incomeSchema = new mongoose.Schema(
     description: String,
     source: {
       type: String,
-      enum: ["api_sync", "manual", "csv_import"],
+      enum: ["api_sync", "manual", "csv_import", "bank_import", "pdf_import", "BANK_PDF"],
       default: "manual"
     }
   },

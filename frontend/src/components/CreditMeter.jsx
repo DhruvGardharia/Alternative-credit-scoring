@@ -1,18 +1,22 @@
 export default function CreditMeter({ score }) {
+  // Score is on a 0-1000 scale
   const getColor = () => {
-    if (score >= 75) return { from: "#10b981", to: "#059669" }; // Green
-    if (score >= 50) return { from: "#f59e0b", to: "#d97706" }; // Yellow/Orange
-    return { from: "#ef4444", to: "#dc2626" }; // Red
+    if (score >= 750) return { from: "#10b981", to: "#059669" }; // Green — Excellent
+    if (score >= 500) return { from: "#f59e0b", to: "#d97706" }; // Yellow/Orange — Good
+    if (score >= 350) return { from: "#f97316", to: "#ea580c" }; // Orange — Fair
+    return { from: "#ef4444", to: "#dc2626" };                   // Red — Poor
   };
 
   const getLabel = () => {
-    if (score >= 75) return "Excellent";
-    if (score >= 50) return "Good";
-    return "Fair";
+    if (score >= 750) return "Excellent";
+    if (score >= 500) return "Good";
+    if (score >= 350) return "Fair";
+    return "Poor";
   };
 
   const { from, to } = getColor();
-  const percentage = score;
+  // Convert 0-1000 to 0-100% for the SVG arc
+  const percentage = Math.min(100, Math.max(0, (score / 1000) * 100));
 
   return (
     <div className="flex flex-col items-center">
@@ -47,15 +51,19 @@ export default function CreditMeter({ score }) {
           </defs>
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-bold text-gray-900">{score}</span>
-          <span className="text-sm text-gray-600 font-medium">{getLabel()}</span>
+          <span className="text-4xl font-bold text-gray-900">{score}</span>
+          <span className="text-xs text-gray-500 font-medium">out of 1000</span>
+          <span className="text-sm font-semibold mt-1" style={{ color: from }}>{getLabel()}</span>
         </div>
       </div>
+      {/* Scale bar */}
       <div className="mt-4 w-full max-w-xs">
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>0</span>
-          <span>50</span>
-          <span>100</span>
+          <span className="text-red-500">350</span>
+          <span className="text-yellow-500">500</span>
+          <span className="text-green-500">750</span>
+          <span>1000</span>
         </div>
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
@@ -65,6 +73,12 @@ export default function CreditMeter({ score }) {
               background: `linear-gradient(to right, ${from}, ${to})`,
             }}
           />
+        </div>
+        <div className="flex justify-between text-xs text-gray-400 mt-1">
+          <span>Poor</span>
+          <span>Fair</span>
+          <span>Good</span>
+          <span>Excellent</span>
         </div>
       </div>
     </div>

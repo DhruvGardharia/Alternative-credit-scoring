@@ -16,14 +16,14 @@ export default function Role1Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddExpense, setShowAddExpense] = useState(false);
-  const [showUploadForm, setShowUploadForm] = useState(false);
-  const [csvFile, setCsvFile] = useState(null);
-  const [uploadLoading, setUploadLoading] = useState(false);
   const [creditData, setCreditData] = useState(null);
   const [financialSummary, setFinancialSummary] = useState(null);
   const [savingsGoal, setSavingsGoal] = useState(10000);
   const [showEditGoal, setShowEditGoal] = useState(false);
   const [tempGoal, setTempGoal] = useState(10000);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfUploading, setPdfUploading] = useState(false);
   
   const [newExpense, setNewExpense] = useState({
     category: "food",
@@ -32,6 +32,21 @@ export default function Role1Dashboard() {
     date: new Date().toISOString().split('T')[0],
     paymentMethod: "cash",
   });
+
+  // Helper function to get userId from context or localStorage
+  const getUserId = () => {
+    if (user && user.id) return user.id;
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        return parsedUser.id;
+      } catch (e) {
+        console.error("Error parsing stored user:", e);
+      }
+    }
+    return null;
+  };
 
   const addSampleExpenses = async () => {
     const sampleExpenses = [
@@ -55,9 +70,38 @@ export default function Role1Dashboard() {
   const categories = ["food", "transport", "utilities", "entertainment", "healthcare", "education", "other"];
   const paymentMethods = ["cash", "card", "upi", "other"];
 
+  // Load credit data on mount so the dashboard reflects latest score
+  const fetchCreditData = async () => {
+    try {
+      const userId = getUserId();
+      if (!userId) return;
+      const { data } = await axios.get(`/api/credit/${userId}`);
+      console.log('\n===== BACKEND CREDIT RESPONSE =====');
+      console.log('Full response:', JSON.stringify(data, null, 2));
+      if (data.success && data.data) {
+        const cd = data.data;
+        console.log('\n--- KEY FIELDS ---');
+        console.log('creditScore:', cd.creditScore);
+        console.log('score (alias):', cd.score);
+        console.log('riskLevel:', cd.riskLevel);
+        console.log('eligibleCreditAmount:', cd.eligibleCreditAmount);
+        console.log('scoreBreakdown:', cd.scoreBreakdown);
+        console.log('riskAnalysis:', cd.riskAnalysis);
+        console.log('financialSummary:', cd.financialSummary);
+        console.log('===================================\n');
+        setCreditData(cd);
+        setFinancialSummary(cd.financialSummary || {});
+      }
+    } catch (err) {
+      // No credit profile yet — that's fine
+      console.log('No credit profile found yet:', err?.response?.data?.error || err.message);
+    }
+  };
+
   useEffect(() => {
     fetchExpenses();
     fetchStats();
+    fetchCreditData();
   }, []);
 
   const fetchExpenses = async () => {
@@ -110,43 +154,11 @@ export default function Role1Dashboard() {
     }
   };
 
-  const handleCSVUpload = async (e) => {
-    e.preventDefault();
-    if (!csvFile) {
-      alert(t("pleaseSelectCSV"));
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("bankStatement", csvFile);
-
-    setUploadLoading(true);
-    try {
-      const { data } = await axios.post("/api/user/upload-statement", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      
-      setCreditData(data.creditScore);
-      setFinancialSummary(data.financialSummary);
-      
-      navigate("/credit-analysis", {
-        state: {
-          creditData: data.creditScore,
-          financialSummary: data.financialSummary
-        }
-      });
-    } catch (error) {
-      alert("Error uploading CSV: " + (error.response?.data?.message || error.message));
-    } finally {
-      setUploadLoading(false);
-      setCsvFile(null);
-    }
-  };
-
   const getFinancialHealth = () => {
     if (creditData) {
-      if (creditData.score >= 75) return { status: t("excellent"), color: "green", icon: "✓", detail: t("excellentDetail") };
-      if (creditData.score >= 50) return { status: t("stable"), color: "blue", icon: "→", detail: t("stableDetail") };
+      const s = creditData.score;
+      if (s >= 750) return { status: t("excellent"), color: "green", icon: "✓", detail: t("excellentDetail") };
+      if (s >= 500) return { status: t("stable"), color: "blue", icon: "→", detail: t("stableDetail") };
       return { status: t("needsAttention"), color: "yellow", icon: "!", detail: t("needsAttentionDetail") };
     }
     return { status: t("preAssessment"), color: "gray", icon: "○", detail: t("preAssessmentDetail") };
@@ -154,8 +166,9 @@ export default function Role1Dashboard() {
 
   const getCreditReadiness = () => {
     if (creditData) {
-      if (creditData.score >= 70) return { status: t("eligible"), color: "green", detail: `₹${creditData.eligibleCreditAmount?.toLocaleString()} pre-approved credit available` };
-      if (creditData.score >= 50) return { status: t("partiallyEligible"), color: "yellow", detail: t("partiallyEligibleDetail") };
+      const s = creditData.score;
+      if (s >= 700) return { status: t("eligible"), color: "green", detail: `₹${creditData.eligibleCreditAmount?.toLocaleString()} pre-approved credit available` };
+      if (s >= 500) return { status: t("partiallyEligible"), color: "yellow", detail: t("partiallyEligibleDetail") };
       return { status: t("buildingEligibility"), color: "orange", detail: t("buildingEligibilityDetail") };
     }
     return { status: t("uploadStatementStatus"), color: "gray", detail: t("uploadStatementDetail") };
@@ -259,14 +272,14 @@ export default function Role1Dashboard() {
         title: t("calculateCreditScore"),
         detail: t("calculateCreditScoreDetail"),
         action: t("uploadNow"),
-        onClick: () => setShowUploadForm(true)
+        onClick: () => setShowUploadModal(true)
       });
-    } else if (creditData.score < 70) {
+    } else if (creditData.score < 700) {
       actions.push({
         priority: "medium",
         icon: "📈",
         title: t("improveYourScore"),
-        detail: `Current score: ${creditData.score}/100 - Track more consistent income`,
+        detail: `Current score: ${creditData.score}/1000 - Track more consistent income`,
         action: "View Tips"
       });
     }
@@ -330,14 +343,51 @@ export default function Role1Dashboard() {
 
         {/* Quick Actions Bar */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-          <button className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800" : "bg-white border-gray-200"}`}>
+          <button 
+            onClick={() => setShowUploadModal(true)}
+            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800" : "bg-white border-gray-200"}`}
+          >
             <svg className="w-5 h-5 text-blue-900 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
             </svg>
             <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>{t("uploadStatement")}</span>
           </button>
           <button
-            onClick={() => navigate('/credit-analysis')}
+            onClick={() => navigate('/platforms')}
+            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
+          >
+            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M13 7H7v6h6V7z"/>
+              <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd"/>
+            </svg>
+            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>Manage Platforms</span>
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                const userId = getUserId();
+                if (!userId) {
+                  alert("Please login to view your credit score");
+                  return;
+                }
+                
+                // Fetch credit data
+                const creditResponse = await axios.get(`/api/credit/${userId}`);
+                if (creditResponse.data.success && creditResponse.data.data) {
+                  navigate('/credit-analysis', {
+                    state: {
+                      creditData: creditResponse.data.data,
+                      financialSummary: creditResponse.data.data.financialSummary || {}
+                    }
+                  });
+                } else {
+                  alert("No credit score available yet. Please upload your bank statement first.");
+                }
+              } catch (error) {
+                console.error('Error fetching credit data:', error);
+                alert("No credit score available yet. Please upload your bank statement first.");
+              }
+            }}
             className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
           >
             <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -412,7 +462,7 @@ export default function Role1Dashboard() {
             </div>
             {!creditData && (
               <button
-                onClick={() => setShowUploadForm(!showUploadForm)}
+                onClick={() => setShowUploadModal(true)}
                 className="ml-4 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-blue-900 rounded-lg font-bold shadow-lg transition text-sm whitespace-nowrap"
               >
                 {t("calculateMyScore")}
@@ -421,35 +471,7 @@ export default function Role1Dashboard() {
           </div>
         </div>
 
-        {/* Upload Form */}
-        {showUploadForm && !creditData && (
-          <div className={`rounded-lg shadow-md p-5 mb-6 border-l-4 border-yellow-400 ${isDark ? "bg-gray-900" : "bg-white"}`}>
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h2 className={`text-lg font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}>{t("uploadBankStatement")}</h2>
-                <p className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}>{t("uploadSubtitle")}</p>
-              </div>
-              <svg className="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <form onSubmit={handleCSVUpload} className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(e) => setCsvFile(e.target.files[0])}
-                className={`flex-1 text-sm px-3 py-2 border-2 rounded-lg focus:outline-none ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
-              />
-              <button
-                type="submit"
-                disabled={uploadLoading || !csvFile}
-                className="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium shadow transition disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
-              >
-                {uploadLoading ? t("analyzing") : t("analyzeNow")}
-              </button>
-            </form>
-          </div>
-        )}
+
 
         {/* Future Integration Note */}
         {!creditData && (
@@ -966,6 +988,147 @@ export default function Role1Dashboard() {
           )}
         </div>
       </div>
+
+      {/* PDF Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowUploadModal(false)}
+          ></div>
+          
+          <div className={`relative w-full max-w-md rounded-2xl shadow-2xl p-8 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-white"} animate-scale-in`}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                Upload Bank Statement
+              </h2>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className={`p-2 rounded-lg hover:bg-gray-100 ${isDark ? "hover:bg-gray-800" : ""}`}
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className={`block text-sm font-semibold mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                  Select PDF File (Max 5MB)
+                </label>
+                <div className={`border-2 border-dashed rounded-xl p-8 text-center ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-gray-50"}`}>
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        if (file.type !== "application/pdf") {
+                          alert("Only PDF files allowed");
+                          return;
+                        }
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert("File must be less than 5MB");
+                          return;
+                        }
+                        setPdfFile(file);
+                      }
+                    }}
+                    className="hidden"
+                    id="pdf-upload-dashboard"
+                  />
+                  <label htmlFor="pdf-upload-dashboard" className="cursor-pointer">
+                    <svg className={`w-16 h-16 mx-auto mb-4 ${isDark ? "text-gray-600" : "text-gray-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                      {pdfFile ? pdfFile.name : "Click to select PDF file"}
+                    </p>
+                    <p className={`text-xs mt-2 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+                      Bank statement PDF (max 5MB)
+                    </p>
+                  </label>
+                </div>
+              </div>
+              
+              <button
+                onClick={async () => {
+                  if (!pdfFile) {
+                    alert("Please select a PDF file");
+                    return;
+                  }
+                  
+                  const userId = getUserId();
+                  if (!userId) {
+                    alert("User not authenticated. Please login again.");
+                    return;
+                  }
+
+                  setPdfUploading(true);
+                  const formData = new FormData();
+                  formData.append("statement", pdfFile);
+                  formData.append("userId", userId);
+
+                  try {
+                    console.log('Uploading PDF:', pdfFile.name, 'for user:', userId);
+                    const { data } = await axios.post("/api/statement/upload", formData, {
+                      headers: { "Content-Type": "multipart/form-data" },
+                    });
+
+                    console.log('Upload response:', data);
+
+                    if (data.success) {
+                      alert(`Bank statement uploaded successfully!.`);
+                      setShowUploadModal(false);
+                      setPdfFile(null);
+                      
+                      // Fetch updated credit data and navigate to credit analysis
+                      try {
+                        const userId = getUserId();
+                        const creditResponse = await axios.get(`/api/credit/${userId}`);
+                        console.log('\n===== CREDIT API RESPONSE (after upload) =====');
+                        console.log(JSON.stringify(creditResponse.data, null, 2));
+                        console.log('==============================================\n');
+                        if (creditResponse.data.success && creditResponse.data.data) {
+                          // Navigate to credit analysis page with the data
+                          navigate("/credit-analysis", {
+                            state: {
+                              creditData: creditResponse.data.data,
+                              financialSummary: creditResponse.data.data.financialSummary || {}
+                            }
+                          });
+                        } else {
+                          // Just refresh dashboard if no credit data yet
+                          fetchExpenses();
+                          fetchStats();
+                        }
+                      } catch (creditError) {
+                        console.log('Could not fetch credit data:', creditError);
+                        // Refresh dashboard data
+                        fetchExpenses();
+                        fetchStats();
+                      }
+                    } else {
+                      alert(data.error || "Upload failed");
+                    }
+                  } catch (error) {
+                    console.error('Upload error:', error);
+                    const errorMsg = error?.response?.data?.error || error?.message || "Upload failed. Please try again.";
+                    alert(errorMsg);
+                  } finally {
+                    setPdfUploading(false);
+                  }
+                }}
+                disabled={!pdfFile || pdfUploading}
+                className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              >
+                {pdfUploading ? "Uploading..." : "Upload Statement"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Credit Policy Assistant */}
       <CreditPolicyBot />

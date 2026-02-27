@@ -22,7 +22,12 @@ const storage = multer.diskStorage({
 // File filter - PDF only for bank statements
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ["application/pdf"];
-  if (allowedTypes.includes(file.mimetype) || file.originalname.endsWith('.pdf')) {
+  const allowedExtensions = ['.pdf'];
+  
+  const hasValidMimeType = allowedTypes.includes(file.mimetype);
+  const hasValidExtension = allowedExtensions.some(ext => file.originalname.toLowerCase().endsWith(ext));
+  
+  if (hasValidMimeType || hasValidExtension) {
     cb(null, true);
   } else {
     cb(new Error("Invalid file type. Only PDF files are allowed for bank statements"), false);

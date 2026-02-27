@@ -79,7 +79,7 @@ const CreditPolicyBot = () => {
         {
           id: "policy5",
           question: "What documents are required?",
-          answer: "Primary requirement: Bank statement (CSV format, minimum 3 months). Optional: Aadhaar card for identity verification, PAN card for tax purposes, and employment proof (if available). No salary slips needed for gig workers."
+          answer: "Primary requirement: Bank statement (PDF format, minimum 3 months). Optional: Aadhaar card for identity verification, PAN card for tax purposes, and employment proof (if available). No salary slips needed for gig workers."
         },
         {
           id: "policy6",
