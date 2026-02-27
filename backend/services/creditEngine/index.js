@@ -120,7 +120,7 @@ export async function calculateCreditProfile(data) {
     {
       new: true,
       upsert: true,
-      runValidators: true
+      runValidators: false   // avoid silent drops when old schema ranges mismatch
     }
   );
 

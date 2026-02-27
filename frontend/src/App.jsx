@@ -3,7 +3,6 @@ import { useAuth } from "./context/AuthContext";
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import OnboardingNew from "./pages/OnboardingNew";
 import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
 import TaxSummary from "./pages/TaxSummary";

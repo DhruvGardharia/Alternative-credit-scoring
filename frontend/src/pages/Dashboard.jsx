@@ -339,7 +339,7 @@ export default function Role1Dashboard() {
         priority: "medium",
         icon: "📈",
         title: t("improveYourScore"),
-        detail: `Current score: ${creditData.score}/1000 - Track more consistent income`,
+        detail: `Current score: ${creditData.score}/850 - Track more consistent income`,
         action: "View Tips"
       });
     }
@@ -446,19 +446,42 @@ export default function Role1Dashboard() {
                   alert("Please login to view your credit score");
                   return;
                 }
-                const creditResponse = await axios.get(`/api/credit/${userId}`);
-                if (creditResponse.data.success && creditResponse.data.data) {
+                // Try to GET existing profile first (teammate's improvement: fallback to calculate)
+                let creditData = null;
+                try {
+                  const getRes = await axios.get(`/api/credit/${userId}`);
+                  if (getRes.data.success && getRes.data.data) {
+                    creditData = getRes.data.data;
+                  }
+                } catch (_) {
+                  // profile not found — trigger calculation
+                }
+
+                // If no existing profile, calculate from saved DB data
+                if (!creditData) {
+                  try {
+                    await axios.post("/api/credit/calculate", { userId });
+                    const getRes2 = await axios.get(`/api/credit/${userId}`);
+                    if (getRes2.data.success && getRes2.data.data) {
+                      creditData = getRes2.data.data;
+                    }
+                  } catch (calcErr) {
+                    console.error('Credit calculation error:', calcErr?.response?.data || calcErr.message);
+                  }
+                }
+
+                if (creditData) {
                   navigate("/credit-analysis", {
                     state: {
-                      creditData: creditResponse.data.data,
-                      financialSummary: creditResponse.data.data.financialSummary || {},
+                      creditData,
+                      financialSummary: creditData.financialSummary || {},
                     },
                   });
                 } else {
                   alert("No credit score available yet. Please upload your bank statement first.");
                 }
               } catch (error) {
-                console.error("Error fetching credit data:", error);
+                console.error("Error loading credit report:", error);
                 alert("No credit score available yet. Please upload your bank statement first.");
               }
             }}
@@ -1491,19 +1514,47 @@ export default function Role1Dashboard() {
                     console.log('Upload response:', data);
 
                     if (data.success) {
-                      alert(`Bank statement uploaded successfully!.`);
                       setShowUploadModal(false);
                       setPdfFile(null);
-                      
-                      // Fetch updated credit data and navigate to credit analysis
+
+                      const userId = getUserId();
+
+                      // If the upload response already contains a credit profile, use it directly
+                      if (data.data?.creditProfile?.creditScore) {
+                        console.log('✅ Credit score from upload response:', data.data.creditProfile.creditScore);
+                        try {
+                          // Fetch the full enriched profile (includes financialSummary, riskAnalysis etc.)
+                          const creditResponse = await axios.get(`/api/credit/${userId}`);
+                          if (creditResponse.data.success && creditResponse.data.data) {
+                            setCreditData(creditResponse.data.data);
+                            navigate("/credit-analysis", {
+                              state: {
+                                creditData: creditResponse.data.data,
+                                financialSummary: creditResponse.data.data.financialSummary || {}
+                              }
+                            });
+                            return;
+                          }
+                        } catch (_) {}
+                        // Fallback: use the profile straight from upload response
+                        setCreditData(data.data.creditProfile);
+                        navigate("/credit-analysis", {
+                          state: {
+                            creditData: data.data.creditProfile,
+                            financialSummary: {}
+                          }
+                        });
+                        return;
+                      }
+
+                      // Credit calculation during upload failed — explicitly trigger it now
                       try {
-                        const userId = getUserId();
+                        console.log('📊 Credit not in upload response, calling /api/credit/calculate...');
+                        const calcRes = await axios.post("/api/credit/calculate", { userId });
+                        console.log('✅ Calculate response:', calcRes.data);
                         const creditResponse = await axios.get(`/api/credit/${userId}`);
-                        console.log('\n===== CREDIT API RESPONSE (after upload) =====');
-                        console.log(JSON.stringify(creditResponse.data, null, 2));
-                        console.log('==============================================\n');
                         if (creditResponse.data.success && creditResponse.data.data) {
-                          // Navigate to credit analysis page with the data
+                          setCreditData(creditResponse.data.data);
                           navigate("/credit-analysis", {
                             state: {
                               creditData: creditResponse.data.data,
@@ -1511,13 +1562,14 @@ export default function Role1Dashboard() {
                             }
                           });
                         } else {
-                          // Just refresh dashboard if no credit data yet
+                          alert("Statement uploaded. Click \"View Credit Report\" to load your score.");
+                          fetchCreditData();
                           fetchExpenses();
                           fetchStats();
                         }
                       } catch (creditError) {
-                        console.log('Could not fetch credit data:', creditError);
-                        // Refresh dashboard data
+                        console.error('Credit calculation error:', creditError?.response?.data || creditError.message);
+                        alert(`Statement uploaded. Credit score error: ${creditError?.response?.data?.error || creditError.message}`);
                         fetchExpenses();
                         fetchStats();
                       }

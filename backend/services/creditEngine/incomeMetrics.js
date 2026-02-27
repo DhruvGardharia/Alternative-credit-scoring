@@ -82,7 +82,11 @@ export function calculateIncomeVolatility(transactions) {
 
 /**
  * Calculate income consistency
- * Percentage of months with income
+ * Blends two signals:
+ *   1. Monthly presence rate  – what % of calendar months had any income
+ *   2. Daily regularity rate  – avg active-work-days per month / 22 expected days
+ * The product of both gives a realistic picture: a worker with only 9 work-days
+ * in a single month scores ~41 %, not 100 %.
  */
 export function calculateIncomeConsistency(transactions) {
   if (transactions.length === 0) {
@@ -93,7 +97,6 @@ export function calculateIncomeConsistency(transactions) {
   const minDate = new Date(Math.min(...allDates));
   const maxDate = new Date(Math.max(...allDates));
 
-  // Calculate total months in period
   const monthsDiff =
     (maxDate.getFullYear() - minDate.getFullYear()) * 12 +
     (maxDate.getMonth() - minDate.getMonth()) +
@@ -102,7 +105,26 @@ export function calculateIncomeConsistency(transactions) {
   const monthlyData = getMonthlyIncomes(transactions);
   const monthsWithIncome = Object.keys(monthlyData).length;
 
-  const consistencyRate = (monthsWithIncome / monthsDiff) * 100;
+  // Signal 1: monthly presence (0-1)
+  const monthlyPresence = Math.min(1, monthsWithIncome / Math.max(1, monthsDiff));
+
+  // Signal 2: daily regularity – avg unique income days per month vs 22 expected
+  const EXPECTED_WORK_DAYS = 22;
+  const monthlyWorkDayCounts = Object.values(monthlyData).map((month) => {
+    const uniqueDays = new Set(
+      month.transactions.map((t) => new Date(t.date).toISOString().slice(0, 10))
+    );
+    return uniqueDays.size;
+  });
+  const avgWorkDays =
+    monthlyWorkDayCounts.length > 0
+      ? monthlyWorkDayCounts.reduce((a, b) => a + b, 0) / monthlyWorkDayCounts.length
+      : 0;
+  const dailyRegularity = Math.min(1, avgWorkDays / EXPECTED_WORK_DAYS);
+
+  // Combined consistency rate (geometric mean to penalise weak signal on either axis)
+  const rawRate = Math.sqrt(monthlyPresence * dailyRegularity) * 100;
+  const consistencyRate = Math.min(100, parseFloat(rawRate.toFixed(2)));
 
   const { score, status } = getScoreFromBands(
     consistencyRate,
@@ -110,7 +132,7 @@ export function calculateIncomeConsistency(transactions) {
   );
 
   return {
-    value: parseFloat(consistencyRate.toFixed(2)),
+    value: consistencyRate,
     score,
     status,
     lastUpdated: new Date()

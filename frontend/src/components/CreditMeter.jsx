@@ -16,7 +16,7 @@ export default function CreditMeter({ score }) {
 
   const { from, to } = getColor();
   // Convert 0-1000 to 0-100% for the SVG arc
-  const percentage = Math.min(100, Math.max(0, (score / 1000) * 100));
+  const percentage = Math.min(100, Math.max(0, (score / 850) * 100));
 
   return (
     <div className="flex flex-col items-center">
@@ -52,7 +52,7 @@ export default function CreditMeter({ score }) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-4xl font-bold text-gray-900">{score}</span>
-          <span className="text-xs text-gray-500 font-medium">out of 1000</span>
+          <span className="text-xs text-gray-500 font-medium">out of 850</span>
           <span className="text-sm font-semibold mt-1" style={{ color: from }}>{getLabel()}</span>
         </div>
       </div>

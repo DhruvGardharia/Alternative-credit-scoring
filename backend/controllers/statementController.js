@@ -121,10 +121,11 @@ export const uploadStatement = async (req, res) => {
       }))
     ];
 
+    let creditResult = null;
     if (normalizedTransactions.length > 0) {
       try {
         console.log(`🔄 Calculating credit profile with ${normalizedTransactions.length} transactions...`);
-        const creditResult = await calculateCreditProfile({ userId, transactions: normalizedTransactions });
+        creditResult = await calculateCreditProfile({ userId, transactions: normalizedTransactions });
         console.log(`✅ Credit score calculated: ${creditResult.creditScore}`);
       } catch (creditError) {
         console.error('❌ Credit profile calculation error:', creditError.message);
@@ -139,7 +140,9 @@ export const uploadStatement = async (req, res) => {
       message: "Bank statement uploaded and processed successfully",
       data: {
         statement,
-        transactionsProcessed: transactions.length
+        transactionsProcessed: transactions.length,
+        creditScore: creditResult?.creditScore || null,
+        creditProfile: creditResult || null,
       }
     });
 

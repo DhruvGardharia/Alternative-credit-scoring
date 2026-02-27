@@ -23,14 +23,27 @@ export default function CreditAnalysis() {
   const monthlyIncome = safeGet(financialSummary?.monthlyAvgIncome || financialSummary?.averageMonthlyIncome, 30000);
   const totalIncome = safeGet(financialSummary?.totalIncome, monthlyIncome * 3);
   const totalExpenses = safeGet(financialSummary?.totalExpenses, monthlyIncome * 1.2);
-  const expenseRatio = safeGet(totalIncome > 0 ? totalExpenses / totalIncome : 0, 0.4);
 
-  const consistencyScore = safeGet(
-    creditData?.metrics?.incomeConsistency?.value ||
-    creditData?.metrics?.avgMonthlyIncome?.score ||
-    financialSummary?.incomeConsistencyScore,
-    75
-  );
+  // Keep raw ratio for smart coloring (teammate's improvement)
+  const expenseRatioRaw = safeGet(totalIncome > 0 ? totalExpenses / totalIncome : 0, 0.4);
+  const expenseRatio = expenseRatioRaw;
+
+  // Derive consistency score from raw value using band thresholds
+  // (handles stale DB where score=0 but value>0 — teammate's improvement)
+  const rawConsistencyValue = Math.min(100, safeGet(creditData?.metrics?.incomeConsistency?.value, 0));
+  const storedConsistencyScore = safeGet(creditData?.metrics?.incomeConsistency?.score, 0);
+  const derivedConsistencyScore = rawConsistencyValue >= 91 ? 100
+    : rawConsistencyValue >= 76 ? 80
+    : rawConsistencyValue >= 61 ? 60
+    : rawConsistencyValue >= 41 ? 40
+    : rawConsistencyValue > 0  ? 20 : 0;
+  const consistencyScore = storedConsistencyScore > 0
+    ? storedConsistencyScore
+    : (derivedConsistencyScore || safeGet(
+        creditData?.metrics?.avgMonthlyIncome?.score ||
+        financialSummary?.incomeConsistencyScore,
+        75
+      ));
 
   const workDays = safeGet(
     creditData?.metrics?.activeWorkDays?.value ||
@@ -48,7 +61,7 @@ export default function CreditAnalysis() {
       setSimulatedExpenses(monthlyIncome * expenseRatio);
       setSimulatedWorkDays(workDays);
     }
-  }, [financialSummary, creditData]);
+  }, [financialSummary, creditData, monthlyIncome, expenseRatio, workDays]);
 
   useEffect(() => {
     if (!creditData || !financialSummary) {
@@ -93,6 +106,7 @@ export default function CreditAnalysis() {
   };
 
   const getScoreColor = (score) => {
+    // Normalise to 0-100 regardless of scale (0-100 or 0-850/1000)
     const normalizedScore = score > 100 ? (score / 1000) * 100 : score;
     if (normalizedScore >= 75) return isDark ? 'text-green-400' : 'text-green-600';
     if (normalizedScore >= 50) return isDark ? 'text-yellow-400' : 'text-yellow-600';
@@ -101,26 +115,27 @@ export default function CreditAnalysis() {
 
   const calculateSimulatedScore = () => {
     if (!financialSummary) return 0;
-    const expenseRatio = simulatedExpenses / simulatedIncome;
-    const consistencyScore = Math.min(100, (simulatedWorkDays / 30) * 100);
-    const savingsRate = Math.max(0, 1 - expenseRatio);
+    const simExpenseRatio = simulatedExpenses / simulatedIncome;
+    const simConsistency = Math.min(100, (simulatedWorkDays / 30) * 100);
+    const simSavings = Math.max(0, 1 - simExpenseRatio);
     let score = 0;
-    score += consistencyScore * 0.4;
-    score += (simulatedWorkDays / 30) * 100 * 0.3;
-    score += savingsRate * 100 * 0.2;
-    score += Math.min(100, (simulatedIncome / 30000) * 100) * 0.1;
+    score += simConsistency * 0.4;         // 40% weight
+    score += (simulatedWorkDays / 30) * 100 * 0.3; // 30% weight
+    score += simSavings * 100 * 0.2;       // 20% weight
+    score += Math.min(100, (simulatedIncome / 30000) * 100) * 0.1; // 10% weight
     return Math.round(Math.min(100, Math.max(0, score)));
   };
 
   const simulatedScore = calculateSimulatedScore();
-  const simulatedCreditAmount = Math.round((simulatedScore / 100) * 200000);
-  const scoreChange = simulatedScore - (creditData?.score || 0);
+  const simulatedCreditAmount = Math.round((simulatedScore / 850) * 100000);
+  const scoreChange = simulatedScore - safeGet(creditData?.score || creditData?.creditScore, 0);
 
+  // Prepare chart data with safe values
   const scoreBreakdownData = [
-    { name: 'Income Consistency', value: Math.round(safeGet(consistencyScore, 0)), color: '#1e3a8a' },
-    { name: 'Work Days', value: Math.round(safeGet((workDays / 30) * 100, 0)), color: '#fbbf24' },
-    { name: 'Expense Control', value: Math.round(safeGet((1 - expenseRatio) * 100, 50)), color: '#10b981' },
-    { name: 'Balance Stability', value: Math.round(safeGet(((creditData?.score || creditData?.creditScore || 50) / 100) * 80, 40)), color: '#8b5cf6' }
+    { name: 'Income Quality',    value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.incomeQualityScore, 0))),    color: '#1e3a8a' },
+    { name: 'Spending Behavior', value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.spendingBehaviorScore, 0))), color: '#fbbf24' },
+    { name: 'Liquidity',         value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.liquidityScore, 0))),         color: '#10b981' },
+    { name: 'Gig Stability',     value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.gigStabilityScore, 0))),     color: '#8b5cf6' }
   ];
 
   const incomeExpenseData = [
@@ -150,18 +165,23 @@ export default function CreditAnalysis() {
 
   const getImprovementTimeline = () => {
     if (!financialSummary || !creditData) return [];
+    // Use safeGet and read activeWorkDays from creditData.metrics when available (teammate's improvement)
+    const currentScore = safeGet(creditData.score || creditData.creditScore, 0);
+    const activeWorkDays = creditData?.metrics?.activeWorkDays?.value || financialSummary?.activeWorkDays || 0;
+
     const timeline = [];
-    const currentScore = creditData.score || 0;
-    if (financialSummary.activeWorkDays < 25) {
+
+    if (activeWorkDays < 25) {
       timeline.push({ timeframe: '2 weeks', action: 'Work 25+ days consistently', impact: '+5 to +8 points', newScore: Math.min(100, currentScore + 6) });
     }
-    if (financialSummary.expenseToIncomeRatio > 0.6) {
+    if (expenseRatioRaw > 0.6) {
       timeline.push({ timeframe: '1 month', action: 'Reduce expenses by 10%', impact: '+8 to +12 points', newScore: Math.min(100, currentScore + 10) });
     }
-    if (financialSummary.averageMonthlyIncome < 40000) {
+    if (monthlyIncome < 40000) {
       timeline.push({ timeframe: '2 months', action: 'Increase income streams', impact: '+10 to +15 points', newScore: Math.min(100, currentScore + 12) });
     }
     timeline.push({ timeframe: '3 months', action: 'Maintain all improvements', impact: '+15 to +20 points', newScore: Math.min(100, currentScore + 18) });
+    
     return timeline;
   };
 
@@ -514,18 +534,16 @@ export default function CreditAnalysis() {
           <h3 className={`text-lg font-bold mb-4 ${headingColor}`}>Peer Comparison</h3>
           <div className="space-y-4">
             {(() => {
-              // Detect scale: if score > 100 assume 0–1000, else 0–100
+              // Detect scale — auto-adjust benchmarks accordingly
               const maxScore = (creditData.score || 0) > 100 ? 1000 : 100;
               const avgGigWorker = maxScore === 1000 ? 550 : 55;
               const top10 = maxScore === 1000 ? 820 : 82;
               const userScore = safeGet(creditData.score, 0);
-
               const items = [
                 { label: 'Your Score', value: userScore, display: Math.round(userScore), barClass: 'bg-gradient-to-r from-blue-900 to-yellow-400' },
                 { label: 'Average Gig Worker', value: avgGigWorker, display: avgGigWorker, barClass: 'bg-gray-400' },
                 { label: 'Top 10% Workers', value: top10, display: top10, barClass: 'bg-green-500' },
               ];
-
               return items.map((item) => {
                 const pct = Math.min(100, (item.value / maxScore) * 100);
                 return (
@@ -537,11 +555,11 @@ export default function CreditAnalysis() {
                         <span className={`ml-1 text-xs font-normal ${subText}`}>/ {maxScore}</span>
                       </span>
                     </div>
-                    <div className={`w-full rounded-full h-3 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}>
+                    <div className={`w-full rounded-full h-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
                       <div
                         className={`${item.barClass} h-3 rounded-full transition-all duration-1000`}
                         style={{ width: `${pct}%` }}
-                      ></div>
+                      />
                     </div>
                   </div>
                 );
