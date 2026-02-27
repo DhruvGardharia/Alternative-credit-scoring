@@ -27,6 +27,7 @@ export default function ExpenseTracker() {
   const [error, setError] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("all");
   const [viewReady, setViewReady] = useState(false);
+  const [refetch, setRefetch] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -83,7 +84,7 @@ export default function ExpenseTracker() {
     return () => {
       ignore = true;
     };
-  }, [t]);
+  }, [t, refetch]);
 
   useEffect(() => {
     const timer = setTimeout(() => setViewReady(true), 80);
@@ -122,6 +123,19 @@ export default function ExpenseTracker() {
   );
   const summaryCardDelays = ["delay-0", "delay-100", "delay-200"];
   const chartDelays = ["delay-0", "delay-150"];
+
+  const handleDeleteExpense = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const authConfig = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : undefined;
+      await axios.delete(`/api/expenses/${id}`, authConfig);
+      setRefetch((prev) => prev + 1);
+    } catch (err) {
+      console.error("ExpenseTracker delete error", err);
+    }
+  };
 
   const monthOptions = useMemo(() => {
     const labels = new Set();
@@ -797,48 +811,145 @@ export default function ExpenseTracker() {
             <div
               className={`rounded-xl border shadow-sm p-6 mb-8 ${panelSurfaceClass}`}
             >
-              <div className="space-y-6">
-                {filteredExpenses.map((expense) => (
-                  <div
-                    key={expense._id || `${expense.date}-${expense.amount}`}
-                    className={`rounded-xl border p-4 flex items-center justify-between ${
-                      isDark
-                        ? "bg-gray-900 border-gray-800"
-                        : "bg-white border-gray-100"
-                    }`}
-                  >
-                    <div>
-                      <p
-                        className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
-                      >
-                        {expense.category ||
-                          t("expenseTrackerUnknownCategory") ||
-                          "General"}
-                      </p>
-                      <p
-                        className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
-                      >
-                        {expense.date
-                          ? new Date(expense.date).toLocaleDateString("en-IN", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })
-                          : t("expenseTrackerNoDate") || "Date unavailable"}
-                      </p>
-                    </div>
-                    <p
-                      className={`text-lg font-bold ${isDark ? "text-blue-300" : "text-blue-900"}`}
+              <div className="space-y-3">
+                {filteredExpenses.map((expense) => {
+                  const cat = (expense.category || "general").toLowerCase();
+                  let iconPath = (
+                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  );
+                  if (
+                    cat.includes("food") ||
+                    cat.includes("dining") ||
+                    cat.includes("restaurant")
+                  ) {
+                    iconPath = (
+                      <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    );
+                  } else if (
+                    cat.includes("transport") ||
+                    cat.includes("travel") ||
+                    cat.includes("fuel") ||
+                    cat.includes("uber")
+                  ) {
+                    iconPath = (
+                      <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    );
+                  } else if (
+                    cat.includes("health") ||
+                    cat.includes("medical") ||
+                    cat.includes("pharmacy")
+                  ) {
+                    iconPath = (
+                      <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    );
+                  } else if (
+                    cat.includes("entertainment") ||
+                    cat.includes("movie") ||
+                    cat.includes("sport")
+                  ) {
+                    iconPath = (
+                      <path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                    );
+                  } else if (
+                    cat.includes("utility") ||
+                    cat.includes("bill") ||
+                    cat.includes("electric") ||
+                    cat.includes("internet")
+                  ) {
+                    iconPath = <path d="M13 10V3L4 14h7v7l9-11h-7z" />;
+                  } else if (
+                    cat.includes("shopping") ||
+                    cat.includes("cloth") ||
+                    cat.includes("apparel")
+                  ) {
+                    iconPath = (
+                      <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    );
+                  }
+                  return (
+                    <div
+                      key={expense._id || `${expense.date}-${expense.amount}`}
+                      className={`flex items-center justify-between p-3 rounded-lg border-l-4 border-blue-900 hover:shadow-md transition ${isDark ? "bg-gray-800" : "bg-gray-50"}`}
                     >
-                      {typeof expense.amount === "number"
-                        ? expense.amount.toLocaleString("en-IN", {
-                            style: "currency",
-                            currency: "INR",
-                          })
-                        : t("expenseTrackerNoAmount") || "N/A"}
-                    </p>
-                  </div>
-                ))}
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? "bg-blue-900/40" : "bg-blue-100"}`}
+                        >
+                          <svg
+                            className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            {iconPath}
+                          </svg>
+                        </div>
+                        <div>
+                          <div
+                            className={`font-semibold capitalize text-sm ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                          >
+                            {expense.category ||
+                              t("expenseTrackerUnknownCategory") ||
+                              "General"}
+                          </div>
+                          <div
+                            className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                          >
+                            {expense.description
+                              ? `${expense.description} • `
+                              : ""}
+                            {expense.date
+                              ? new Date(expense.date).toLocaleDateString(
+                                  "en-IN",
+                                  {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  },
+                                )
+                              : t("expenseTrackerNoDate") || "Date unavailable"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-red-500">
+                            -₹
+                            {typeof expense.amount === "number"
+                              ? expense.amount.toLocaleString("en-IN")
+                              : t("expenseTrackerNoAmount") || "N/A"}
+                          </div>
+                          {expense.paymentMethod && (
+                            <div
+                              className={`text-xs uppercase ${isDark ? "text-gray-500" : "text-gray-500"}`}
+                            >
+                              {expense.paymentMethod}
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleDeleteExpense(expense._id)}
+                          className="p-2 bg-red-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg transition"
+                          title="Delete expense"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
