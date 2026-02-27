@@ -328,6 +328,18 @@ const translations = {
     taxNoData: "No tax summary data available yet.",
     taxBackToDashboard: "Back to Dashboard",
     taxPreparingMsg: "Preparing tax summary...",
+
+    // Expense Tracker
+    expenseTrackerTitle: "Expense Tracker",
+    expenseTrackerSubtitle: "Visual breakdown of your spending",
+    expenseTrackerExecutiveSummary: "Smart spending summary",
+    expenseTrackerTotal: "Total Expenses",
+    expenseTrackerAvgDaily: "Average Daily Spend",
+    expenseTrackerTopCategory: "Top Category",
+    expenseTrackerEmpty: "No expenses recorded for this period.",
+    expenseTrackerFilterLabel: "Filter by month",
+    expenseTrackerFilterAll: "All",
+    expenseTrackerInsightsTitle: "AI Expense Insights",
   },
 
   hi: {
@@ -651,6 +663,18 @@ const translations = {
     taxNoData: "अभी तक कोई कर सारांश डेटा उपलब्ध नहीं है।",
     taxBackToDashboard: "डैशबोर्ड पर वापस जाएं",
     taxPreparingMsg: "कर सारांश तैयार हो रहा है...",
+
+    // Expense Tracker
+    expenseTrackerTitle: "खर्च ट्रैकर",
+    expenseTrackerSubtitle: "आपके खर्च का दृश्य विश्लेषण",
+    expenseTrackerExecutiveSummary: "आपकी स्मार्ट खर्च सारांश",
+    expenseTrackerTotal: "कुल खर्च",
+    expenseTrackerAvgDaily: "औसत दैनिक खर्च",
+    expenseTrackerTopCategory: "शीर्ष श्रेणी",
+    expenseTrackerEmpty: "इस अवधि के लिए कोई खर्च दर्ज नहीं है।",
+    expenseTrackerFilterLabel: "महीने अनुसार फ़िल्टर करें",
+    expenseTrackerFilterAll: "सभी",
+    expenseTrackerInsightsTitle: "एआई खर्च इनसाइट्स",
   },
 
   mr: {
@@ -975,6 +999,18 @@ const translations = {
     taxNoData: "अद्याप कोणताही कर सारांश डेटा उपलब्ध नाही.",
     taxBackToDashboard: "डॅशबोर्डवर परत जा",
     taxPreparingMsg: "कर सारांश तयार होत आहे...",
+
+    // Expense Tracker
+    expenseTrackerTitle: "खर्च ट्रॅकर",
+    expenseTrackerSubtitle: "तुमच्या खर्चाचा दृश्य आढावा",
+    expenseTrackerExecutiveSummary: "तुमच्यासाठी स्मार्ट खर्च सारांश",
+    expenseTrackerTotal: "एकूण खर्च",
+    expenseTrackerAvgDaily: "दररोजचा सरासरी खर्च",
+    expenseTrackerTopCategory: "सर्वोच्च श्रेणी",
+    expenseTrackerEmpty: "या कालावधीसाठी कोणतेही खर्च नोंदलेले नाहीत.",
+    expenseTrackerFilterLabel: "महिन्यानुसार फिल्टर करा",
+    expenseTrackerFilterAll: "सर्व",
+    expenseTrackerInsightsTitle: "एआय खर्च अंतर्दृष्टी",
   },
 };
 

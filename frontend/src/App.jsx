@@ -6,6 +6,7 @@ import RegisterPage from "./pages/RegisterPage";
 import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
 import TaxSummary from "./pages/TaxSummary";
+import ExpenseTracker from "./pages/ExpenseTracker";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -52,6 +53,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <TaxSummary />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/expense-tracker"
+          element={
+            <ProtectedRoute>
+              <ExpenseTracker />
             </ProtectedRoute>
           }
         />
