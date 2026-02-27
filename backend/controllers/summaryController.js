@@ -4,7 +4,7 @@
  * Get aggregated financial data - used by ALL teams
  */
 
-import { FinancialSummary } from "../models/financialSummary.js";
+import { UserFinancialSummary } from "../models/financialSummary.js";
 
 /**
  * GET /api/summary/:userId
@@ -14,11 +14,11 @@ export const getFinancialSummary = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    let summary = await FinancialSummary.findOne({ userId });
+    let summary = await UserFinancialSummary.findOne({ userId });
 
     // If no summary exists, create one
     if (!summary) {
-      summary = await FinancialSummary.updateSummary(userId);
+      summary = await UserFinancialSummary.updateSummary(userId);
     }
 
     if (!summary) {
@@ -50,7 +50,7 @@ export const refreshFinancialSummary = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const summary = await FinancialSummary.updateSummary(userId);
+    const summary = await UserFinancialSummary.updateSummary(userId);
 
     if (!summary) {
       return res.status(404).json({
