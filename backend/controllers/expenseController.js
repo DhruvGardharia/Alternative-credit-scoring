@@ -92,6 +92,9 @@ export const updateExpense = TryCatch(async (req, res) => {
 
   await expense.save();
 
+  // Auto-update financial summary
+  await UserFinancialSummary.updateSummary(userId);
+
   res.json({
     success: true,
     message: "Expense updated successfully",

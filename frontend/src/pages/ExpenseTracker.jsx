@@ -124,6 +124,21 @@ export default function ExpenseTracker() {
   const summaryCardDelays = ["delay-0", "delay-100", "delay-200"];
   const chartDelays = ["delay-0", "delay-150"];
 
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+
+  const CATEGORIES = [
+    "food",
+    "transport",
+    "utilities",
+    "rent",
+    "healthcare",
+    "entertainment",
+    "education",
+    "other",
+  ];
+  const PAYMENT_METHODS = ["cash", "card", "upi", "wallet"];
+
   const handleDeleteExpense = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -134,6 +149,51 @@ export default function ExpenseTracker() {
       setRefetch((prev) => prev + 1);
     } catch (err) {
       console.error("ExpenseTracker delete error", err);
+    }
+  };
+
+  const startEdit = (expense) => {
+    setEditingId(expense._id);
+    setEditForm({
+      category: expense.category || "other",
+      amount: expense.amount ?? "",
+      description: expense.description || "",
+      date: expense.date
+        ? new Date(expense.date).toISOString().split("T")[0]
+        : new Date().toISOString().split("T")[0],
+      paymentMethod: expense.paymentMethod || "cash",
+      otherNote: expense.otherNote || "",
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditForm({});
+  };
+
+  const handleSaveEdit = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const authConfig = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : undefined;
+      const payload = {
+        category: editForm.category,
+        amount: Number(editForm.amount),
+        description:
+          editForm.category === "other" && editForm.otherNote
+            ? editForm.otherNote
+            : editForm.description,
+        date: editForm.date,
+        paymentMethod: editForm.paymentMethod,
+      };
+      await axios.put(`/api/expenses/${id}`, payload, authConfig);
+      setEditingId(null);
+      setEditForm({});
+      setRefetch((prev) => prev + 1);
+    } catch (err) {
+      console.error("ExpenseTracker edit error", err);
+      alert("Error updating expense: " + (err?.response?.data?.message || err.message));
     }
   };
 
@@ -811,142 +871,228 @@ export default function ExpenseTracker() {
             <div
               className={`rounded-xl border shadow-sm p-6 mb-8 ${panelSurfaceClass}`}
             >
-              <div className="space-y-3">
+            <div className="space-y-3">
                 {filteredExpenses.map((expense) => {
                   const cat = (expense.category || "general").toLowerCase();
                   let iconPath = (
                     <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                   );
-                  if (
-                    cat.includes("food") ||
-                    cat.includes("dining") ||
-                    cat.includes("restaurant")
-                  ) {
-                    iconPath = (
-                      <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    );
-                  } else if (
-                    cat.includes("transport") ||
-                    cat.includes("travel") ||
-                    cat.includes("fuel") ||
-                    cat.includes("uber")
-                  ) {
-                    iconPath = (
-                      <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    );
-                  } else if (
-                    cat.includes("health") ||
-                    cat.includes("medical") ||
-                    cat.includes("pharmacy")
-                  ) {
-                    iconPath = (
-                      <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    );
-                  } else if (
-                    cat.includes("entertainment") ||
-                    cat.includes("movie") ||
-                    cat.includes("sport")
-                  ) {
-                    iconPath = (
-                      <path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
-                    );
-                  } else if (
-                    cat.includes("utility") ||
-                    cat.includes("bill") ||
-                    cat.includes("electric") ||
-                    cat.includes("internet")
-                  ) {
+                  if (cat.includes("food") || cat.includes("dining") || cat.includes("restaurant")) {
+                    iconPath = (<path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />);
+                  } else if (cat.includes("transport") || cat.includes("travel") || cat.includes("fuel") || cat.includes("uber")) {
+                    iconPath = (<path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />);
+                  } else if (cat.includes("health") || cat.includes("medical") || cat.includes("pharmacy")) {
+                    iconPath = (<path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />);
+                  } else if (cat.includes("entertainment") || cat.includes("movie") || cat.includes("sport")) {
+                    iconPath = (<path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />);
+                  } else if (cat.includes("utility") || cat.includes("bill") || cat.includes("electric") || cat.includes("internet")) {
                     iconPath = <path d="M13 10V3L4 14h7v7l9-11h-7z" />;
-                  } else if (
-                    cat.includes("shopping") ||
-                    cat.includes("cloth") ||
-                    cat.includes("apparel")
-                  ) {
-                    iconPath = (
-                      <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    );
+                  } else if (cat.includes("education") || cat.includes("school") || cat.includes("college")) {
+                    iconPath = (<path d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />);
+                  } else if (cat.includes("shopping") || cat.includes("cloth") || cat.includes("apparel")) {
+                    iconPath = (<path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />);
                   }
+
+                  const isEditing = editingId === expense._id;
+
                   return (
                     <div
                       key={expense._id || `${expense.date}-${expense.amount}`}
-                      className={`flex items-center justify-between p-3 rounded-lg border-l-4 border-blue-900 hover:shadow-md transition ${isDark ? "bg-gray-800" : "bg-gray-50"}`}
+                      className={`rounded-lg border-l-4 border-blue-900 transition ${isDark ? "bg-gray-800" : "bg-gray-50"}`}
                     >
-                      <div className="flex items-center space-x-3">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? "bg-blue-900/40" : "bg-blue-100"}`}
-                        >
-                          <svg
-                            className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            {iconPath}
-                          </svg>
-                        </div>
-                        <div>
-                          <div
-                            className={`font-semibold capitalize text-sm ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                          >
-                            {expense.category ||
-                              t("expenseTrackerUnknownCategory") ||
-                              "General"}
-                          </div>
-                          <div
-                            className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}
-                          >
-                            {expense.description
-                              ? `${expense.description} • `
-                              : ""}
-                            {expense.date
-                              ? new Date(expense.date).toLocaleDateString(
-                                  "en-IN",
-                                  {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                  },
-                                )
-                              : t("expenseTrackerNoDate") || "Date unavailable"}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="text-right">
-                          <div className="text-lg font-bold text-red-500">
-                            -₹
-                            {typeof expense.amount === "number"
-                              ? expense.amount.toLocaleString("en-IN")
-                              : t("expenseTrackerNoAmount") || "N/A"}
-                          </div>
-                          {expense.paymentMethod && (
+                      {/* Normal row */}
+                      {!isEditing && (
+                        <div className="flex items-center justify-between p-3 hover:shadow-md">
+                          <div className="flex items-center space-x-3">
                             <div
-                              className={`text-xs uppercase ${isDark ? "text-gray-500" : "text-gray-500"}`}
+                              className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? "bg-blue-900/40" : "bg-blue-100"}`}
                             >
-                              {expense.paymentMethod}
+                              <svg
+                                className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                {iconPath}
+                              </svg>
                             </div>
-                          )}
+                            <div>
+                              <div
+                                className={`font-semibold capitalize text-sm ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                              >
+                                {expense.category || t("expenseTrackerUnknownCategory") || "General"}
+                              </div>
+                              <div
+                                className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                              >
+                                {expense.description ? `${expense.description} • ` : ""}
+                                {expense.date
+                                  ? new Date(expense.date).toLocaleDateString("en-IN", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    })
+                                  : t("expenseTrackerNoDate") || "Date unavailable"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-right">
+                              <div className="text-lg font-bold text-red-500">
+                                -₹
+                                {typeof expense.amount === "number"
+                                  ? expense.amount.toLocaleString("en-IN")
+                                  : t("expenseTrackerNoAmount") || "N/A"}
+                              </div>
+                              {expense.paymentMethod && (
+                                <div
+                                  className={`text-xs uppercase ${isDark ? "text-gray-500" : "text-gray-500"}`}
+                                >
+                                  {expense.paymentMethod}
+                                </div>
+                              )}
+                            </div>
+                            {/* Edit button */}
+                            <button
+                              onClick={() => startEdit(expense)}
+                              className={`p-2 rounded-lg transition ${
+                                isDark
+                                  ? "bg-blue-900/30 hover:bg-blue-700 text-blue-400"
+                                  : "bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-600"
+                              }`}
+                              title="Edit expense"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            </button>
+                            {/* Delete button */}
+                            <button
+                              onClick={() => handleDeleteExpense(expense._id)}
+                              className="p-2 bg-red-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg transition"
+                              title="Delete expense"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => handleDeleteExpense(expense._id)}
-                          className="p-2 bg-red-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg transition"
-                          title="Delete expense"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      </div>
+                      )}
+
+                      {/* Inline edit form */}
+                      {isEditing && (
+                        <div className={`p-4 border-t-2 border-yellow-400 ${isDark ? "bg-gray-900" : "bg-white"} rounded-b-lg`}>
+                          <p className={`text-xs font-bold uppercase mb-3 ${isDark ? "text-yellow-400" : "text-yellow-600"}`}>
+                            Editing Expense
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {/* Category */}
+                            <div>
+                              <label className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Category</label>
+                              <select
+                                value={editForm.category}
+                                onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                                className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                              >
+                                {CATEGORIES.map((cat) => (
+                                  <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+                                ))}
+                              </select>
+                            </div>
+                            {/* Amount */}
+                            <div>
+                              <label className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Amount (₹)</label>
+                              <input
+                                type="number"
+                                min="1"
+                                value={editForm.amount}
+                                onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                                className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                              />
+                            </div>
+                            {/* Date */}
+                            <div>
+                              <label className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Date</label>
+                              <input
+                                type="date"
+                                value={editForm.date}
+                                onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                                className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                              />
+                            </div>
+                            {/* Payment Method */}
+                            <div>
+                              <label className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Payment Method</label>
+                              <select
+                                value={editForm.paymentMethod}
+                                onChange={(e) => setEditForm({ ...editForm, paymentMethod: e.target.value })}
+                                className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                              >
+                                {PAYMENT_METHODS.map((m) => (
+                                  <option key={m} value={m}>{m.toUpperCase()}</option>
+                                ))}
+                              </select>
+                            </div>
+                            {/* Description */}
+                            <div className="md:col-span-2">
+                              <label className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Description</label>
+                              <input
+                                type="text"
+                                value={editForm.description}
+                                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                                className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                                placeholder="Optional description"
+                              />
+                            </div>
+                            {/* Other note — only when category is 'other' */}
+                            {editForm.category === "other" && (
+                              <div className="md:col-span-2">
+                                <label className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                                  Note (describe the other expense)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={editForm.otherNote}
+                                  onChange={(e) => setEditForm({ ...editForm, otherNote: e.target.value })}
+                                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-yellow-700 text-gray-300 focus:border-yellow-500" : "border-yellow-300 text-gray-700 focus:border-yellow-500"}`}
+                                  placeholder="E.g. Gift, donation, misc…"
+                                />
+                              </div>
+                            )}
+                            {/* Actions */}
+                            <div className="md:col-span-2 flex gap-3 mt-1">
+                              <button
+                                onClick={() => handleSaveEdit(expense._id)}
+                                className="flex-1 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition"
+                              >
+                                Save Changes
+                              </button>
+                              <button
+                                onClick={cancelEdit}
+                                className={`flex-1 py-2 rounded-lg font-medium text-sm transition ${isDark ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
