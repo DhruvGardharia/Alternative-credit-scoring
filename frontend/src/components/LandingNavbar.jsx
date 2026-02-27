@@ -118,6 +118,12 @@ export default function LandingNavbar() {
           </button>
 
           <button
+            onClick={() => navigate("/lender-login")}
+            className={`transition px-4 py-2 text-sm font-medium ${isDark ? "text-yellow-400 hover:text-yellow-300" : "text-indigo-700 hover:text-indigo-900"}`}
+          >
+            Lender Login
+          </button>
+          <button
             onClick={() => navigate("/login")}
             className={`transition px-4 py-2 text-sm font-medium ${isDark ? "text-gray-300 hover:text-white" : "text-blue-900 hover:text-blue-700"}`}
           >

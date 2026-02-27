@@ -12,7 +12,7 @@ const generateDates = (days = 60) => {
   const dates = [];
   for (let i = days; i >= 0; i--) {
     const date = new Date();
-    date.setDate(date.setDate(date.getDate() - i));
+    date.setDate(date.getDate() - i);
     dates.push(date);
   }
   return dates;

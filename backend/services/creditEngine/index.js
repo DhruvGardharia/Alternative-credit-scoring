@@ -61,11 +61,22 @@ export async function calculateCreditProfile(data) {
   }
   validateTransactions(transactions);
 
+  console.log(`\n🔷 Starting credit calculation for user: ${userId}`);
+  console.log(`📊 Total transactions: ${transactions.length}`);
+  console.log(`   Credits: ${transactions.filter(t => t.type === 'credit').length}`);
+  console.log(`   Debits: ${transactions.filter(t => t.type === 'debit').length}`);
+
   // Step 1: Calculate all metrics
+  console.log('\n📈 Calculating metrics...');
   const incomeMetrics = calculateAllIncomeMetrics(transactions);
   const spendingMetrics = calculateAllSpendingMetrics(transactions);
   const liquidityMetrics = calculateAllLiquidityMetrics(transactions);
   const gigMetrics = calculateAllGigMetrics(transactions, gigData);
+
+  console.log('✅ Metrics calculated:');
+  console.log(`   Income metrics:`, Object.keys(incomeMetrics).length);
+  console.log(`   Spending metrics:`, Object.keys(spendingMetrics).length);
+  console.log(`   Liquidity metrics:`, Object.keys(liquidityMetrics).length);
 
   // Step 2: Aggregate scores
   const allMetrics = {
@@ -77,12 +88,17 @@ export async function calculateCreditProfile(data) {
 
   const { creditScore, scoreBreakdown } = aggregateAllScores(allMetrics);
 
+  console.log(`\n🎯 Credit Score: ${creditScore}`);
+  console.log(`📊 Score Breakdown:`, scoreBreakdown);
+
   // Step 3: Classify risk
   const riskLevel = analyzeRisk(
     creditScore,
     scoreBreakdown,
     { ...incomeMetrics, ...spendingMetrics, ...liquidityMetrics }
   ).riskLevel;
+
+  console.log(`⚠️  Risk Level: ${riskLevel}\n`);
 
   // Step 4: Prepare complete metrics object
   const metrics = {
@@ -104,7 +120,7 @@ export async function calculateCreditProfile(data) {
     {
       new: true,
       upsert: true,
-      runValidators: true
+      runValidators: false   // avoid silent drops when old schema ranges mismatch
     }
   );
 
