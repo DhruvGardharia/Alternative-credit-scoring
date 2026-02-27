@@ -7,13 +7,14 @@ import OnboardingNew from "./pages/OnboardingNew";
 import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
 import TaxSummary from "./pages/TaxSummary";
+import ExpenseTracker from "./pages/ExpenseTracker";
 import PlatformManagement from "./pages/PlatformManagement";
 
 
 // Protected Route Component - Requires Authentication
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -21,7 +22,7 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   return user ? children : <Navigate to="/login" />;
 };
 
@@ -49,6 +50,8 @@ const App = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
+        {/* Protected Dashboard Routes */}
         
         {/* Dashboard Routes - Require authentication */}
         <Route
@@ -83,7 +86,14 @@ const App = () => {
             </DashboardRoute>
           }
         />
-
+        <Route
+          path="/expense-tracker"
+          element={
+            <DashboardRoute>
+              <ExpenseTracker />
+            </DashboardRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
