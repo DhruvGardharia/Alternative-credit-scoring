@@ -66,6 +66,57 @@ const buildSlabBreakdown = (netTaxableIncome) => {
 const calculateTotalTax = (slabBreakdown) =>
   slabBreakdown.reduce((sum, slab) => sum + slab.taxAmount, 0);
 
+const generateTaxAlerts = (taxSummary = {}, financialSummary = {}) => {
+  const alerts = [];
+  const {
+    effectiveTaxRate = 0,
+    netTaxableIncome = 0,
+    deductibleBusinessExpenses = 0,
+    grossIncome = 0,
+    totalTax = 0,
+  } = taxSummary;
+
+  if (effectiveTaxRate > 15) {
+    alerts.push({
+      type: "warning",
+      title: "High Effective Tax Rate",
+      message:
+        "Your effective tax rate exceeds 15%. Consider planning for advance tax payments or exploring eligible deductions.",
+    });
+  }
+
+  if (netTaxableIncome > 900000) {
+    alerts.push({
+      type: "info",
+      title: "Higher Tax Slab",
+      message:
+        "Your taxable income falls into the higher tax slabs. Track quarterly earnings to avoid unexpected liabilities.",
+    });
+  }
+
+  const deductionRatio =
+    grossIncome > 0 ? deductibleBusinessExpenses / grossIncome : 0;
+  if (deductionRatio < 0.1) {
+    alerts.push({
+      type: "warning",
+      title: "Low Business Deductions",
+      message:
+        "Business-related deductions are below 10% of gross income. Review eligible expenses like fuel, rent, and equipment.",
+    });
+  }
+
+  if (totalTax > 10000) {
+    alerts.push({
+      type: "info",
+      title: "Advance Tax Advisory",
+      message:
+        "Total tax payable crosses ₹10,000. Remember to pay advance tax instalments to avoid interest penalties.",
+    });
+  }
+
+  return alerts;
+};
+
 export function calculateAnnualTaxSummary(financialSummary = {}) {
   const grossIncome = Math.max(0, toNumber(financialSummary.totalIncome));
   const deductibleBusinessExpenses = Math.min(
@@ -84,12 +135,17 @@ export function calculateAnnualTaxSummary(financialSummary = {}) {
     ? roundToTwo((totalTax / grossIncome) * 100)
     : 0;
 
-  return {
+  const taxSummary = {
     grossIncome: roundToTwo(grossIncome),
     deductibleBusinessExpenses: roundToTwo(deductibleBusinessExpenses),
     netTaxableIncome: roundToTwo(netTaxableIncome),
     slabBreakdown,
     totalTax,
     effectiveTaxRate,
+  };
+
+  return {
+    ...taxSummary,
+    alerts: generateTaxAlerts(taxSummary, financialSummary),
   };
 }
