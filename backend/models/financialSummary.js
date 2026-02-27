@@ -4,7 +4,7 @@ import "./expenseModel.js";
 
 /**
  * Financial Summary Model
- * 
+ *
  * Central snapshot of user's financial state
  * Auto-updates when Income or Expense changes
  * Used by ALL teams: Credit, Insurance, Expense Tracking, Lender Dashboard
@@ -17,7 +17,7 @@ const financialSummarySchema = new mongoose.Schema(
       ref: "User",
       required: true,
       unique: true,
-      index: true
+      index: true,
     },
 
     // Income Summary
@@ -29,7 +29,7 @@ const financialSummarySchema = new mongoose.Schema(
       ola: { type: Number, default: 0 },
       swiggy: { type: Number, default: 0 },
       zomato: { type: Number, default: 0 },
-      other: { type: Number, default: 0 }
+      other: { type: Number, default: 0 },
     },
 
     // Expense Summary
@@ -43,7 +43,7 @@ const financialSummarySchema = new mongoose.Schema(
       rent: { type: Number, default: 0 },
       healthcare: { type: Number, default: 0 },
       entertainment: { type: Number, default: 0 },
-      other: { type: Number, default: 0 }
+      other: { type: Number, default: 0 },
     },
 
     // Net Position
@@ -53,17 +53,17 @@ const financialSummarySchema = new mongoose.Schema(
     // Period Covered
     dataStartDate: Date,
     dataEndDate: Date,
-    
+
     // Last Update Tracking
-    lastUpdated: { type: Date, default: Date.now }
+    lastUpdated: { type: Date, default: Date.now },
   },
-  { 
-    timestamps: true 
-  }
+  {
+    timestamps: true,
+  },
 );
 
 // Calculate and update summary
-financialSummarySchema.statics.updateSummary = async function(userId) {
+financialSummarySchema.statics.updateSummary = async function (userId) {
   const Income = mongoose.model("Income");
   const Expense = mongoose.model("Expense");
 
@@ -78,10 +78,14 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
   // Calculate income metrics
   const totalIncome = incomes.reduce((sum, inc) => sum + inc.amount, 0);
   const incomeByPlatform = {
-    uber: 0, ola: 0, swiggy: 0, zomato: 0, other: 0
+    uber: 0,
+    ola: 0,
+    swiggy: 0,
+    zomato: 0,
+    other: 0,
   };
-  
-  incomes.forEach(inc => {
+
+  incomes.forEach((inc) => {
     if (incomeByPlatform.hasOwnProperty(inc.platform)) {
       incomeByPlatform[inc.platform] += inc.amount;
     } else {
@@ -92,11 +96,16 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
   // Calculate expense metrics
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   const expensesByCategory = {
-    food: 0, transport: 0, utilities: 0, rent: 0, 
-    healthcare: 0, entertainment: 0, other: 0
+    food: 0,
+    transport: 0,
+    utilities: 0,
+    rent: 0,
+    healthcare: 0,
+    entertainment: 0,
+    other: 0,
   };
-  
-  expenses.forEach(exp => {
+
+  expenses.forEach((exp) => {
     if (expensesByCategory.hasOwnProperty(exp.category)) {
       expensesByCategory[exp.category] += exp.amount;
     } else {
@@ -106,16 +115,20 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
 
   // Calculate monthly averages
   const allDates = [
-    ...incomes.map(i => new Date(i.date)),
-    ...expenses.map(e => new Date(e.date))
+    ...incomes.map((i) => new Date(i.date)),
+    ...expenses.map((e) => new Date(e.date)),
   ];
-  
-  const dataStartDate = allDates.length > 0 ? new Date(Math.min(...allDates)) : new Date();
-  const dataEndDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : new Date();
-  
-  const monthsDiff = Math.max(1, 
+
+  const dataStartDate =
+    allDates.length > 0 ? new Date(Math.min(...allDates)) : new Date();
+  const dataEndDate =
+    allDates.length > 0 ? new Date(Math.max(...allDates)) : new Date();
+
+  const monthsDiff = Math.max(
+    1,
     (dataEndDate.getFullYear() - dataStartDate.getFullYear()) * 12 +
-    (dataEndDate.getMonth() - dataStartDate.getMonth()) + 1
+      (dataEndDate.getMonth() - dataStartDate.getMonth()) +
+      1,
   );
 
   const monthlyAvgIncome = totalIncome / monthsDiff;
@@ -126,12 +139,14 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
   const savingsRate = totalIncome > 0 ? (netBalance / totalIncome) * 100 : 0;
 
   // Last transaction dates
-  const lastIncomeDate = incomes.length > 0 
-    ? new Date(Math.max(...incomes.map(i => new Date(i.date)))) 
-    : null;
-  const lastExpenseDate = expenses.length > 0 
-    ? new Date(Math.max(...expenses.map(e => new Date(e.date)))) 
-    : null;
+  const lastIncomeDate =
+    incomes.length > 0
+      ? new Date(Math.max(...incomes.map((i) => new Date(i.date))))
+      : null;
+  const lastExpenseDate =
+    expenses.length > 0
+      ? new Date(Math.max(...expenses.map((e) => new Date(e.date))))
+      : null;
 
   // Update or create summary
   const summary = await this.findOneAndUpdate(
@@ -150,13 +165,13 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
       savingsRate: parseFloat(savingsRate.toFixed(2)),
       dataStartDate,
       dataEndDate,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     },
-    { 
-      upsert: true, 
+    {
+      upsert: true,
       new: true,
-      setDefaultsOnInsert: true 
-    }
+      setDefaultsOnInsert: true,
+    },
   );
 
   return summary;
