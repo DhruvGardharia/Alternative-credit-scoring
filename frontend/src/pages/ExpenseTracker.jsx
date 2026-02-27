@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   ResponsiveContainer,
@@ -18,9 +19,11 @@ import Navbar from "../components/Navbar";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 
+
 export default function ExpenseTracker() {
   const { isDark } = useTheme();
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -313,8 +316,7 @@ export default function ExpenseTracker() {
       Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0] || [];
     if (topValue / total > 0.4) {
       insights.push(
-        t("expenseInsightHighCategory") ||
-          `${topCategory} accounts for ${Math.round((topValue / total) * 100)}% of your spend. Consider rebalancing to avoid overexposure.`,
+        `${topCategory} accounts for ${Math.round((topValue / total) * 100)}% of your spend. Consider rebalancing to avoid overexposure.`,
       );
     }
 
@@ -334,8 +336,7 @@ export default function ExpenseTracker() {
       const prev = monthBuckets[sortedMonths[sortedMonths.length - 2]];
       if (prev > 0 && last > prev * 1.15) {
         insights.push(
-          t("expenseInsightMoM") ||
-            `Spending grew by ${Math.round(((last - prev) / prev) * 100)}% month over month. Investigate recent outflows.`,
+          `Spending grew by ${Math.round(((last - prev) / prev) * 100)}% month over month. Investigate recent outflows.`,
         );
       }
     }
@@ -355,8 +356,7 @@ export default function ExpenseTracker() {
       .reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0);
     if (discretionaryTotal / total > 0.3) {
       insights.push(
-        t("expenseInsightDiscretionary") ||
-          `Discretionary categories form ${Math.round((discretionaryTotal / total) * 100)}% of spending. Consider capping non-essential purchases.`,
+        `Discretionary categories form ${Math.round((discretionaryTotal / total) * 100)}% of spending. Consider capping non-essential purchases.`,
       );
     }
 
@@ -368,8 +368,7 @@ export default function ExpenseTracker() {
       const ratio = total / incomeSum;
       if (ratio > 0.6) {
         insights.push(
-          t("expenseInsightSavings") ||
-            `Expenses consume ${Math.round(ratio * 100)}% of income. Target a lower burn rate to improve savings.`,
+          `Expenses consume ${Math.round(ratio * 100)}% of income. Target a lower burn rate to improve savings.`,
         );
       }
     }
@@ -479,6 +478,19 @@ export default function ExpenseTracker() {
       <div className={`min-h-screen ${isDark ? "bg-gray-950" : "bg-gray-50"}`}>
         <Navbar />
         <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+          {/* Back to Dashboard */}
+          <button
+            onClick={() => navigate("/dashboard")}
+            className={`flex items-center gap-1 text-sm font-medium mb-2 transition ${
+              isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-900 hover:text-blue-700"
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Dashboard
+          </button>
+
           <header
             className={`rounded-xl shadow-sm px-6 py-6 mb-8 ${panelSurfaceClass} flex flex-col gap-6 md:flex-row md:items-center md:justify-between`}
           >
@@ -816,43 +828,106 @@ export default function ExpenseTracker() {
                 </div>
               </div>
 
-              {expenseInsights.length > 0 && (
-                <div
-                  className={`rounded-xl border shadow-sm p-6 ${panelSurfaceClass} ${interactiveBaseClass} delay-300`}
-                >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              {/* ── AI Expense Insights ── */}
+              {expenseInsights.length > 0 ? (
+                <div className={`rounded-xl border shadow-sm p-6 ${panelSurfaceClass} ${interactiveBaseClass} delay-300`}>
+                  {/* Header with score badge */}
+                  <div className="flex items-start justify-between gap-4 mb-5">
                     <div>
-                      <p
-                        className={`text-xs font-semibold uppercase tracking-wide ${subtleTextClass}`}
-                      >
-                        {t("expenseTrackerInsightsTitle") ||
-                          "AI Expense Insights"}
+                      <p className={`text-xs font-bold uppercase tracking-widest ${subtleTextClass}`}>
+                        AI Expense Insights
                       </p>
-                      <p
-                        className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
-                      >
-                        {t("expenseTrackerInsightsSubtitle") ||
-                          "Recommendations tailored to your current spend"}
+                      <p className={`text-sm font-semibold mt-0.5 ${isDark ? "text-white" : "text-gray-900"}`}>
+                        Powered by your financial behavior
                       </p>
                     </div>
+                    {/* Health score badge */}
+                    <div className={`flex-shrink-0 flex flex-col items-center px-4 py-2 rounded-xl ${
+                      expenseInsights.length === 1
+                        ? isDark ? "bg-green-900/30 text-green-300" : "bg-green-50 text-green-700"
+                        : expenseInsights.length === 2
+                        ? isDark ? "bg-yellow-900/30 text-yellow-300" : "bg-yellow-50 text-yellow-700"
+                        : isDark ? "bg-red-900/30 text-red-300" : "bg-red-50 text-red-700"
+                    }`}>
+                      <span className="text-2xl font-black">
+                        {expenseInsights.length === 1 ? "A" : expenseInsights.length === 2 ? "B" : "C"}
+                      </span>
+                      <span className="text-xs font-semibold mt-0.5">Health</span>
+                    </div>
                   </div>
-                  <ul className="mt-4 space-y-3">
-                    {expenseInsights.map((insight, index) => (
-                      <li
-                        key={`${insight}-${index}`}
-                        className={`${transitionBaseClass} flex items-start gap-3 rounded-lg border px-4 py-3 text-sm transform ${
-                          isDark
-                            ? "bg-gray-800/60 border-gray-700 text-gray-100"
-                            : "bg-gray-50 border-gray-200 text-gray-700"
-                        } hover:-translate-y-0.5`}
-                      >
-                        <span className="mt-1 h-2.5 w-2.5 rounded-full bg-blue-500" />
-                        <p className="leading-relaxed">{insight}</p>
-                      </li>
-                    ))}
+
+                  {/* Progress bar */}
+                  <div className={`w-full h-1.5 rounded-full mb-5 overflow-hidden ${
+                    isDark ? "bg-gray-700" : "bg-gray-200"
+                  }`}>
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: expenseInsights.length === 1 ? "85%" : expenseInsights.length === 2 ? "55%" : "30%",
+                        background: expenseInsights.length === 1
+                          ? "linear-gradient(90deg,#10b981,#34d399)"
+                          : expenseInsights.length === 2
+                          ? "linear-gradient(90deg,#f59e0b,#fbbf24)"
+                          : "linear-gradient(90deg,#ef4444,#f87171)",
+                      }}
+                    />
+                  </div>
+
+                  {/* Insight cards */}
+                  <ul className="space-y-3">
+                    {expenseInsights.map((insight, idx) => {
+                      const isHighSpend = insight.includes("accounts for");
+                      const isTrend = insight.includes("grew by");
+                      const isSavings = insight.includes("income");
+                      const isDiscretionary = insight.includes("Discretionary");
+
+                      const iconColor = isHighSpend
+                        ? "bg-red-500"
+                        : isTrend
+                        ? "bg-orange-500"
+                        : isSavings
+                        ? "bg-purple-500"
+                        : "bg-blue-500";
+
+                      const icon = isHighSpend ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                      ) : isTrend ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                      ) : isSavings ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                      );
+
+                      return (
+                        <li
+                          key={idx}
+                          className={`flex items-start gap-3 rounded-xl border px-4 py-3.5 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                            isDark ? "bg-gray-800/60 border-gray-700" : "bg-white border-gray-200"
+                          }`}
+                        >
+                          <span className={`mt-0.5 flex-shrink-0 w-7 h-7 rounded-full ${iconColor} flex items-center justify-center`}>
+                            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                              {icon}
+                            </svg>
+                          </span>
+                          <p className={`leading-relaxed pt-0.5 ${isDark ? "text-gray-200" : "text-gray-700"}`}>{insight}</p>
+                        </li>
+                      );
+                    })}
                   </ul>
+
+                  <p className={`mt-4 text-xs ${subtleTextClass}`}>
+                    ✦ Insights are generated from your transaction patterns. Review monthly for best results.
+                  </p>
                 </div>
-              )}
+              ) : filteredExpenses.length > 0 ? (
+                <div className={`rounded-xl border shadow-sm p-6 ${panelSurfaceClass} text-center`}>
+                  <div className="text-3xl mb-2">🎉</div>
+                  <p className={`font-semibold ${isDark ? "text-green-300" : "text-green-700"}`}>Your spending looks healthy!</p>
+                  <p className={`text-xs mt-1 ${subtleTextClass}`}>No anomalies detected. Keep tracking to unlock deeper insights.</p>
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -1099,8 +1174,8 @@ export default function ExpenseTracker() {
               </div>
             </div>
           )}
-        </div>
       </div>
+    </div>
     );
   } catch (renderError) {
     console.error("ExpenseTracker render error", renderError);
