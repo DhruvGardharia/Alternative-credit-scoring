@@ -5,12 +5,12 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
-
+import TaxSummary from "./pages/TaxSummary";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   return user ? children : <Navigate to="/login" />;
 };
 
@@ -29,7 +29,7 @@ const App = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        
+
         {/* Protected Dashboard Routes */}
         <Route
           path="/dashboard"
@@ -47,7 +47,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/tax-summary"
+          element={
+            <ProtectedRoute>
+              <TaxSummary />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
