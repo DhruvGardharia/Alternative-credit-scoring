@@ -409,31 +409,47 @@ export default function Role1Dashboard() {
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Quick Actions Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {/* 1. Upload Statement */}
           <button
             onClick={() => setShowUploadModal(true)}
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-500" : "bg-white border-gray-200 hover:border-blue-400"}`}
+            className={`relative flex flex-col items-start p-6 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border text-left group overflow-hidden ${isDark ? "bg-gradient-to-br from-blue-900/40 to-gray-900 border-blue-800/60 hover:border-blue-500" : "bg-gradient-to-br from-white to-blue-50/50 border-blue-100 hover:border-blue-400"}`}
           >
-            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-              {t("uploadStatement")}
+            {/* Background Glow */}
+            <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-20 transition-opacity group-hover:opacity-40 ${isDark ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm ${isDark ? "bg-blue-900/60 text-blue-400" : "bg-blue-100 text-blue-600"}`}>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className={`text-lg font-bold mb-1 flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-800"}`}>
+              📄 {t("uploadStatement")}
+            </span>
+            <span className={`text-sm leading-relaxed ${isDark ? "text-gray-400 group-hover:text-gray-300" : "text-gray-500 group-hover:text-gray-700"} transition-colors`}>
+              {t("uploadStatementDesc") || "Analyze your bank statement"}
             </span>
           </button>
 
           {/* 2. Manage Platforms */}
           <button
             onClick={() => navigate("/platforms")}
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
+            className={`relative flex flex-col items-start p-6 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border text-left group overflow-hidden ${isDark ? "bg-gradient-to-br from-indigo-900/40 to-gray-900 border-indigo-800/60 hover:border-indigo-500" : "bg-gradient-to-br from-white to-indigo-50/50 border-indigo-100 hover:border-indigo-400"}`}
           >
-            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M13 7H7v6h6V7z" />
-              <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
-            </svg>
-            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-              Manage Platforms
+            {/* Background Glow */}
+            <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-20 transition-opacity group-hover:opacity-40 ${isDark ? "bg-indigo-500" : "bg-indigo-400"}`}></div>
+
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm ${isDark ? "bg-indigo-900/60 text-indigo-400" : "bg-indigo-100 text-indigo-600"}`}>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 7H7v6h6V7z" />
+                <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className={`text-lg font-bold mb-1 flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-800"}`}>
+              💼 {t("managePlatforms") || "Manage Platforms"}
+            </span>
+            <span className={`text-sm leading-relaxed ${isDark ? "text-gray-400 group-hover:text-gray-300" : "text-gray-500 group-hover:text-gray-700"} transition-colors`}>
+              {t("managePlatformsDesc") || "Connect your gig platforms"}
             </span>
           </button>
 
@@ -485,31 +501,46 @@ export default function Role1Dashboard() {
                 alert("No credit score available yet. Please upload your bank statement first.");
               }
             }}
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
+             className={`relative flex flex-col items-start p-6 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border text-left group overflow-hidden ${isDark ? "bg-gradient-to-br from-purple-900/40 to-gray-900 border-purple-800/60 hover:border-purple-500" : "bg-gradient-to-br from-white to-purple-50/50 border-purple-100 hover:border-purple-400"}`}
           >
-            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-              <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-            </svg>
-            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-              {t("viewCreditReport")}
+             {/* Background Glow */}
+             <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-20 transition-opacity group-hover:opacity-40 ${isDark ? "bg-purple-500" : "bg-purple-400"}`}></div>
+
+             <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm ${isDark ? "bg-purple-900/60 text-purple-400" : "bg-purple-100 text-purple-600"}`}>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+              </svg>
+            </div>
+             <span className={`text-lg font-bold mb-1 flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-800"}`}>
+              📊 {t("viewCreditReport")}
+            </span>
+            <span className={`text-sm leading-relaxed ${isDark ? "text-gray-400 group-hover:text-gray-300" : "text-gray-500 group-hover:text-gray-700"} transition-colors`}>
+              {t("viewCreditReportDesc") || "Access your credit details"}
             </span>
           </button>
 
           {/* 4. Tax Summary */}
           <button
             onClick={() => navigate("/tax-summary")}
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-yellow-500" : "bg-white border-gray-200 hover:border-yellow-400"}`}
+             className={`relative flex flex-col items-start p-6 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border text-left group overflow-hidden ${isDark ? "bg-gradient-to-br from-amber-900/40 to-gray-900 border-amber-800/60 hover:border-amber-500" : "bg-gradient-to-br from-white to-amber-50/50 border-amber-100 hover:border-amber-400"}`}
           >
-            <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
-            </svg>
-            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-              Tax Summary
+             {/* Background Glow */}
+             <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-20 transition-opacity group-hover:opacity-40 ${isDark ? "bg-amber-500" : "bg-amber-400"}`}></div>
+
+             <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm ${isDark ? "bg-amber-900/60 text-amber-400" : "bg-amber-100 text-amber-600"}`}>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className={`text-lg font-bold mb-1 flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-800"}`}>
+              💰 {t("taxSummary") || "Tax Summary"}
+            </span>
+            <span className={`text-sm leading-relaxed ${isDark ? "text-gray-400 group-hover:text-gray-300" : "text-gray-500 group-hover:text-gray-700"} transition-colors`}>
+              {t("taxSummaryDesc") || "Clear breakdown of taxes"}
             </span>
           </button>
         </div>
-
 
         {/* Welcome Banner with Insights */}
         <div className="bg-gradient-to-r from-blue-900 to-blue-800 rounded-lg shadow-md p-6 mb-6 text-white">
@@ -623,7 +654,413 @@ export default function Role1Dashboard() {
           </div>
         )}
 
-        {/* Financial Health Snapshot */}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div
+            className={`rounded-lg shadow-md p-4 border-l-4 border-blue-900 hover:shadow-lg transition ${isDark ? "bg-gray-900" : "bg-white"}`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
+              >
+                {t("totalExpenses")}
+              </span>
+              <svg
+                className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div
+              className={`text-2xl font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
+            >
+              ₹
+              {(
+                stats?.totalExpenses ||
+                expenses.reduce((sum, e) => sum + e.amount, 0)
+              )?.toLocaleString()}
+            </div>
+          </div>
+
+          <div
+            className={`rounded-lg shadow-md p-4 border-l-4 border-yellow-400 hover:shadow-lg transition ${isDark ? "bg-gray-900" : "bg-white"}`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
+              >
+                {t("transactions")}
+              </span>
+              <svg
+                className="w-5 h-5 text-yellow-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div
+              className={`text-2xl font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
+            >
+              {expenses.length}
+            </div>
+          </div>
+
+          <div
+            className={`rounded-lg shadow-md p-4 border-l-4 border-green-500 hover:shadow-lg transition ${isDark ? "bg-gray-900" : "bg-white"}`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
+              >
+                {t("dailyAverage")}
+              </span>
+              <svg
+                className="w-5 h-5 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div
+              className={`text-2xl font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
+            >
+              ₹{stats?.dailyAverage?.toFixed(0) || 0}
+            </div>
+          </div>
+
+          <div
+            className={`rounded-lg shadow-md p-4 border-l-4 border-purple-500 hover:shadow-lg transition cursor-pointer ${isDark ? "bg-gray-900" : "bg-white"}`}
+            onClick={() => {
+              setShowEditGoal(true);
+              setTempGoal(savingsGoal);
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
+              >
+                {t("savingsGoal")}
+              </span>
+              <svg
+                className="w-5 h-5 text-purple-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div
+              className={`text-2xl font-bold mb-2 ${isDark ? "text-blue-400" : "text-blue-900"}`}
+            >
+              ₹{savingsGoal.toLocaleString()}
+            </div>
+
+            {(() => {
+              const totalExpenses =
+                stats?.totalExpenses ||
+                expenses.reduce((sum, e) => sum + e.amount, 0);
+              const estimatedIncome =
+                financialSummary?.averageMonthlyIncome ||
+                (totalExpenses > 0 ? totalExpenses * 1.5 : 15000);
+              const savedAmount = Math.max(0, estimatedIncome - totalExpenses);
+              const progressPercent = Math.min(
+                100,
+                (savedAmount / savingsGoal) * 100,
+              );
+
+              return (
+                <>
+                  <div className="flex justify-between items-center mb-1">
+                    <span
+                      className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                    >
+                      {t("saved")}: ₹{savedAmount.toLocaleString()}
+                    </span>
+                    <span className="text-xs font-bold text-purple-600">
+                      {progressPercent.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div
+                    className={`w-full rounded-full h-2 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}
+                  >
+                    <div
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${progressPercent}%` }}
+                    ></div>
+                  </div>
+                  <p
+                    className={`text-xs mt-2 ${isDark ? "text-gray-500" : "text-gray-500"}`}
+                  >
+                    {t("clickToEditGoal")}
+                  </p>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+
+
+        {/* Category Breakdown — computed from all expenses (no period filter) */}
+        {expenses.length > 0 && (() => {
+          const categoryMap = expenses.reduce((acc, exp) => {
+            const key = exp.category || "other";
+            acc[key] = (acc[key] || 0) + (exp.amount || 0);
+            return acc;
+          }, {});
+          const grandTotal = Object.values(categoryMap).reduce((s, v) => s + v, 0);
+          const sorted = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
+          return (
+            <div
+              className={`rounded-lg shadow-md p-5 mb-6 ${isDark ? "bg-gray-900" : "bg-white"}`}
+            >
+              <div className="flex items-center space-x-2 mb-4">
+                <svg
+                  className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                </svg>
+                <h2
+                  className={`text-lg font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                >
+                  {t("categoryBreakdown")}
+                </h2>
+              </div>
+              <div className="space-y-3">
+                {sorted.map(([category, amount]) => (
+                  <div key={category}>
+                    <div className="flex justify-between mb-1">
+                      <span
+                        className={`capitalize font-medium text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                      >
+                        {category}
+                      </span>
+                      <span
+                        className={`font-bold text-sm ${isDark ? "text-blue-400" : "text-blue-900"}`}
+                      >
+                        ₹{amount.toLocaleString()}
+                      </span>
+                    </div>
+                    <div
+                      className={`w-full rounded-full h-2 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}
+                    >
+                      <div
+                        className="bg-gradient-to-r from-blue-900 to-yellow-400 h-2 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${grandTotal > 0 ? (amount / grandTotal) * 100 : 0}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+
+
+        {/* Actions */}
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-2">
+            <svg
+              className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <h2
+              className={`text-lg font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
+            >
+              {t("yourExpenses")}
+            </h2>
+          </div>
+          <button
+            onClick={() => setShowAddExpense(!showAddExpense)}
+            className="px-5 py-2 bg-yellow-400 hover:bg-yellow-500 text-blue-900 rounded-lg font-medium shadow transition text-sm"
+          >
+            {showAddExpense ? t("cancelBtn") : t("addExpenseBtn")}
+          </button>
+        </div>
+
+        {/* Add Expense Form */}
+        {showAddExpense && (
+          <div
+            className={`rounded-lg shadow-md p-5 mb-6 border-l-4 border-yellow-400 ${isDark ? "bg-gray-900" : "bg-white"}`}
+          >
+            <form
+              onSubmit={handleAddExpense}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              <div>
+                <label
+                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                >
+                  {t("category")}
+                </label>
+                <select
+                  value={newExpense.category}
+                  onChange={(e) =>
+                    setNewExpense({ ...newExpense, category: e.target.value })
+                  }
+                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                >
+                  {t("amount")}
+                </label>
+                <input
+                  type="number"
+                  value={newExpense.amount}
+                  onChange={(e) =>
+                    setNewExpense({ ...newExpense, amount: e.target.value })
+                  }
+                  required
+                  min="1"
+                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                  placeholder="0"
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                >
+                  {t("date")}
+                </label>
+                <input
+                  type="date"
+                  value={newExpense.date}
+                  onChange={(e) =>
+                    setNewExpense({ ...newExpense, date: e.target.value })
+                  }
+                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                >
+                  {t("paymentMethod")}
+                </label>
+                <select
+                  value={newExpense.paymentMethod}
+                  onChange={(e) =>
+                    setNewExpense({
+                      ...newExpense,
+                      paymentMethod: e.target.value,
+                    })
+                  }
+                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                >
+                  {paymentMethods.map((method) => (
+                    <option key={method} value={method}>
+                      {method.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label
+                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                >
+                  {t("description")}
+                </label>
+                <input
+                  type="text"
+                  value={newExpense.description}
+                  onChange={(e) =>
+                    setNewExpense({
+                      ...newExpense,
+                      description: e.target.value,
+                    })
+                  }
+                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
+                  placeholder={t("descriptionPlaceholder")}
+                />
+              </div>
+
+              {newExpense.category === "other" && (
+                <div className="md:col-span-2">
+                  <label
+                    className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  >
+                    {t("otherNoteLabel") || "Note (describe the other expense)"}
+                  </label>
+                  <input
+                    type="text"
+                    value={newExpense.otherNote || ""}
+                    onChange={(e) =>
+                      setNewExpense({ ...newExpense, otherNote: e.target.value })
+                    }
+                    className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-yellow-700 text-gray-300 focus:border-yellow-500" : "border-yellow-300 text-gray-700 focus:border-yellow-500"}`}
+                    placeholder={t("otherNotePlaceholder") || "E.g. Gift, donation, misc…"}
+                  />
+                </div>
+              )}
+
+              <div className="md:col-span-2">
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium shadow transition text-sm"
+                >
+                  {t("addExpenseSubmit")}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+
+
+        <div className="mb-6">
+          <button
+            onClick={() => navigate("/expense-tracker")}
+            className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium shadow transition text-sm"
+          >
+            {t("trackExpensesCta") || "Track Your Expenses"}
+          </button>
+        </div>
+              {/* Financial Health Snapshot */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {/* Financial Health Status */}
           <div
@@ -884,234 +1321,6 @@ export default function Role1Dashboard() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div
-            className={`rounded-lg shadow-md p-4 border-l-4 border-blue-900 hover:shadow-lg transition ${isDark ? "bg-gray-900" : "bg-white"}`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span
-                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
-              >
-                {t("totalExpenses")}
-              </span>
-              <svg
-                className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div
-              className={`text-2xl font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
-            >
-              ₹
-              {(
-                stats?.totalExpenses ||
-                expenses.reduce((sum, e) => sum + e.amount, 0)
-              )?.toLocaleString()}
-            </div>
-          </div>
-
-          <div
-            className={`rounded-lg shadow-md p-4 border-l-4 border-yellow-400 hover:shadow-lg transition ${isDark ? "bg-gray-900" : "bg-white"}`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span
-                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
-              >
-                {t("transactions")}
-              </span>
-              <svg
-                className="w-5 h-5 text-yellow-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div
-              className={`text-2xl font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
-            >
-              {expenses.length}
-            </div>
-          </div>
-
-          <div
-            className={`rounded-lg shadow-md p-4 border-l-4 border-green-500 hover:shadow-lg transition ${isDark ? "bg-gray-900" : "bg-white"}`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span
-                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
-              >
-                {t("dailyAverage")}
-              </span>
-              <svg
-                className="w-5 h-5 text-green-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div
-              className={`text-2xl font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
-            >
-              ₹{stats?.dailyAverage?.toFixed(0) || 0}
-            </div>
-          </div>
-
-          <div
-            className={`rounded-lg shadow-md p-4 border-l-4 border-purple-500 hover:shadow-lg transition cursor-pointer ${isDark ? "bg-gray-900" : "bg-white"}`}
-            onClick={() => {
-              setShowEditGoal(true);
-              setTempGoal(savingsGoal);
-            }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span
-                className={`text-xs font-semibold ${isDark ? "text-gray-400" : "text-gray-600"}`}
-              >
-                {t("savingsGoal")}
-              </span>
-              <svg
-                className="w-5 h-5 text-purple-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div
-              className={`text-2xl font-bold mb-2 ${isDark ? "text-blue-400" : "text-blue-900"}`}
-            >
-              ₹{savingsGoal.toLocaleString()}
-            </div>
-
-            {(() => {
-              const totalExpenses =
-                stats?.totalExpenses ||
-                expenses.reduce((sum, e) => sum + e.amount, 0);
-              const estimatedIncome =
-                financialSummary?.averageMonthlyIncome ||
-                (totalExpenses > 0 ? totalExpenses * 1.5 : 15000);
-              const savedAmount = Math.max(0, estimatedIncome - totalExpenses);
-              const progressPercent = Math.min(
-                100,
-                (savedAmount / savingsGoal) * 100,
-              );
-
-              return (
-                <>
-                  <div className="flex justify-between items-center mb-1">
-                    <span
-                      className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}
-                    >
-                      {t("saved")}: ₹{savedAmount.toLocaleString()}
-                    </span>
-                    <span className="text-xs font-bold text-purple-600">
-                      {progressPercent.toFixed(1)}%
-                    </span>
-                  </div>
-                  <div
-                    className={`w-full rounded-full h-2 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}
-                  >
-                    <div
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${progressPercent}%` }}
-                    ></div>
-                  </div>
-                  <p
-                    className={`text-xs mt-2 ${isDark ? "text-gray-500" : "text-gray-500"}`}
-                  >
-                    {t("clickToEditGoal")}
-                  </p>
-                </>
-              );
-            })()}
-          </div>
-        </div>
-
-
-        {/* Category Breakdown — computed from all expenses (no period filter) */}
-        {expenses.length > 0 && (() => {
-          const categoryMap = expenses.reduce((acc, exp) => {
-            const key = exp.category || "other";
-            acc[key] = (acc[key] || 0) + (exp.amount || 0);
-            return acc;
-          }, {});
-          const grandTotal = Object.values(categoryMap).reduce((s, v) => s + v, 0);
-          const sorted = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
-          return (
-            <div
-              className={`rounded-lg shadow-md p-5 mb-6 ${isDark ? "bg-gray-900" : "bg-white"}`}
-            >
-              <div className="flex items-center space-x-2 mb-4">
-                <svg
-                  className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                </svg>
-                <h2
-                  className={`text-lg font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                >
-                  {t("categoryBreakdown")}
-                </h2>
-              </div>
-              <div className="space-y-3">
-                {sorted.map(([category, amount]) => (
-                  <div key={category}>
-                    <div className="flex justify-between mb-1">
-                      <span
-                        className={`capitalize font-medium text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}
-                      >
-                        {category}
-                      </span>
-                      <span
-                        className={`font-bold text-sm ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                      >
-                        ₹{amount.toLocaleString()}
-                      </span>
-                    </div>
-                    <div
-                      className={`w-full rounded-full h-2 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}
-                    >
-                      <div
-                        className="bg-gradient-to-r from-blue-900 to-yellow-400 h-2 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${grandTotal > 0 ? (amount / grandTotal) * 100 : 0}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
-
-
         {/* Savings Goal Edit Modal */}
         {showEditGoal && (
           <div
@@ -1244,185 +1453,7 @@ export default function Role1Dashboard() {
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center space-x-2">
-            <svg
-              className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-900"}`}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <h2
-              className={`text-lg font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
-            >
-              {t("yourExpenses")}
-            </h2>
-          </div>
-          <button
-            onClick={() => setShowAddExpense(!showAddExpense)}
-            className="px-5 py-2 bg-yellow-400 hover:bg-yellow-500 text-blue-900 rounded-lg font-medium shadow transition text-sm"
-          >
-            {showAddExpense ? t("cancelBtn") : t("addExpenseBtn")}
-          </button>
-        </div>
-
-        {/* Add Expense Form */}
-        {showAddExpense && (
-          <div
-            className={`rounded-lg shadow-md p-5 mb-6 border-l-4 border-yellow-400 ${isDark ? "bg-gray-900" : "bg-white"}`}
-          >
-            <form
-              onSubmit={handleAddExpense}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
-              <div>
-                <label
-                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  {t("category")}
-                </label>
-                <select
-                  value={newExpense.category}
-                  onChange={(e) =>
-                    setNewExpense({ ...newExpense, category: e.target.value })
-                  }
-                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
-                >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label
-                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  {t("amount")}
-                </label>
-                <input
-                  type="number"
-                  value={newExpense.amount}
-                  onChange={(e) =>
-                    setNewExpense({ ...newExpense, amount: e.target.value })
-                  }
-                  required
-                  min="1"
-                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
-                  placeholder="0"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  {t("date")}
-                </label>
-                <input
-                  type="date"
-                  value={newExpense.date}
-                  onChange={(e) =>
-                    setNewExpense({ ...newExpense, date: e.target.value })
-                  }
-                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  {t("paymentMethod")}
-                </label>
-                <select
-                  value={newExpense.paymentMethod}
-                  onChange={(e) =>
-                    setNewExpense({
-                      ...newExpense,
-                      paymentMethod: e.target.value,
-                    })
-                  }
-                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
-                >
-                  {paymentMethods.map((method) => (
-                    <option key={method} value={method}>
-                      {method.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="md:col-span-2">
-                <label
-                  className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  {t("description")}
-                </label>
-                <input
-                  type="text"
-                  value={newExpense.description}
-                  onChange={(e) =>
-                    setNewExpense({
-                      ...newExpense,
-                      description: e.target.value,
-                    })
-                  }
-                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
-                  placeholder={t("descriptionPlaceholder")}
-                />
-              </div>
-
-              {newExpense.category === "other" && (
-                <div className="md:col-span-2">
-                  <label
-                    className={`block text-xs font-semibold mb-1 ${isDark ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    {t("otherNoteLabel") || "Note (describe the other expense)"}
-                  </label>
-                  <input
-                    type="text"
-                    value={newExpense.otherNote || ""}
-                    onChange={(e) =>
-                      setNewExpense({ ...newExpense, otherNote: e.target.value })
-                    }
-                    className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm ${isDark ? "bg-gray-800 border-yellow-700 text-gray-300 focus:border-yellow-500" : "border-yellow-300 text-gray-700 focus:border-yellow-500"}`}
-                    placeholder={t("otherNotePlaceholder") || "E.g. Gift, donation, misc…"}
-                  />
-                </div>
-              )}
-
-              <div className="md:col-span-2">
-                <button
-                  type="submit"
-                  className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium shadow transition text-sm"
-                >
-                  {t("addExpenseSubmit")}
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-
-
-        <div className="mb-6">
-          <button
-            onClick={() => navigate("/expense-tracker")}
-            className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium shadow transition text-sm"
-          >
-            {t("trackExpensesCta") || "Track Your Expenses"}
-          </button>
-        </div>
-      </div>
+</div>
 
       {/* PDF Upload Modal */}
       {showUploadModal && (
