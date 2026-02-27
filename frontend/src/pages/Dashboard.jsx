@@ -1428,55 +1428,7 @@ export default function Role1Dashboard() {
           </div>
         )}
 
-        {/* Top Category Summary */}
-        {stats?.categoryBreakdown && Object.keys(stats.categoryBreakdown).length > 0 && (() => {
-          const topEntry = Object.entries(stats.categoryBreakdown).sort((a, b) => b[1] - a[1])[0];
-          const topCat = topEntry?.[0];
-          const topAmt = topEntry?.[1] || 0;
-          const totalAmt = stats?.totalExpenses || expenses.reduce((s, e) => s + e.amount, 0);
-          const pct = totalAmt > 0 ? Math.round((topAmt / totalAmt) * 100) : 0;
-          return (
-            <div
-              className={`rounded-lg shadow-md p-5 mb-4 border-l-4 border-yellow-400 ${isDark ? "bg-gray-900" : "bg-white"}`}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <svg
-                  className={`w-5 h-5 ${isDark ? "text-yellow-400" : "text-yellow-600"}`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                </svg>
-                <h2
-                  className={`text-sm font-bold ${isDark ? "text-yellow-400" : "text-yellow-700"}`}
-                >
-                  {t("topCategory") || "Top Spending Category"}
-                </h2>
-              </div>
-              <div className="flex items-center justify-between">
-                <span
-                  className={`capitalize font-semibold text-base ${isDark ? "text-gray-100" : "text-gray-800"}`}
-                >
-                  {topCat}
-                </span>
-                <span
-                  className={`font-bold text-base ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                >
-                  ₹{topAmt.toLocaleString()}
-                  <span className="ml-2 text-xs font-normal text-yellow-500">{pct}% of total</span>
-                </span>
-              </div>
-              <div
-                className={`w-full rounded-full h-2 mt-3 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}
-              >
-                <div
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-            </div>
-          );
-        })()}
+
 
         <div className="mb-6">
           <button
