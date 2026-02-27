@@ -409,7 +409,7 @@ export default function Role1Dashboard() {
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Quick Actions Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {/* 1. Upload Statement */}
           <button
             onClick={() => setShowUploadModal(true)}
@@ -552,7 +552,7 @@ export default function Role1Dashboard() {
               <p className="text-blue-100 text-sm mb-4">
                 {t("welcomeSubtitle")}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <svg
@@ -655,7 +655,7 @@ export default function Role1Dashboard() {
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div
             className={`rounded-lg shadow-md p-4 border-l-4 border-blue-900 hover:shadow-lg transition ${isDark ? "bg-gray-900" : "bg-white"}`}
           >
@@ -917,7 +917,7 @@ export default function Role1Dashboard() {
           >
             <form
               onSubmit={handleAddExpense}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
               <div>
                 <label
@@ -1061,7 +1061,7 @@ export default function Role1Dashboard() {
           </button>
         </div>
               {/* Financial Health Snapshot */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           {/* Financial Health Status */}
           <div
             className={`rounded-lg shadow-md p-5 border-l-4 border-${financialHealth.color}-500 ${isDark ? "bg-gray-900" : "bg-white"}`}
@@ -1388,7 +1388,7 @@ export default function Role1Dashboard() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2 mt-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
                   {[5000, 10000, 20000, 50000].map((amount) => (
                     <button
                       key={amount}

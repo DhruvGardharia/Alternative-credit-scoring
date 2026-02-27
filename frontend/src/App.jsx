@@ -14,6 +14,7 @@ import TaxSummary from "./pages/TaxSummary";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import PlatformManagement from "./pages/PlatformManagement";
 import CreditPolicyBot from "./components/CreditPolicyBot";
+import MyAccount from "./pages/MyAccount";
 
 // Redirects to /dashboard if already logged in
 const PublicRoute = ({ children }) => {
@@ -138,6 +139,14 @@ const App = () => {
           element={
             <DashboardRoute>
               <ExpenseTracker />
+            </DashboardRoute>
+          }
+        />
+        <Route
+          path="/my-account"
+          element={
+            <DashboardRoute>
+              <MyAccount />
             </DashboardRoute>
           }
         />

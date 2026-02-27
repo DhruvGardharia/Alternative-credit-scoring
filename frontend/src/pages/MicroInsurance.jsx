@@ -452,10 +452,10 @@ export default function MicroInsurance() {
           <div style={{ animation:"fadeIn 0.3s ease" }}>
 
             {/* Row 1: Risk + Quick Stats */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16, marginBottom:20 }}>
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 mb-5">
 
               {/* Risk Assessment Card */}
-              <div className="card" style={{ padding:24, gridColumn:"span 1" }}>
+              <div className="card w-full lg:col-span-1" style={{ padding:24 }}>
                 <div style={{ fontWeight:700, fontSize:14, color: T.textSecondary,
                   marginBottom:16, textTransform:"uppercase", letterSpacing:1 }}>
                   AI Risk Assessment
@@ -500,7 +500,7 @@ export default function MicroInsurance() {
               </div>
 
               {/* Premium Options */}
-              <div style={{ gridColumn:"span 2", display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              <div className="w-full lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { type:"shift", label:"Per Shift", icon:"", subtitle:"8-hour coverage", color:"#1e40af" },
                   { type:"daily", label:"Per Day", icon:"", subtitle:"Full day coverage", color:"#1e40af" },
@@ -586,7 +586,7 @@ export default function MicroInsurance() {
 
               {showClaimForm && (
                 <form onSubmit={handleFileClaim} style={{ animation:"fadeIn 0.3s ease" }}>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <div>
                       <label style={{ fontSize:12, color: T.textMuted, display:"block", marginBottom:6 }}>
                         Incident Type
@@ -638,7 +638,7 @@ export default function MicroInsurance() {
                   <div style={{ fontWeight:700, color: T.bannerText, marginBottom:16, fontSize:15 }}>
                     AI Claim Analysis Complete
                   </div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <div style={{ fontSize:11, color: T.textMuted, marginBottom:4 }}>Summary</div>
                       <p style={{ fontSize:13, color: T.textPrimary, lineHeight:1.6 }}>
