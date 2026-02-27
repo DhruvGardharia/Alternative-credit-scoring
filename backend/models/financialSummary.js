@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import "./incomeModel.js";
+import "./expenseModel.js";
 
 /**
  * Financial Summary Model
@@ -163,3 +165,5 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
 export const UserFinancialSummary =
   mongoose.models.UserFinancialSummary ||
   mongoose.model("UserFinancialSummary", financialSummarySchema);
+
+export const FinancialSummary = UserFinancialSummary;

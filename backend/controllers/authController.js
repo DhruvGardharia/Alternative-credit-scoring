@@ -30,9 +30,13 @@ export const register = TryCatch(async (req, res) => {
     phone,
   });
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secret_key_12345", {
-    expiresIn: "30d",
-  });
+  const token = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET || "secret_key_12345",
+    {
+      expiresIn: "30d",
+    },
+  );
 
   res.status(201).json({
     success: true,
@@ -50,30 +54,34 @@ export const register = TryCatch(async (req, res) => {
 // Login user
 export const login = TryCatch(async (req, res) => {
   const { email, password } = req.body;
-
+  console.log("Login attempt:", email, password);
   if (!email || !password) {
     return res.status(400).json({
-      message: "Email and password are required",
+      message: "Email and password are required1",
     });
   }
 
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(401).json({
-      message: "Invalid email or password",
+      message: "Invalid email or password2",
     });
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     return res.status(401).json({
-      message: "Invalid email or password",
+      message: "Invalid email or password3",
     });
   }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secret_key_12345", {
-    expiresIn: "30d",
-  });
+  const token = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET || "secret_key_12345",
+    {
+      expiresIn: "30d",
+    },
+  );
 
   res.json({
     success: true,
@@ -91,7 +99,7 @@ export const login = TryCatch(async (req, res) => {
 // Get current user
 export const getMe = TryCatch(async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
-  
+
   if (!user) {
     return res.status(404).json({
       message: "User not found",
