@@ -90,16 +90,8 @@ const App = () => {
           path="/expense-tracker"
           element={
             <DashboardRoute>
-              <TaxSummary />
-            </DashboardRoute>
-          }
-        />
-        <Route
-          path="/expense-tracker"
-          element={
-            <ProtectedRoute>
               <ExpenseTracker />
-            </ProtectedRoute>
+            </DashboardRoute>
           }
         />
       </Routes>
