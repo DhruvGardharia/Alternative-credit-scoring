@@ -25,8 +25,17 @@ const financialSummarySchema = new mongoose.Schema(
     incomeByPlatform: {
       uber: { type: Number, default: 0 },
       ola: { type: Number, default: 0 },
+      rapido: { type: Number, default: 0 },
       swiggy: { type: Number, default: 0 },
       zomato: { type: Number, default: 0 },
+      zepto: { type: Number, default: 0 },
+      blinkit: { type: Number, default: 0 },
+      dunzo: { type: Number, default: 0 },
+      fiverr: { type: Number, default: 0 },
+      upwork: { type: Number, default: 0 },
+      freelancer: { type: Number, default: 0 },
+      urbanCompany: { type: Number, default: 0 },
+      meesho: { type: Number, default: 0 },
       other: { type: Number, default: 0 }
     },
 
@@ -76,12 +85,15 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
   // Calculate income metrics
   const totalIncome = incomes.reduce((sum, inc) => sum + inc.amount, 0);
   const incomeByPlatform = {
-    uber: 0, ola: 0, swiggy: 0, zomato: 0, other: 0
+    uber: 0, ola: 0, rapido: 0, swiggy: 0, zomato: 0, zepto: 0, 
+    blinkit: 0, dunzo: 0, fiverr: 0, upwork: 0, freelancer: 0,
+    urbanCompany: 0, meesho: 0, other: 0
   };
   
   incomes.forEach(inc => {
-    if (incomeByPlatform.hasOwnProperty(inc.platform)) {
-      incomeByPlatform[inc.platform] += inc.amount;
+    const platform = inc.platform?.toLowerCase();
+    if (incomeByPlatform.hasOwnProperty(platform)) {
+      incomeByPlatform[platform] += inc.amount;
     } else {
       incomeByPlatform.other += inc.amount;
     }

@@ -19,13 +19,13 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter
+// File filter - PDF only for bank statements
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "text/csv", "application/vnd.ms-excel", "text/plain"];
-  if (allowedTypes.includes(file.mimetype) || file.originalname.endsWith('.csv')) {
+  const allowedTypes = ["application/pdf"];
+  if (allowedTypes.includes(file.mimetype) || file.originalname.endsWith('.pdf')) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only PDF, JPG, PNG, and CSV are allowed"), false);
+    cb(new Error("Invalid file type. Only PDF files are allowed for bank statements"), false);
   }
 };
 

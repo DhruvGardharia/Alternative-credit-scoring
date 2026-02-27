@@ -2,9 +2,10 @@ import { User } from "../models/userModel.js";
 import { BankStatement } from "../models/bankStatementModel.js";
 import { FinancialSummary } from "../models/financialSummary.js";
 import { CreditScore } from "../models/creditScoreModel.js";
+import { Income } from "../models/incomeModel.js";
+import { Expense } from "../models/expenseModel.js";
 import TryCatch from "../utils/TryCatch.js";
-import { parseCSVBankStatement, validateCSV } from "../services/csvParser.js";
-import { calculateCreditScore } from "../services/creditScoring.js";
+import { calculateCreditProfile } from "../services/creditEngine/index.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -65,74 +66,13 @@ export const getAllUsers = TryCatch(async (req, res) => {
   });
 });
 
-// Upload bank statement (CSV)
+// Upload bank statement (Deprecated - Use statementController instead)
+// This function is kept for backward compatibility but should use /api/statement/upload endpoint
 export const uploadBankStatement = TryCatch(async (req, res) => {
-  const userId = req.user.id;
-
-  if (!req.file) {
-    return res.status(400).json({
-      message: "No file uploaded",
-    });
-  }
-
-  // Validate file
-  try {
-    validateCSV(req.file);
-  } catch (error) {
-    return res.status(400).json({
-      message: error.message,
-    });
-  }
-
-  // Create bank statement record
-  const bankStatement = await BankStatement.create({
-    userId,
-    fileName: req.file.originalname,
-    fileUrl: req.file.path,
-    status: "processing",
+  return res.status(410).json({
+    success: false,
+    message: "This endpoint is deprecated. Please use POST /api/statement/upload for PDF bank statements",
   });
-
-  try {
-    // Parse the CSV bank statement
-    const financialMetrics = await parseCSVBankStatement(req.file.path);
-
-    // Create financial summary
-    const financialSummary = await FinancialSummary.create({
-      userId,
-      bankStatementId: bankStatement._id,
-      ...financialMetrics,
-    });
-
-    // Calculate credit score
-    const creditScoreData = calculateCreditScore(financialSummary);
-
-    // Save credit score
-    const creditScore = await CreditScore.create({
-      userId,
-      financialSummaryId: financialSummary._id,
-      ...creditScoreData,
-    });
-
-    // Update bank statement status
-    bankStatement.status = "processed";
-    await bankStatement.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Bank statement uploaded and processed successfully",
-      bankStatement,
-      financialSummary,
-      creditScore,
-    });
-  } catch (error) {
-    // Update bank statement status to failed
-    bankStatement.status = "failed";
-    await bankStatement.save();
-
-    return res.status(400).json({
-      message: error.message,
-    });
-  }
 });
 
 // Get financial summary for a user
@@ -166,31 +106,44 @@ export const generateCreditScore = TryCatch(async (req, res) => {
     });
   }
 
-  // Get latest financial summary
-  const financialSummary = await FinancialSummary.findOne({ userId }).sort({
-    createdAt: -1,
-  });
+  // Get all incomes and expenses for this user
+  const allIncomes = await Income.find({ userId, status: "completed" }).lean();
+  const allExpenses = await Expense.find({ userId }).lean();
 
-  if (!financialSummary) {
+  if (allIncomes.length === 0 && allExpenses.length === 0) {
     return res.status(404).json({
-      message: "No financial summary found. Please upload a bank statement first.",
+      message: "No financial data found. Please connect platforms or upload bank statement first.",
     });
   }
 
-  // Calculate credit score
-  const creditScoreData = calculateCreditScore(financialSummary);
+  // Convert to normalized transaction format
+  const normalizedTransactions = [
+    ...allIncomes.map(inc => ({
+      date: inc.date,
+      type: "credit",
+      amount: inc.amount,
+      category: inc.platform,
+      source: "platform"
+    })),
+    ...allExpenses.map(exp => ({
+      date: exp.date,
+      type: "debit",
+      amount: exp.amount,
+      category: exp.category,
+      source: "manual"
+    }))
+  ];
 
-  // Save credit score
-  const creditScore = await CreditScore.create({
-    userId,
-    financialSummaryId: financialSummary._id,
-    ...creditScoreData,
+  // Calculate credit profile using new credit engine
+  const creditProfile = await calculateCreditProfile({ 
+    userId, 
+    transactions: normalizedTransactions 
   });
 
   res.status(201).json({
     success: true,
     message: "Credit score generated successfully",
-    creditScore,
+    creditProfile,
   });
 });
 
