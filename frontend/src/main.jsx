@@ -5,15 +5,18 @@ import "./index.css";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
+import { LenderAuthProvider } from "./context/LenderAuthContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <ThemeProvider>
-        <LanguageProvider>
-          <App />
-        </LanguageProvider>  
-      </ThemeProvider>
+      <LenderAuthProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <App />
+          </LanguageProvider>  
+        </ThemeProvider>
+      </LenderAuthProvider>
     </AuthProvider>
   </React.StrictMode>
 );

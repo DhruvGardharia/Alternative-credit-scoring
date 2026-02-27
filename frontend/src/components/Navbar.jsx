@@ -63,6 +63,26 @@ export default function Navbar() {
             {t("welcome")}, {user?.name}
           </span>
 
+          {/* Nav Links */}
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate("/emergency-loan")}
+            className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
+          >
+            Emergency Loan
+          </button>
+          <button
+            onClick={() => navigate("/insurance")}
+            className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
+          >
+            Micro Insurance
+          </button>
+
           {/* Language Selector Dropdown */}
           <div className="relative">
             <button
