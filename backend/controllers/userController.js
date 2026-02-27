@@ -1,6 +1,6 @@
 import { User } from "../models/userModel.js";
 import { BankStatement } from "../models/bankStatementModel.js";
-import { FinancialSummary } from "../models/financialSummaryModel.js";
+import { FinancialSummary } from "../models/financialSummary.js";
 import { CreditScore } from "../models/creditScoreModel.js";
 import TryCatch from "../utils/TryCatch.js";
 import { parseCSVBankStatement, validateCSV } from "../services/csvParser.js";
