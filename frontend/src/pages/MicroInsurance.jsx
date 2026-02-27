@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 // ── helpers ──────────────────────────────────────────────────
 const api = (path, opts = {}) =>
@@ -356,6 +357,8 @@ export default function MicroInsurance() {
   const rs = risk?.riskAssessment;
 
   return (
+    <>
+      <Navbar />
     <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter',sans-serif",
       color:"#e2e8f0" }}>
       <style>{`
@@ -382,40 +385,6 @@ export default function MicroInsurance() {
         textarea.input { resize:vertical; min-height:90px; }
         select.input { cursor:pointer; }
       `}</style>
-
-      {/* ── Navbar ── */}
-      <nav style={{ background:"#0d1117", borderBottom:"1px solid #1e293b",
-        padding:"14px 24px", display:"flex", alignItems:"center", justifyContent:"space-between",
-        position:"sticky", top:0, zIndex:100 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-          <button onClick={() => navigate("/dashboard")}
-            style={{ background:"#1e293b", border:"none", color:"#94a3b8",
-              borderRadius:8, padding:"6px 12px", cursor:"pointer", fontSize:13 }}>
-            ← Dashboard
-          </button>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ width:36, height:36, background:"linear-gradient(135deg,#3b82f6,#8b5cf6)",
-              borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize:18 }}>🛡️</div>
-            <div>
-              <div style={{ fontWeight:800, fontSize:16, letterSpacing:-0.5 }}>GigShield</div>
-              <div style={{ color:"#64748b", fontSize:11 }}>Micro-Insurance Platform</div>
-            </div>
-          </div>
-        </div>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <span style={{ color:"#94a3b8", fontSize:13 }}>Hi, {user?.name}</span>
-          {activePolicy ? (
-            <span className="tag" style={{ background:"#166534", color:"#86efac" }}>
-              🟢 Covered
-            </span>
-          ) : (
-            <span className="tag" style={{ background:"#7f1d1d", color:"#fca5a5" }}>
-              🔴 Unprotected
-            </span>
-          )}
-        </div>
-      </nav>
 
       {/* ── Active Policy Banner ── */}
       {activePolicy && (
@@ -1312,5 +1281,6 @@ export default function MicroInsurance() {
       </div>
 
     </div>
+     </>
   );
 }
