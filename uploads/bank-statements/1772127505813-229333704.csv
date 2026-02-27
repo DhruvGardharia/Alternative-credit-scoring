@@ -1,0 +1,32 @@
+Date,Description,Debit,Credit,Balance
+2026-01-01,Opening Balance,0,0,5000
+2026-01-02,Zomato Payment,0,850,5850
+2026-01-03,Swiggy Payment,0,920,6770
+2026-01-04,Grocery Store,450,0,6320
+2026-01-05,Fuel Expense,600,0,5720
+2026-01-06,Zomato Payment,0,1100,6820
+2026-01-07,Rent Payment,8000,0,-1180
+2026-01-08,Swiggy Payment,0,950,−230
+2026-01-09,Uber Payment,0,780,550
+2026-01-10,Restaurant,350,0,200
+2026-01-11,Zomato Payment,0,1200,1400
+2026-01-12,Swiggy Payment,0,890,2290
+2026-01-13,Electricity Bill,850,0,1440
+2026-01-14,Uber Payment,0,670,2110
+2026-01-15,Mobile Recharge,299,0,1811
+2026-01-16,Zomato Payment,0,1050,2861
+2026-01-17,Swiggy Payment,0,980,3841
+2026-01-18,Medical Store,420,0,3421
+2026-01-19,Uber Payment,0,850,4271
+2026-01-20,Grocery Store,550,0,3721
+2026-01-21,Zomato Payment,0,1150,4871
+2026-01-22,Swiggy Payment,0,920,5791
+2026-01-23,Entertainment,600,0,5191
+2026-01-24,Uber Payment,0,790,5981
+2026-01-25,Water Bill,200,0,5781
+2026-01-26,Zomato Payment,0,1080,6861
+2026-01-27,Swiggy Payment,0,940,7801
+2026-01-28,Clothing Store,1200,0,6601
+2026-01-29,Uber Payment,0,720,7321
+2026-01-30,Zomato Payment,0,1150,8471
+2026-01-31,Swiggy Payment,0,890,9361

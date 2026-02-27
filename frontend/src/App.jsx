@@ -5,6 +5,11 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
+import MicroInsurance from "./pages/MicroInsurance";
+import EmergencyLoan from "./pages/EmergencyLoan";
+import LenderDashboard from "./pages/LenderDashboard";
+import LenderLogin from "./pages/LenderLogin";
+import LenderRegister from "./pages/LenderRegister";
 import TaxSummary from "./pages/TaxSummary";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import PlatformManagement from "./pages/PlatformManagement";
@@ -92,6 +97,35 @@ const App = () => {
             </DashboardRoute>
           }
         />
+        <Route
+          path="/insurance"
+          element={
+            <ProtectedRoute>
+              <MicroInsurance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/emergency-loan"
+          element={
+            <ProtectedRoute>
+              <EmergencyLoan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/lender-login"
+          element={<LenderLogin />}
+        />
+        <Route
+          path="/lender-register"
+          element={<LenderRegister />}
+        />
+        <Route
+          path="/lender-dashboard"
+          element={<LenderDashboard />}
+        />
+
         <Route
           path="/expense-tracker"
           element={

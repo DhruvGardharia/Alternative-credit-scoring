@@ -1,15 +1,16 @@
-import express from "express";
-import dotenv from "dotenv";
-import connectDb from "./database/db.js";
-import bodyParser from "body-parser";
-import path from "path";
-import cookieParser from "cookie-parser";
-import cloudinary from "cloudinary";
-import axios from "axios";
-import cors from "cors";
-import multer from "multer";
-import fs from "fs";
-import FormData from "form-data";
+import express from 'express';
+import dotenv from 'dotenv';
+import connectDb from './database/db.js';
+import bodyParser from 'body-parser';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import cloudinary from 'cloudinary';
+import axios from 'axios';
+import cors from 'cors';
+import multer from 'multer';
+import fs from 'fs';
+import FormData from 'form-data';
+
 dotenv.config();
 const port = process.env.PORT || 5005;
 
@@ -19,6 +20,7 @@ cloudinary.v2.config({
   api_secret: process.env.Cloud_Secret,
 });
 
+
 const app = express();
 
 app.use(cors());
@@ -26,10 +28,15 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
 
-import userRoutes from "./routes/userRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import expenseRoutes from "./routes/expenseRoutes.js";
+
+import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import expenseRoutes from './routes/expenseRoutes.js';
+import insuranceRoutes from './routes/insuranceRoutes.js';
 import taxRoutes from "./routes/taxRoutes.js";
+import loanRoutes from './routes/loanRoutes.js';
+import lenderRoutes from './routes/lenderRoutes.js';
+import lenderAuthRoutes from './routes/lenderAuthRoutes.js';
 
 import platformRoutes from './routes/platformRoutes.js';
 import statementRoutes from './routes/statementRoutes.js';
@@ -37,13 +44,15 @@ import incomeRoutes from './routes/incomeRoutes.js';
 import summaryRoutes from './routes/summaryRoutes.js';
 import creditRoutes from './routes/creditRoutes.js';
 
-app.use("/api/user", userRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/expenses", expenseRoutes);
-app.use("/api/tax", taxRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/insurance', insuranceRoutes);
+app.use("/api/tax", taxRoutes);
+app.use('/api/loans', loanRoutes);
+app.use('/api/lender', lenderRoutes);
+app.use('/api/lender-auth', lenderAuthRoutes);
+
 app.use('/api/platform', platformRoutes);
 app.use('/api/statement', statementRoutes);
 app.use('/api/income', incomeRoutes);
