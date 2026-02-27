@@ -51,15 +51,23 @@ const incomeSchema = new mongoose.Schema(
       default: "completed"
     },
 
-    // Platform-Specific Data (optional)
+    // Platform-Specific Data — stored as flexible Mixed so all mock fields are saved
+    // (tripsCompleted, deliveriesCompleted, baseFare, surge, incentives, platformFee, etc.)
     platformData: {
-      orderId: String,
-      rideId: String,
-      tripId: String,
-      distance: Number,
-      duration: Number,
-      rating: Number
+      type: mongoose.Schema.Types.Mixed,
+      default: {}
     },
+
+    // Top-level queryable: trips or deliveries completed that day (for today's activity)
+    tripsOrDeliveries: {
+      type: Number,
+      default: 0
+    },
+
+    // Breakdown fields for reporting
+    baseFare: { type: Number, default: 0 },
+    platformFee: { type: Number, default: 0 },
+    incentives: { type: Number, default: 0 },
 
     // Metadata
     description: String,

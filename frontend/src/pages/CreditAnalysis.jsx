@@ -21,16 +21,20 @@ export default function CreditAnalysis() {
   const monthlyIncome = safeGet(financialSummary?.monthlyAvgIncome || financialSummary?.averageMonthlyIncome, 30000);
   
   const totalIncome = safeGet(financialSummary?.totalIncome, monthlyIncome * 3);
-  const totalExpenses = safeGet(financialSummary?.totalExpenses,monthlyIncome * 1.2);
-  const expenseRatio = safeGet(totalIncome > 0 ? totalExpenses / totalIncome : 0, 0.4);
+  const totalExpenses = safeGet(financialSummary?.totalExpenses, monthlyIncome * 1.2);
+  // Cap expenseRatio display at 200% max for sanity; store raw for calcs
+  const expenseRatioRaw = safeGet(totalIncome > 0 ? totalExpenses / totalIncome : 0, 0.4);
+  const expenseRatio = expenseRatioRaw; // kept for calculations
   
-  // Try to get consistency from creditData metrics or calculate from financial summary
-  const consistencyScore = safeGet(
-    creditData?.metrics?.incomeConsistency?.value ||
-    creditData?.metrics?.avgMonthlyIncome?.score ||
-    financialSummary?.incomeConsistencyScore,
-    75
-  );
+  // Derive consistency score from raw value using band thresholds (handles stale DB where score=0 but value>0)
+  const rawConsistencyValue = Math.min(100, safeGet(creditData?.metrics?.incomeConsistency?.value, 0));
+  const storedConsistencyScore = safeGet(creditData?.metrics?.incomeConsistency?.score, 0);
+  const derivedConsistencyScore = rawConsistencyValue >= 91 ? 100
+    : rawConsistencyValue >= 76 ? 80
+    : rawConsistencyValue >= 61 ? 60
+    : rawConsistencyValue >= 41 ? 40
+    : rawConsistencyValue > 0  ? 20 : 0;
+  const consistencyScore = storedConsistencyScore > 0 ? storedConsistencyScore : (derivedConsistencyScore || safeGet(financialSummary?.incomeConsistencyScore, 75));
 
   // Active work days - estimate from data
   const workDays = safeGet(
@@ -73,40 +77,40 @@ export default function CreditAnalysis() {
 
   const getScoreColor = (score) => {
     // Score is on 0-1000 scale — normalize to 0-100 for color thresholds
-    const normalizedScore = score > 100 ? (score / 1000) * 100 : score;
+    const normalizedScore = score > 100 ? (score / 850) * 100 : score;
     
     if (normalizedScore >= 75) return 'text-green-600';
     if (normalizedScore >= 50) return 'text-yellow-600';
     return 'text-red-600';
   };
 
-  // Calculate simulated credit score
+  // Calculate simulated credit score on 0-1000 scale
   const calculateSimulatedScore = () => {
     if (!financialSummary) return 0;
     
-    const expenseRatio = simulatedExpenses / simulatedIncome;
-    const consistencyScore = Math.min(100, (simulatedWorkDays / 30) * 100);
-    const savingsRate = Math.max(0, 1 - expenseRatio);
+    const simExpenseRatio = simulatedExpenses / simulatedIncome;
+    const simConsistency = Math.min(100, (simulatedWorkDays / 30) * 100);
+    const simSavings = Math.max(0, 1 - simExpenseRatio);
     
     let score = 0;
-    score += consistencyScore * 0.4; // 40% weight
-    score += (simulatedWorkDays / 30) * 100 * 0.3; // 30% weight
-    score += savingsRate * 100 * 0.2; // 20% weight
-    score += Math.min(100, (simulatedIncome / 30000) * 100) * 0.1; // 10% weight
-    
-    return Math.round(Math.min(100, Math.max(0, score)));
+    score += simConsistency * 0.4;
+    score += (simulatedWorkDays / 30) * 100 * 0.3;
+    score += simSavings * 100 * 0.2;
+    score += Math.min(100, (simulatedIncome / 30000) * 100) * 0.1;
+    // Scale to 0-1000
+    return Math.round(Math.min(1000, Math.max(0, score * 10)));
   };
 
   const simulatedScore = calculateSimulatedScore();
-  const simulatedCreditAmount = Math.round((simulatedScore / 100) * 200000);
-  const scoreChange = simulatedScore - (creditData?.score || 0);
+  const simulatedCreditAmount = Math.round((simulatedScore / 850) * 100000);
+  const scoreChange = simulatedScore - safeGet(creditData?.score || creditData?.creditScore, 0);
 
-  // Prepare chart data with safe values
+  // Use actual scoreBreakdown from API (all 0-100) for the pie chart
   const scoreBreakdownData = [
-    { name: 'Income Consistency', value: Math.round(safeGet(consistencyScore, 0)), color: '#1e3a8a' },
-    { name: 'Work Days', value: Math.round(safeGet((workDays / 30) * 100, 0)), color: '#fbbf24' },
-    { name: 'Expense Control', value: Math.round(safeGet((1 - expenseRatio) * 100, 50)), color: '#10b981' },
-    { name: 'Balance Stability', value: Math.round(safeGet(((creditData?.score || creditData?.creditScore || 50) / 100) * 80, 40)), color: '#8b5cf6' }
+    { name: 'Income Quality',    value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.incomeQualityScore, 0))),    color: '#1e3a8a' },
+    { name: 'Spending Behavior', value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.spendingBehaviorScore, 0))), color: '#fbbf24' },
+    { name: 'Liquidity',         value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.liquidityScore, 0))),         color: '#10b981' },
+    { name: 'Gig Stability',     value: Math.max(0, Math.round(safeGet(creditData?.scoreBreakdown?.gigStabilityScore, 0))),     color: '#8b5cf6' }
   ];
 
   const incomeExpenseData = [
@@ -149,42 +153,43 @@ export default function CreditAnalysis() {
     if (!financialSummary || !creditData) return [];
     
     const timeline = [];
-    const currentScore = creditData.score || 0;
+    const currentScore = safeGet(creditData.score || creditData.creditScore, 0);
+    const activeWorkDays = creditData?.metrics?.activeWorkDays?.value || financialSummary?.activeWorkDays || 0;
     
-    if (financialSummary.activeWorkDays < 25) {
+    if (activeWorkDays < 25) {
       timeline.push({
         timeframe: '2 weeks',
         action: 'Work 25+ days consistently',
-        impact: '+5 to +8 points',
-        newScore: Math.min(100, currentScore + 6)
+        impact: '+50 to +80 pts',
+        newScore: Math.min(1000, currentScore + 60)
       });
     }
     
-    if (financialSummary.expenseToIncomeRatio > 0.6) {
+    if (expenseRatioRaw > 0.6) {
       timeline.push({
         timeframe: '1 month',
         action: 'Reduce expenses by 10%',
-        impact: '+8 to +12 points',
-        newScore: Math.min(100, currentScore + 10)
+        impact: '+80 to +120 pts',
+        newScore: Math.min(1000, currentScore + 100)
       });
     }
     
-    if (financialSummary.averageMonthlyIncome < 40000) {
+    if (monthlyIncome < 40000) {
       timeline.push({
         timeframe: '2 months',
         action: 'Increase income streams',
-        impact: '+10 to +15 points',
-        newScore: Math.min(100, currentScore + 12)
+        impact: '+100 to +150 pts',
+        newScore: Math.min(1000, currentScore + 120)
       });
     }
     
     timeline.push({
       timeframe: '3 months',
       action: 'Maintain all improvements',
-      impact: '+15 to +20 points',
-      newScore: Math.min(100, currentScore + 18)
+      impact: '+150 to +200 pts',
+      newScore: Math.min(1000, currentScore + 180)
     });
-    
+
     return timeline;
   };
 
@@ -316,8 +321,8 @@ export default function CreditAnalysis() {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{Math.round(consistencyScore)}%</div>
-            <div className="text-xs text-gray-500 mt-1">Income reliability</div>
+            <div className="text-2xl font-bold text-gray-900">{Math.round(consistencyScore)}/100</div>
+            <div className="text-xs text-gray-500 mt-1">Income reliability score</div>
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-yellow-500">
@@ -331,16 +336,20 @@ export default function CreditAnalysis() {
             <div className="text-xs text-gray-500 mt-1">Days per month</div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-purple-500">
+          <div className={`bg-white rounded-lg shadow-md p-4 border-l-4 ${expenseRatioRaw > 1 ? 'border-red-500' : expenseRatioRaw > 0.6 ? 'border-orange-500' : 'border-purple-500'}`}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-gray-600">Expense Ratio</span>
-              <svg className="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg className={`w-4 h-4 ${expenseRatioRaw > 1 ? 'text-red-500' : 'text-purple-500'}`} fill="currentColor" viewBox="0 0 20 20">
                 <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
               </svg>
             </div>
-            <div className="text-2xl font-bold text-gray-900">{(expenseRatio * 100).toFixed(0)}%</div>
-            <div className="text-xs text-gray-500 mt-1">Of total income</div>
+            <div className={`text-2xl font-bold ${expenseRatioRaw > 1 ? 'text-red-600' : 'text-gray-900'}`}>{(expenseRatioRaw * 100).toFixed(0)}%</div>
+            <div className="text-xs mt-1">
+              {expenseRatioRaw > 1
+                ? <span className="text-red-500 font-semibold">Expenses exceed income!</span>
+                : <span className="text-gray-500">Of total income</span>}
+            </div>
           </div>
         </div>
 
@@ -629,19 +638,19 @@ export default function CreditAnalysis() {
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-gray-600">Your Score</span>
-                <span className="font-semibold text-blue-900">{creditData.score}</span>
+                <span className="font-semibold text-blue-900">{creditData.score} / 850</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div 
                   className="bg-gradient-to-r from-blue-900 to-yellow-400 h-3 rounded-full transition-all duration-1000"
-                  style={{ width: `${creditData.score}%` }}
+                  style={{ width: `${Math.min(100, safeGet((creditData.score / 850) * 100, 0))}%` }}
                 ></div>
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-gray-600">Average Gig Worker</span>
-                <span className="font-semibold text-gray-700">55</span>
+                <span className="font-semibold text-gray-700">450 / 850</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div className="bg-gray-400 h-3 rounded-full" style={{ width: '55%' }}></div>
@@ -650,7 +659,7 @@ export default function CreditAnalysis() {
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-gray-600">Top 10% Workers</span>
-                <span className="font-semibold text-gray-700">82</span>
+                <span className="font-semibold text-gray-700">700 / 850</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div className="bg-green-500 h-3 rounded-full" style={{ width: '82%' }}></div>

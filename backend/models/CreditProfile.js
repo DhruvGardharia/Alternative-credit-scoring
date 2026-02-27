@@ -28,9 +28,9 @@ const creditProfileSchema = new mongoose.Schema(
     creditScore: {
       type: Number,
       required: true,
-      min: 300,
+      min: 0,
       max: 850,
-      default: 300
+      default: 0
     },
 
     riskLevel: {

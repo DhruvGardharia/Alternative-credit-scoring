@@ -7,13 +7,13 @@
 
 export const SCORE_RANGE = {
   MIN: 0,
-  MAX: 1000
+  MAX: 850
 };
 
 export const RISK_BANDS = {
-  HIGH: { min: 0,   max: 350,  label: "HIGH" },
-  MEDIUM: { min: 351, max: 700,  label: "MEDIUM" },
-  LOW: { min: 701, max: 1000, label: "LOW" }
+  HIGH:   { min: 0,   max: 300, label: "HIGH" },
+  MEDIUM: { min: 301, max: 600, label: "MEDIUM" },
+  LOW:    { min: 601, max: 850, label: "LOW" }
 };
 
 /**
@@ -173,6 +173,7 @@ export const LIQUIDITY_METRICS = {
     weight: 60,
     // Average daily balance
     scoringBands: [
+      { min: -Infinity, max: -1, score: 0, status: "Negative Balance" },
       { min: 0, max: 1000, score: 20, status: "Very Low Liquidity" },
       { min: 1001, max: 3000, score: 40, status: "Low Liquidity" },
       { min: 3001, max: 7000, score: 60, status: "Moderate Liquidity" },
@@ -209,17 +210,13 @@ export const GIG_METRICS = {
 export function getScoreFromBands(value, bands) {
   for (const band of bands) {
     if (value >= band.min && value <= band.max) {
-      return {
-        score: band.score,
-        status: band.status
-      };
+      return { score: band.score, status: band.status };
     }
   }
-  // Default fallback
-  return {
-    score: 0,
-    status: "Unknown"
-  };
+  // Fallback: return score from the closest band edge
+  if (value < bands[0].min) return { score: bands[0].score, status: bands[0].status };
+  const last = bands[bands.length - 1];
+  return { score: last.score, status: last.status };
 }
 
 /**

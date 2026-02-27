@@ -83,14 +83,22 @@ export const connectPlatform = async (req, res) => {
       });
     }
 
+    console.log(`\n✅ [Platform Connect] ${platform.toUpperCase()}`);
+    console.log(`   Transactions synced : ${syncResult.transactionCount}`);
+    console.log(`   Total earnings      : ₹${syncResult.totalEarnings.toLocaleString("en-IN")}`);
+    console.log(`   Today's activity    : ${syncResult.today ? `${syncResult.today.tripsOrDeliveries} trips · ₹${syncResult.today.earnings}` : 'off day'}`);
+    console.log(`   Credit score        : ${creditProfile?.creditScore ?? 'not calculated'}\n`);
+
     res.status(200).json({
       success: true,
       message: `Successfully connected to ${platform}`,
       data: {
         platform,
         workType: workType || "FULL_TIME",
-        ...syncResult,
-        creditScore: creditProfile?.creditScore
+        transactionCount: syncResult.transactionCount,
+        totalEarnings: syncResult.totalEarnings,
+        today: syncResult.today,
+        creditScore: creditProfile?.creditScore ?? null
       }
     });
 
@@ -105,19 +113,55 @@ export const connectPlatform = async (req, res) => {
 
 /**
  * GET /api/platform/connected/:userId
- * Get list of connected platforms for a user
+ * Get connected platforms with aggregated earnings + today's activity
  */
 export const getConnectedPlatforms = async (req, res) => {
   try {
     const { userId } = req.params;
 
     const user = await User.findById(userId).select("connectedPlatforms").lean();
-
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: "User not found"
-      });
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    // All-time earnings per platform
+    const earningsAgg = await Income.aggregate([
+      { $match: { userId: user._id, status: "completed" } },
+      { $group: {
+          _id: "$platform",
+          totalEarnings: { $sum: "$amount" },
+          transactionCount: { $sum: 1 }
+      }}
+    ]);
+    const earningsMap = {};
+    for (const row of earningsAgg) {
+      earningsMap[row._id] = {
+        totalEarnings: Math.round(row.totalEarnings),
+        transactionCount: row.transactionCount
+      };
+    }
+
+    // Today's activity per platform
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    const todayEnd   = new Date(); todayEnd.setHours(23, 59, 59, 999);
+    const todayAgg = await Income.aggregate([
+      { $match: {
+          userId: user._id,
+          status: "completed",
+          date: { $gte: todayStart, $lte: todayEnd }
+      }},
+      { $group: {
+          _id: "$platform",
+          todayEarnings: { $sum: "$amount" },
+          todayActivity: { $sum: "$tripsOrDeliveries" }
+      }}
+    ]);
+    const todayMap = {};
+    for (const row of todayAgg) {
+      todayMap[row._id] = {
+        todayEarnings: Math.round(row.todayEarnings),
+        todayActivity: row.todayActivity
+      };
     }
 
     const connected = [];
@@ -126,22 +170,20 @@ export const getConnectedPlatforms = async (req, res) => {
         connected.push({
           platform,
           workType: data.workType,
-          lastSync: data.lastSync
+          lastSync: data.lastSync,
+          totalEarnings: earningsMap[platform]?.totalEarnings || 0,
+          transactionCount: earningsMap[platform]?.transactionCount || 0,
+          todayEarnings: todayMap[platform]?.todayEarnings || 0,
+          todayActivity: todayMap[platform]?.todayActivity || 0,
         });
       }
     }
 
-    res.status(200).json({
-      success: true,
-      data: { connected }
-    });
+    res.status(200).json({ success: true, data: { connected } });
 
   } catch (error) {
     console.error("Get connected platforms error:", error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
