@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import Navbar from "../components/Navbar";
 import axios from "axios";
 
@@ -31,6 +32,7 @@ const STATUS_STYLES = {
 
 export default function EmergencyLoan() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const [tab, setTab] = useState("apply"); // apply | history
   const [eligibility, setEligibility] = useState(null);
   const [loans, setLoans] = useState([]);
@@ -123,12 +125,12 @@ export default function EmergencyLoan() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-blue-950">
+      <div className={`min-h-screen ${isDark ? "bg-gradient-to-br from-gray-950 via-gray-900 to-blue-950 text-gray-100" : "bg-gradient-to-br from-gray-50 via-white to-blue-50 text-gray-900"}`}>
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
-            <p className="text-gray-400 text-lg">Loading loan details...</p>
+            <p className={isDark ? "text-gray-400 text-lg" : "text-gray-600 text-lg"}>Loading loan details...</p>
           </div>
         </div>
       </div>
@@ -136,7 +138,7 @@ export default function EmergencyLoan() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-blue-950">
+    <div className={`min-h-screen ${isDark ? "bg-gradient-to-br from-gray-950 via-gray-900 to-blue-950 text-white" : "bg-gradient-to-br from-gray-50 via-white to-blue-50 text-gray-900"}`}>
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
@@ -149,20 +151,20 @@ export default function EmergencyLoan() {
               </svg>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Emergency Loan</h1>
-              <p className="text-gray-400">Quick financing for gig workers based on your credit profile</p>
+              <h1 className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Emergency Loan</h1>
+              <p className={isDark ? "text-gray-400" : "text-gray-600"}>Quick financing for gig workers based on your credit profile</p>
             </div>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-1 p-1 bg-gray-800/50 rounded-xl mb-8 w-fit">
+        <div className={`flex gap-1 p-1 rounded-xl mb-8 w-fit ${isDark ? "bg-gray-800/50" : "bg-white shadow border border-gray-100"}`}>
           <button
             onClick={() => setTab("apply")}
             className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
               tab === "apply"
                 ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-600/25"
-                : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                : `${isDark ? "text-gray-400 hover:text-white hover:bg-gray-700/50" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`
             }`}
           >
             Apply for Loan
@@ -172,7 +174,7 @@ export default function EmergencyLoan() {
             className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
               tab === "history"
                 ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-600/25"
-                : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                : `${isDark ? "text-gray-400 hover:text-white hover:bg-gray-700/50" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`
             }`}
           >
             My Loans
@@ -187,8 +189,8 @@ export default function EmergencyLoan() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Eligibility Card */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 sticky top-6">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <div className={`${isDark ? "bg-gray-800/40 border-gray-700/50" : "bg-white border-gray-200 shadow-xl"} backdrop-blur-xl border rounded-2xl p-6 sticky top-6`}>
+                <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDark ? "text-white" : "text-gray-900"}`}>
                   <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                   </svg>
@@ -201,7 +203,7 @@ export default function EmergencyLoan() {
                     <div className="text-center py-4">
                       <div className="relative w-32 h-32 mx-auto">
                         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                          <circle cx="60" cy="60" r="50" fill="none" stroke="#1f2937" strokeWidth="10"/>
+                          <circle cx="60" cy="60" r="50" fill="none" stroke={isDark ? "#1f2937" : "#e5e7eb"} strokeWidth="10"/>
                           <circle
                             cx="60" cy="60" r="50" fill="none"
                             stroke={eligibility.creditScore >= 650 ? "#22c55e" : eligibility.creditScore >= 500 ? "#eab308" : "#ef4444"}
@@ -210,8 +212,8 @@ export default function EmergencyLoan() {
                           />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className="text-3xl font-bold text-white">{eligibility.creditScore}</span>
-                          <span className="text-xs text-gray-400">/ 850</span>
+                          <span className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{eligibility.creditScore}</span>
+                          <span className={isDark ? "text-xs text-gray-400" : "text-xs text-gray-500"}>/ 850</span>
                         </div>
                       </div>
                     </div>
@@ -225,19 +227,18 @@ export default function EmergencyLoan() {
                       {eligibility.eligible ? "✅ Eligible for Loan" : "❌ Not Eligible"}
                     </div>
 
-                    {/* Stats */}
                     {eligibility.eligible && (
                       <div className="space-y-3">
-                        <div className="flex justify-between items-center p-3 bg-gray-700/30 rounded-lg">
-                          <span className="text-gray-400 text-sm">Max Amount</span>
-                          <span className="text-white font-bold text-lg">₹{eligibility.maxAmount.toLocaleString()}</span>
+                        <div className={`flex justify-between items-center p-3 rounded-lg ${isDark ? "bg-gray-700/30 text-gray-400" : "bg-gray-100 text-gray-600"}`}>
+                          <span className="text-sm">Max Amount</span>
+                          <span className={`font-bold text-lg ${isDark ? "text-white" : "text-gray-900"}`}>₹{eligibility.maxAmount.toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-gray-700/30 rounded-lg">
-                          <span className="text-gray-400 text-sm">Interest Rate</span>
-                          <span className="text-white font-semibold">{eligibility.suggestedInterestRate}%</span>
+                        <div className={`flex justify-between items-center p-3 rounded-lg ${isDark ? "bg-gray-700/30 text-gray-400" : "bg-gray-100 text-gray-600"}`}>
+                          <span className="text-sm">Interest Rate</span>
+                          <span className={`font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>{eligibility.suggestedInterestRate}%</span>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-gray-700/30 rounded-lg">
-                          <span className="text-gray-400 text-sm">Risk Level</span>
+                        <div className={`flex justify-between items-center p-3 rounded-lg ${isDark ? "bg-gray-700/30 text-gray-400" : "bg-gray-100 text-gray-600"}`}>
+                          <span className="text-sm">Risk Level</span>
                           <span className={`px-2 py-1 rounded text-xs font-bold ${
                             eligibility.riskLevel === "LOW" ? "bg-green-500/20 text-green-400" :
                             eligibility.riskLevel === "MEDIUM" ? "bg-yellow-500/20 text-yellow-400" :
@@ -249,9 +250,9 @@ export default function EmergencyLoan() {
 
                     {/* Reasons */}
                     {eligibility.reasons.length > 0 && (
-                      <div className="pt-3 border-t border-gray-700/50">
+                      <div className={`pt-3 border-t ${isDark ? "border-gray-700/50" : "border-gray-200"}`}>
                         {eligibility.reasons.map((r, i) => (
-                          <p key={i} className="text-xs text-gray-400 flex items-start gap-1.5 mb-1.5">
+                          <p key={i} className={`text-xs flex items-start gap-1.5 mb-1.5 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
                             <span className="text-blue-400 mt-0.5">ℹ</span> {r}
                           </p>
                         ))}
@@ -266,8 +267,8 @@ export default function EmergencyLoan() {
 
             {/* Application Form */}
             <div className="lg:col-span-2">
-              <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+              <div className={`${isDark ? "bg-gray-800/40 border-gray-700/50" : "bg-white border-gray-200 shadow-xl"} backdrop-blur-xl border rounded-2xl p-6`}>
+                <h3 className={`text-lg font-semibold mb-6 flex items-center gap-2 ${isDark ? "text-white" : "text-gray-900"}`}>
                   <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
@@ -277,18 +278,18 @@ export default function EmergencyLoan() {
                 {!eligibility?.eligible ? (
                   <div className="text-center py-12">
                     <div className="w-20 h-20 mx-auto mb-4 bg-red-500/10 rounded-full flex items-center justify-center">
-                      <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                       </svg>
                     </div>
-                    <h4 className="text-white font-semibold text-lg mb-2">Not Eligible Yet</h4>
-                    <p className="text-gray-400">Complete your credit analysis first to check loan eligibility.</p>
+                    <h4 className={`font-semibold text-lg mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Not Eligible Yet</h4>
+                    <p className={isDark ? "text-gray-400" : "text-gray-600"}>Complete your credit analysis first to check loan eligibility.</p>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Amount */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Loan Amount (₹)</label>
+                      <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Loan Amount (₹)</label>
                       <input
                         type="number"
                         value={form.amount}
@@ -296,15 +297,19 @@ export default function EmergencyLoan() {
                         min="1000"
                         max={eligibility.maxAmount}
                         placeholder={`₹1,000 — ₹${eligibility.maxAmount.toLocaleString()}`}
-                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition ${
+                          isDark 
+                          ? "bg-gray-900/50 border-gray-600/50 text-white placeholder-gray-500" 
+                          : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
+                        }`}
                         required
                       />
-                      <p className="mt-1.5 text-xs text-gray-500">Max eligible: ₹{eligibility.maxAmount.toLocaleString()}</p>
+                      <p className={`mt-1.5 text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Max eligible: ₹{eligibility.maxAmount.toLocaleString()}</p>
                     </div>
 
                     {/* Purpose */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Purpose</label>
+                      <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Purpose</label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {PURPOSE_OPTIONS.map((opt) => (
                           <button
@@ -313,8 +318,10 @@ export default function EmergencyLoan() {
                             onClick={() => setForm({ ...form, purpose: opt.value })}
                             className={`p-3 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
                               form.purpose === opt.value
-                                ? "bg-blue-600/20 border-blue-500/50 text-blue-300 shadow-lg shadow-blue-500/10"
-                                : "bg-gray-800/50 border-gray-700/50 text-gray-400 hover:border-gray-600 hover:text-gray-300"
+                                ? "bg-blue-600/20 border-blue-500/50 text-blue-600 dark:text-blue-300 shadow-lg shadow-blue-500/10"
+                                : isDark
+                                  ? "bg-gray-800/50 border-gray-700/50 text-gray-400 hover:border-gray-600 hover:text-gray-300"
+                                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
                             }`}
                           >
                             {opt.label}
@@ -325,22 +332,26 @@ export default function EmergencyLoan() {
 
                     {/* Description */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Describe your need</label>
+                      <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Describe your need</label>
                       <textarea
                         value={form.purposeDescription}
                         onChange={(e) => setForm({ ...form, purposeDescription: e.target.value })}
                         rows={3}
                         maxLength={500}
                         placeholder="Briefly describe why you need this emergency loan..."
-                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition resize-none"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition resize-none ${
+                          isDark 
+                          ? "bg-gray-900/50 border-gray-600/50 text-white placeholder-gray-500" 
+                          : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
+                        }`}
                         required
                       />
-                      <p className="mt-1 text-xs text-gray-500 text-right">{form.purposeDescription.length}/500</p>
+                      <p className={`mt-1 text-xs text-right ${isDark ? "text-gray-500" : "text-gray-400"}`}>{form.purposeDescription.length}/500</p>
                     </div>
 
                     {/* Urgency */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Urgency Level</label>
+                      <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>Urgency Level</label>
                       <div className="space-y-2">
                         {URGENCY_OPTIONS.map((opt) => (
                           <button
@@ -350,7 +361,9 @@ export default function EmergencyLoan() {
                             className={`w-full p-3 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
                               form.urgencyLevel === opt.value
                                 ? opt.color + " shadow-lg"
-                                : "bg-gray-800/50 border-gray-700/50 text-gray-400 hover:border-gray-600"
+                                : isDark
+                                  ? "bg-gray-800/50 border-gray-700/50 text-gray-400 hover:border-gray-600"
+                                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
                             }`}
                           >
                             {opt.label}
@@ -402,14 +415,14 @@ export default function EmergencyLoan() {
         {tab === "history" && (
           <div className="space-y-4">
             {loans.length === 0 ? (
-              <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-12 text-center">
-                <div className="w-20 h-20 mx-auto mb-4 bg-gray-700/30 rounded-full flex items-center justify-center">
-                  <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <div className={`${isDark ? "bg-gray-800/40 border-gray-700/50" : "bg-white border-dashed border-gray-300"} backdrop-blur-xl border rounded-2xl p-12 text-center`}>
+                <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${isDark ? "bg-gray-700/30 text-gray-500" : "bg-gray-100 text-gray-400"}`}>
+                  <svg className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
                   </svg>
                 </div>
-                <h4 className="text-white font-semibold text-lg mb-2">No Loans Yet</h4>
-                <p className="text-gray-400 mb-4">You haven't applied for any emergency loans.</p>
+                <h4 className={`font-semibold text-lg mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>No Loans Yet</h4>
+                <p className={`mb-4 ${isDark ? "text-gray-400" : "text-gray-500"}`}>You haven't applied for any emergency loans.</p>
                 <button
                   onClick={() => setTab("apply")}
                   className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
@@ -421,50 +434,50 @@ export default function EmergencyLoan() {
               loans.map((loan) => (
                 <div
                   key={loan._id}
-                  className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 hover:border-gray-600/50 transition-all duration-300"
+                  className={`${isDark ? "bg-gray-800/40 border-gray-700/50 hover:border-gray-600/50" : "bg-white border-gray-200 hover:border-blue-300"} backdrop-blur-xl border rounded-2xl p-6 transition-all duration-300 shadow-sm`}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                     <div>
                       <div className="flex items-center gap-3 mb-1">
-                        <h4 className="text-xl font-bold text-white">₹{loan.amount.toLocaleString()}</h4>
+                        <h4 className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>₹{loan.amount.toLocaleString()}</h4>
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${STATUS_STYLES[loan.status]}`}>
                           {loan.status.replace("_", " ").toUpperCase()}
                         </span>
                       </div>
-                      <p className="text-gray-400 text-sm">
+                      <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                         {PURPOSE_OPTIONS.find(p => p.value === loan.purpose)?.label || loan.purpose} • Applied {new Date(loan.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                       {loan.lenderOrganization && (
-                        <p className="text-indigo-400 text-xs mt-1 font-medium">🏦 {loan.lenderOrganization}</p>
+                        <p className="text-indigo-500 dark:text-indigo-400 text-xs mt-1 font-medium">🏦 {loan.lenderOrganization}</p>
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="text-gray-400 text-xs">Credit Score at Application</p>
-                      <p className="text-white font-bold text-lg">{loan.creditScoreAtApplication}</p>
+                      <p className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>Credit Score at App.</p>
+                      <p className={`font-bold text-lg ${isDark ? "text-white" : "text-gray-900"}`}>{loan.creditScoreAtApplication}</p>
                     </div>
                   </div>
 
-                  <p className="text-gray-300 text-sm mb-4 bg-gray-900/30 p-3 rounded-lg">{loan.purposeDescription}</p>
+                  <p className={`text-sm mb-4 p-3 rounded-lg ${isDark ? "text-gray-300 bg-gray-900/30" : "text-gray-700 bg-gray-50 border border-gray-100"}`}>{loan.purposeDescription}</p>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="bg-gray-900/30 p-3 rounded-lg">
-                      <p className="text-gray-500 text-xs">Urgency</p>
-                      <p className="text-white font-medium text-sm capitalize">{loan.urgencyLevel}</p>
+                    <div className={`p-3 rounded-lg ${isDark ? "bg-gray-900/30" : "bg-gray-50 border border-gray-100"}`}>
+                      <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Urgency</p>
+                      <p className={`font-medium text-sm capitalize ${isDark ? "text-white" : "text-gray-900"}`}>{loan.urgencyLevel}</p>
                     </div>
-                    <div className="bg-gray-900/30 p-3 rounded-lg">
-                      <p className="text-gray-500 text-xs">Risk Level</p>
-                      <p className="text-white font-medium text-sm">{loan.riskLevelAtApplication}</p>
+                    <div className={`p-3 rounded-lg ${isDark ? "bg-gray-900/30" : "bg-gray-50 border border-gray-100"}`}>
+                      <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Risk Level</p>
+                      <p className={`font-medium text-sm ${isDark ? "text-white" : "text-gray-900"}`}>{loan.riskLevelAtApplication}</p>
                     </div>
                     {loan.interestRate && (
-                      <div className="bg-gray-900/30 p-3 rounded-lg">
-                        <p className="text-gray-500 text-xs">Interest Rate</p>
-                        <p className="text-white font-medium text-sm">{loan.interestRate}%</p>
+                      <div className={`p-3 rounded-lg ${isDark ? "bg-gray-900/30" : "bg-gray-50 border border-gray-100"}`}>
+                        <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Interest Rate</p>
+                        <p className={`font-medium text-sm ${isDark ? "text-white" : "text-gray-900"}`}>{loan.interestRate}%</p>
                       </div>
                     )}
                     {loan.approvedAmount && (
-                      <div className="bg-gray-900/30 p-3 rounded-lg">
-                        <p className="text-gray-500 text-xs">Approved Amount</p>
-                        <p className="text-green-400 font-bold text-sm">₹{loan.approvedAmount.toLocaleString()}</p>
+                      <div className={`p-3 rounded-lg ${isDark ? "bg-gray-900/30" : "bg-gray-50 border border-gray-100"}`}>
+                        <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Approved Amount</p>
+                        <p className="text-green-600 dark:text-green-400 font-bold text-sm">₹{loan.approvedAmount.toLocaleString()}</p>
                       </div>
                     )}
                   </div>
@@ -502,7 +515,7 @@ export default function EmergencyLoan() {
                               )}
                             </div>
 
-                            <div className="grid grid-cols-4 gap-2 text-center mb-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center mb-3">
                               <div className="bg-gray-900/50 p-2 rounded-lg">
                                 <p className="text-gray-500 text-[10px]">Rate</p>
                                 <p className="text-white font-bold text-sm">{offer.interestRate}%</p>
@@ -567,7 +580,7 @@ export default function EmergencyLoan() {
 
                   {/* EMI & Due Date for approved+ loans */}
                   {loan.monthlyEmi > 0 && (
-                    <div className="grid grid-cols-3 gap-3 mt-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                       <div className="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-lg text-center">
                         <p className="text-indigo-400 text-xs">Monthly EMI</p>
                         <p className="text-white font-bold">₹{loan.monthlyEmi.toLocaleString()}</p>
