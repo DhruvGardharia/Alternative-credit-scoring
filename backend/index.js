@@ -35,6 +35,7 @@ import platformRoutes from './routes/platformRoutes.js';
 import statementRoutes from './routes/statementRoutes.js';
 import incomeRoutes from './routes/incomeRoutes.js';
 import summaryRoutes from './routes/summaryRoutes.js';
+import chatRoutes from "./routes/chatRoutes.js";
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -47,6 +48,7 @@ app.use('/api/platform', platformRoutes);
 app.use('/api/statement', statementRoutes);
 app.use('/api/income', incomeRoutes);
 app.use('/api/summary', summaryRoutes);  
+app.use("/api/ai", chatRoutes);
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "/frontend/dist")));

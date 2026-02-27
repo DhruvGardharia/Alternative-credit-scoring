@@ -116,14 +116,7 @@ export default function Navbar() {
               </svg>
             )}
           </button>
-
-          <button
-            onClick={() => navigate("/tax-summary")}
-            className="px-3 py-1.5 border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-blue-900 rounded-lg font-medium transition text-sm"
-          >
-            Tax Summary
-          </button>
-
+          
           {/* Logout Button */}
           <button
             onClick={handleLogout}

@@ -329,7 +329,7 @@ export default function Role1Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
         {/* Quick Actions Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
           <button className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800" : "bg-white border-gray-200"}`}>
             <svg className="w-5 h-5 text-blue-900 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
@@ -345,6 +345,15 @@ export default function Role1Dashboard() {
               <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"/>
             </svg>
             <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>{t("viewCreditReport")}</span>
+          </button>
+          <button
+            onClick={() => navigate('/tax-summary')}
+            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-yellow-600" : "bg-white border-gray-200 hover:border-yellow-300"}`}
+          >
+            <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+            </svg>
+            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>{t("taxSummary")}</span>
           </button>
           <button
             onClick={() => {
