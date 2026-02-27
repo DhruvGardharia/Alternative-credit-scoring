@@ -199,6 +199,7 @@ const translations = {
     step3Desc: "AI analyzes your financial patterns instantly",
     step4Title: "Check Eligibility",
     step4Desc: "See your pre-approved loan amount",
+    taxSummary: "Tax Summary",
 
     // Trust Section
     trustTitle: "Why Gig Workers Trust Us",
@@ -401,6 +402,8 @@ const translations = {
     creditReadiness: "क्रेडिट तत्परता",
     riskAssessment: "जोखिम मूल्यांकन",
     risk: "जोखिम",
+    taxSummary: "कर सारांश",
+
 
     // Health Statuses
     excellent: "उत्कृष्ट",
@@ -751,6 +754,7 @@ const translations = {
     creditReadiness: "क्रेडिट तयारी",
     riskAssessment: "जोखीम मूल्यांकन",
     risk: "जोखीम",
+    taxSummary: "कर सारांश",
 
     // Health Statuses
     excellent: "उत्कृष्ट",

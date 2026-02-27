@@ -5,11 +5,22 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
+import MicroInsurance from "./pages/MicroInsurance";
+import EmergencyLoan from "./pages/EmergencyLoan";
+import LenderDashboard from "./pages/LenderDashboard";
+import LenderLogin from "./pages/LenderLogin";
+import LenderRegister from "./pages/LenderRegister";
 import TaxSummary from "./pages/TaxSummary";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import PlatformManagement from "./pages/PlatformManagement";
 import CreditPolicyBot from "./components/CreditPolicyBot";
 
+// Redirects to /dashboard if already logged in
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingSpinner />;
+  return user ? <Navigate to="/dashboard" replace /> : children;
+};
 
 // Protected Route Component - Requires Authentication
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +64,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public — redirect to dashboard if already logged in */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -92,6 +104,35 @@ const App = () => {
             </DashboardRoute>
           }
         />
+        <Route
+          path="/insurance"
+          element={
+            <ProtectedRoute>
+              <MicroInsurance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/emergency-loan"
+          element={
+            <ProtectedRoute>
+              <EmergencyLoan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/lender-login"
+          element={<LenderLogin />}
+        />
+        <Route
+          path="/lender-register"
+          element={<LenderRegister />}
+        />
+        <Route
+          path="/lender-dashboard"
+          element={<LenderDashboard />}
+        />
+
         <Route
           path="/expense-tracker"
           element={
