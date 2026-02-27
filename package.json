@@ -31,7 +31,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.5",
     "npm": "^11.11.0",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "^1.1.1",
     "pdf-parser": "^1.0.5",
     "pdfkit": "^0.17.2",
     "validator": "^13.15.15"

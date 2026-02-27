@@ -6,14 +6,14 @@
  */
 
 export const SCORE_RANGE = {
-  MIN: 300,
-  MAX: 850
+  MIN: 0,
+  MAX: 1000
 };
 
 export const RISK_BANDS = {
-  HIGH: { min: 300, max: 550, label: "HIGH" },
-  MEDIUM: { min: 551, max: 700, label: "MEDIUM" },
-  LOW: { min: 701, max: 850, label: "LOW" }
+  HIGH: { min: 0,   max: 350,  label: "HIGH" },
+  MEDIUM: { min: 351, max: 700,  label: "MEDIUM" },
+  LOW: { min: 701, max: 1000, label: "LOW" }
 };
 
 /**

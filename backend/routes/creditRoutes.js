@@ -1,8 +1,9 @@
 import express from "express";
-import { generateCreditScore } from "../controllers/credit.controller.js";
+import { getCreditScore } from "../controllers/newCreditController.js";
 
 const router = express.Router();
 
-router.post("/generate", generateCreditScore);
+// GET /api/credit/:userId - Get credit score for a user
+router.get("/:userId", getCreditScore);
 
 export default router;

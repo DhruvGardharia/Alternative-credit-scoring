@@ -26,6 +26,11 @@ const expenseSchema = new mongoose.Schema(
       type: String,
       enum: ["cash", "card", "upi", "wallet"],
       default: "cash"
+    },
+    source: {
+      type: String,
+      enum: ["manual", "bank_import", "pdf_import", "BANK_PDF"],
+      default: "manual"
     }
   },
   { timestamps: true }

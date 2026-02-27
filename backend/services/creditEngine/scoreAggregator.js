@@ -28,13 +28,20 @@ function calculateCategoryScore(metrics, metricDefinitions) {
       const weight = metricDefinitions[metricName].weight;
       const score = metricResult.score || 0;
       
-      weightedSum += score * weight;
-      totalWeight += weight;
+      // Ensure score is a valid number
+      if (typeof score === 'number' && !isNaN(score) && isFinite(score)) {
+        weightedSum += score * weight;
+        totalWeight += weight;
+      }
     }
   });
 
-  // Return weighted average
-  return totalWeight > 0 ? weightedSum / totalWeight : 0;
+  // Return weighted average, default to 50 if no valid scores
+  if (totalWeight > 0) {
+    const result = weightedSum / totalWeight;
+    return isNaN(result) || !isFinite(result) ? 50 : result;
+  }
+  return 50; // Default middle score if no metrics
 }
 
 /**
@@ -67,26 +74,32 @@ export function aggregateGigScore(gigMetrics) {
 }
 
 /**
- * Calculate final credit score (300-850)
+ * Calculate final credit score (0-1000)
  * Combines all category scores using CATEGORY_WEIGHTS
  * 
  * @param {Object} scoreBreakdown - Category scores
- * @returns {Number} - Final credit score (300-850)
+ * @returns {Number} - Final credit score (0-1000)
  */
 export function calculateFinalCreditScore(scoreBreakdown) {
   const {
-    incomeQualityScore,
-    spendingBehaviorScore,
-    liquidityScore,
-    gigStabilityScore
+    incomeQualityScore = 50,
+    spendingBehaviorScore = 50,
+    liquidityScore = 50,
+    gigStabilityScore = 50
   } = scoreBreakdown;
+
+  // Ensure all scores are valid numbers
+  const validIncomeScore = isNaN(incomeQualityScore) || !isFinite(incomeQualityScore) ? 50 : incomeQualityScore;
+  const validSpendingScore = isNaN(spendingBehaviorScore) || !isFinite(spendingBehaviorScore) ? 50 : spendingBehaviorScore;
+  const validLiquidityScore = isNaN(liquidityScore) || !isFinite(liquidityScore) ? 50 : liquidityScore;
+  const validGigScore = isNaN(gigStabilityScore) || !isFinite(gigStabilityScore) ? 50 : gigStabilityScore;
 
   // Calculate weighted average of category scores (0-100)
   const compositeScore =
-    (incomeQualityScore * CATEGORY_WEIGHTS.incomeQuality +
-      spendingBehaviorScore * CATEGORY_WEIGHTS.spendingBehavior +
-      liquidityScore * CATEGORY_WEIGHTS.liquidity +
-      gigStabilityScore * CATEGORY_WEIGHTS.gigStability) /
+    (validIncomeScore * CATEGORY_WEIGHTS.incomeQuality +
+      validSpendingScore * CATEGORY_WEIGHTS.spendingBehavior +
+      validLiquidityScore * CATEGORY_WEIGHTS.liquidity +
+      validGigScore * CATEGORY_WEIGHTS.gigStability) /
     100;
 
   // Convert 0-100 score to 300-850 range
@@ -94,8 +107,11 @@ export function calculateFinalCreditScore(scoreBreakdown) {
     SCORE_RANGE.MIN +
     (compositeScore / 100) * (SCORE_RANGE.MAX - SCORE_RANGE.MIN);
 
-  // Round to nearest integer
-  return Math.round(creditScore);
+  // Round to nearest integer and ensure it's within range
+  const finalScore = Math.round(creditScore);
+  
+  // Clamp score to valid range (300-850)
+  return Math.max(SCORE_RANGE.MIN, Math.min(SCORE_RANGE.MAX, finalScore));
 }
 
 /**

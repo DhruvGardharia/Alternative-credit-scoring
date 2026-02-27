@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }) => {
     if (response.data.success) {
       const { token, user } = response.data;
       localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
       setToken(token);
       setUser(user);
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -58,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     if (response.data.success) {
       const { token, user } = response.data;
       localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
       setToken(token);
       setUser(user);
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -67,6 +69,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("onboarded");
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);

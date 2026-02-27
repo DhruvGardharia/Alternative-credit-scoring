@@ -31,11 +31,12 @@ const translations = {
 
     // Upload Form
     uploadBankStatement: "Upload Bank Statement",
+    uploadSubtitle: "Upload your PDF file to calculate your credit score instantly",
     uploadSubtitle:
       "Upload your CSV file to calculate your credit score instantly",
     analyzeNow: "Analyze Now",
     analyzing: "Analyzing...",
-    pleaseSelectCSV: "Please select a CSV file",
+    pleaseSelectCSV: "Please select a PDF file",
 
     // Future Integration Note
     futureEnhancement: "Future Enhancement",
@@ -93,6 +94,7 @@ const translations = {
     regularActivity: "Regular Activity",
     activeDaysDetail: "active days shows commitment",
     getCreditScore: "Get Your Credit Score",
+    getCreditScoreDetail: "Upload your bank statement (PDF format) for instant credit assessment",
     getCreditScoreDetail:
       "Upload your bank statement (CSV format) for instant credit assessment",
     securePrivate: "Secure & Private Analysis",
@@ -196,7 +198,7 @@ const translations = {
     step1Title: "Sign Up",
     step1Desc: "Create your free account as a gig worker",
     step2Title: "Upload Statement",
-    step2Desc: "Securely upload your bank statement CSV",
+    step2Desc: "Securely upload your bank statement PDF",
     step3Title: "Get Your Score",
     step3Desc: "AI analyzes your financial patterns instantly",
     step4Title: "Check Eligibility",
@@ -388,10 +390,10 @@ const translations = {
 
     // Upload Form
     uploadBankStatement: "बैंक स्टेटमेंट अपलोड करें",
-    uploadSubtitle: "तत्काल क्रेडिट स्कोर के लिए अपनी CSV फ़ाइल अपलोड करें",
+    uploadSubtitle: "तत्काल क्रेडिट स्कोर के लिए अपनी PDF फ़ाइल अपलोड करें",
     analyzeNow: "अभी विश्लेषण करें",
-    analyzing: "विश्लेषण हो रहा है...",
-    pleaseSelectCSV: "कृपया एक CSV फ़ाइल चुनें",
+    analyzing: "विश्लेषण किया जा रहा है...",
+    pleaseSelectCSV: "कृपया एक PDF फ़ाइल चुनें",
 
     // Future Integration Note
     futureEnhancement: "भविष्य का सुधार",
@@ -444,6 +446,7 @@ const translations = {
     regularActivity: "नियमित गतिविधि",
     activeDaysDetail: "सक्रिय दिन प्रतिबद्धता दिखाते हैं",
     getCreditScore: "अपना क्रेडिट स्कोर प्राप्त करें",
+    getCreditScoreDetail: "तत्काल क्रेडिट मूल्यांकन के लिए बैंक स्टेटमेंट (PDF) अपलोड करें",
     getCreditScoreDetail:
       "तत्काल क्रेडिट मूल्यांकन के लिए बैंक स्टेटमेंट (CSV) अपलोड करें",
     securePrivate: "सुरक्षित और निजी विश्लेषण",
@@ -547,7 +550,7 @@ const translations = {
     step1Title: "साइन अप करें",
     step1Desc: "गिग वर्कर के रूप में अपना मुफ्त खाता बनाएं",
     step2Title: "स्टेटमेंट अपलोड करें",
-    step2Desc: "सुरक्षित रूप से अपना बैंक स्टेटमेंट CSV अपलोड करें",
+    step2Desc: "सुरक्षित रूप से अपना बैंक स्टेटमेंट PDF अपलोड करें",
     step3Title: "अपना स्कोर पाएं",
     step3Desc: "AI तुरंत आपके वित्तीय पैटर्न का विश्लेषण करता है",
     step4Title: "पात्रता जांचें",
@@ -739,10 +742,10 @@ const translations = {
 
     // Upload Form
     uploadBankStatement: "बँक स्टेटमेंट अपलोड करा",
-    uploadSubtitle: "तत्काल क्रेडिट स्कोरसाठी तुमची CSV फाइल अपलोड करा",
+ uploadSubtitle: "तत्काल क्रेडिट स्कोरसाठी तुमची PDF फाइल अपलोड करा",
     analyzeNow: "आता विश्लेषण करा",
-    analyzing: "विश्लेषण होत आहे...",
-    pleaseSelectCSV: "कृपया CSV फाइल निवडा",
+    analyzing: "विश्लेषण करत आहे...",
+    pleaseSelectCSV: "कृपया PDF फाइल निवडा",
 
     // Future Integration Note
     futureEnhancement: "भविष्यातील सुधारणा",
@@ -797,6 +800,7 @@ const translations = {
     regularActivity: "नियमित क्रियाकलाप",
     activeDaysDetail: "सक्रिय दिवस वचनबद्धता दर्शवतात",
     getCreditScore: "तुमचा क्रेडिट स्कोर मिळवा",
+    getCreditScoreDetail: "तत्काल क्रेडिट मूल्यांकनासाठी बँक स्टेटमेंट (PDF) अपलोड करा",
     getCreditScoreDetail:
       "तत्काल क्रेडिट मूल्यांकनासाठी बँक स्टेटमेंट (CSV) अपलोड करा",
     securePrivate: "सुरक्षित आणि खाजगी विश्लेषण",
@@ -900,7 +904,7 @@ const translations = {
     step1Title: "साइन अप करा",
     step1Desc: "गिग वर्कर म्हणून तुमचे मोफत खाते तयार करा",
     step2Title: "स्टेटमेंट अपलोड करा",
-    step2Desc: "तुमचे बँक स्टेटमेंट CSV सुरक्षितपणे अपलोड करा",
+    step2Desc: "तुमचे बँक स्टेटमेंट PDF सुरक्षितपणे अपलोड करा",
     step3Title: "तुमचा स्कोर मिळवा",
     step3Desc: "AI तुमच्या आर्थिक नमुन्यांचे त्वरित विश्लेषण करते",
     step4Title: "पात्रता तपासा",
