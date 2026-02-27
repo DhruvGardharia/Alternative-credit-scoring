@@ -12,6 +12,7 @@ import {
   getRiskAnalysis
 } from "../services/creditEngine/index.js";
 import { Expense } from "../models/expenseModel.js";
+import { Income } from "../models/incomeModel.js";
 import { BankStatement } from "../models/bankStatementModel.js";
 
 /**
@@ -43,13 +44,22 @@ async function getBankTransactions(userId) {
 
 /**
  * Helper: Get platform earnings (gig income)
- * This is a placeholder for platform API integrations
+ * Fetches from Income model (populated by platform integration team)
  */
 async function getPlatformEarnings(userId) {
-  // TODO: Implement platform earnings sync
-  // For now, return empty array
-  // In production, this would fetch from Uber, Swiggy, Zomato, etc. APIs
-  return [];
+  const earnings = await Income.find({ 
+    userId, 
+    status: "completed" 
+  }).lean();
+  
+  return earnings.map((earning) => ({
+    date: earning.date,
+    type: "credit",
+    amount: earning.amount,
+    category: earning.platform,
+    source: "platform",
+    description: earning.description
+  }));
 }
 
 /**

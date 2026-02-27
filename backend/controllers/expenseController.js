@@ -1,4 +1,5 @@
 import { Expense } from "../models/expenseModel.js";
+import { FinancialSummary } from "../models/financialSummary.js";
 import TryCatch from "../utils/TryCatch.js";
 
 // Add new expense
@@ -20,6 +21,9 @@ export const addExpense = TryCatch(async (req, res) => {
     date: date || Date.now(),
     paymentMethod,
   });
+
+  // Auto-update financial summary
+  await FinancialSummary.updateSummary(userId);
 
   res.status(201).json({
     success: true,
