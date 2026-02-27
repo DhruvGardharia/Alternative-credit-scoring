@@ -123,7 +123,51 @@ const drawTaxTable = (doc, slabBreakdown = []) => {
       currentY - 5,
     )
     .stroke();
+
+  doc.y = currentY + 5;
 };
+
+const drawTwoColumnTable = (doc, headers, rows, colWidths = [220, 220]) => {
+  const startY = doc.y + 5;
+  const xPositions = colWidths.map(
+    (_, index) => 50 + colWidths.slice(0, index).reduce((sum, w) => sum + w, 0),
+  );
+  const totalWidth = colWidths.reduce((sum, w) => sum + w, 0);
+
+  doc
+    .lineWidth(1)
+    .moveTo(50, startY - 5)
+    .lineTo(50 + totalWidth, startY - 5)
+    .stroke();
+
+  doc.font("Helvetica-Bold");
+  headers.forEach((h, i) =>
+    doc.text(h, xPositions[i], startY, { width: colWidths[i], align: "left" }),
+  );
+  doc.moveDown(0.5).font("Helvetica");
+
+  const rowHeight = 20;
+  let currentY = startY + rowHeight;
+
+  rows.forEach((row) => {
+    row.forEach((cell, i) => {
+      doc.text(cell, xPositions[i], currentY, {
+        width: colWidths[i],
+        align: i === 0 ? "left" : "right",
+      });
+    });
+    currentY += rowHeight;
+  });
+
+  doc
+    .moveTo(50, currentY - 5)
+    .lineTo(50 + totalWidth, currentY - 5)
+    .stroke();
+  doc.y = currentY + 5;
+};
+
+const capitalize = (str = "") =>
+  str.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 export function generateTaxSummaryPdf(
   taxSummary = {},
@@ -143,36 +187,95 @@ export function generateTaxSummaryPdf(
     effectiveTaxRate = 0,
   } = taxSummary;
 
+  const {
+    totalExpenses = 0,
+    netBalance = 0,
+    savingsRate = 0,
+    monthlyAvgIncome = 0,
+    monthlyAvgExpenses = 0,
+    dataStartDate,
+    dataEndDate,
+    totalTransactions = 0,
+    creditTransactions = 0,
+    debitTransactions = 0,
+    incomeByPlatform = {},
+    expensesByCategory = {},
+  } = financialSummary;
+
+  // ── Header ──────────────────────────────────────────────
   doc
     .font("Helvetica-Bold")
     .fontSize(18)
-    .text("Annual Financial & Tax Summary Report", {
-      align: "center",
-    })
+    .text("Annual Financial & Tax Summary Report", { align: "center" })
     .moveDown(1.5)
     .fontSize(12)
     .font("Helvetica");
 
+  // ── User Information ─────────────────────────────────────
   addSectionTitle(doc, "User Information");
   drawKeyValue(doc, "Name", user?.name || "Not Provided");
   drawKeyValue(doc, "Generated Date", formatDate(new Date()));
 
+  // ── Statement Period ─────────────────────────────────────
+  if (dataStartDate || dataEndDate) {
+    addSectionTitle(doc, "Bank Statement Coverage");
+    drawKeyValue(
+      doc,
+      "Statement Period",
+      `${formatDate(dataStartDate)} – ${formatDate(dataEndDate)}`,
+    );
+    drawKeyValue(doc, "Total Transactions", `${totalTransactions} (${creditTransactions} credits, ${debitTransactions} debits)`);
+  }
+
+  // ── Income Summary ────────────────────────────────────────
   addSectionTitle(doc, "Income Summary");
-  drawKeyValue(doc, "Gross Income", formatCurrency(grossIncome));
-  drawKeyValue(
-    doc,
-    "Deductible Business Expenses",
-    formatCurrency(deductibleBusinessExpenses),
-  );
+  drawKeyValue(doc, "Gross Income (Total Credits)", formatCurrency(grossIncome));
+  drawKeyValue(doc, "Monthly Average Income", formatCurrency(monthlyAvgIncome));
+  drawKeyValue(doc, "Deductible Business Expenses", formatCurrency(deductibleBusinessExpenses));
   drawKeyValue(doc, "Net Taxable Income", formatCurrency(netTaxableIncome));
 
-  addSectionTitle(doc, "Tax Breakdown");
+  // Income by Source table
+  const incomeRows = Object.entries(incomeByPlatform)
+    .filter(([, amount]) => Number(amount) > 0)
+    .map(([platform, amount]) => [capitalize(platform), formatCurrency(amount)]);
+
+  if (incomeRows.length > 0) {
+    doc.moveDown(0.5).font("Helvetica-Bold").text("Income by Source:").font("Helvetica");
+    drawTwoColumnTable(doc, ["Source / Platform", "Amount"], incomeRows);
+  }
+
+  // ── Expense Summary ───────────────────────────────────────
+  addSectionTitle(doc, "Expense Summary");
+  drawKeyValue(doc, "Total Expenses (Total Debits)", formatCurrency(totalExpenses));
+  drawKeyValue(doc, "Monthly Average Expenses", formatCurrency(monthlyAvgExpenses));
+
+  const expenseRows = Object.entries(expensesByCategory)
+    .filter(([, amount]) => Number(amount) > 0)
+    .map(([cat, amount]) => {
+      const pct = grossIncome > 0 ? ((Number(amount) / grossIncome) * 100).toFixed(1) : "0.0";
+      return [capitalize(cat), `${formatCurrency(amount)} (${pct}% of income)`];
+    });
+
+  if (expenseRows.length > 0) {
+    doc.moveDown(0.5).font("Helvetica-Bold").text("Expenses by Category:").font("Helvetica");
+    drawTwoColumnTable(doc, ["Category", "Amount (% of Income)"], expenseRows, [180, 260]);
+  }
+
+  // ── Financial Overview ────────────────────────────────────
+  addSectionTitle(doc, "Financial Overview");
+  drawKeyValue(doc, "Net Balance (Income − Expenses)", formatCurrency(netBalance));
+  drawKeyValue(doc, "Savings Rate", `${Number(savingsRate || 0).toFixed(2)}%`);
+
+  // ── Tax Breakdown ─────────────────────────────────────────
+  addSectionTitle(doc, "Tax Breakdown (New Regime)");
   drawTaxTable(doc, Array.isArray(slabBreakdown) ? slabBreakdown : []);
 
+  // ── Tax Summary ───────────────────────────────────────────
   addSectionTitle(doc, "Tax Summary");
   drawKeyValue(doc, "Total Tax", formatCurrency(totalTax));
-  drawKeyValue(doc, "Effective Tax Rate", `${effectiveTaxRate.toFixed(2)}%`);
+  drawKeyValue(doc, "Effective Tax Rate", `${Number(effectiveTaxRate || 0).toFixed(2)}%`);
 
+  // ── Advisory ─────────────────────────────────────────────
   addSectionTitle(doc, "Advisory");
   doc
     .font("Helvetica")

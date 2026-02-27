@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import axios from "axios";
-import CreditPolicyBot from "../components/CreditPolicyBot";
+
 import Navbar from "../components/Navbar";
 
 export default function Role1Dashboard() {
@@ -409,30 +409,35 @@ export default function Role1Dashboard() {
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Quick Actions Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-          <button 
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {/* 1. Upload Statement */}
+          <button
             onClick={() => setShowUploadModal(true)}
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800" : "bg-white border-gray-200"}`}
+            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-500" : "bg-white border-gray-200 hover:border-blue-400"}`}
           >
-            <svg className="w-5 h-5 text-blue-900 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
+            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
-            <span
-              className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
-            >
+            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
               {t("uploadStatement")}
             </span>
           </button>
+
+          {/* 2. Manage Platforms */}
           <button
-            onClick={() => navigate('/platforms')}
+            onClick={() => navigate("/platforms")}
             className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
           >
             <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M13 7H7v6h6V7z"/>
-              <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd"/>
+              <path d="M13 7H7v6h6V7z" />
+              <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
             </svg>
-            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>Manage Platforms</span>
+            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+              Manage Platforms
+            </span>
           </button>
+
+          {/* 3. View Credit Report */}
           <button
             onClick={async () => {
               try {
@@ -441,8 +446,7 @@ export default function Role1Dashboard() {
                   alert("Please login to view your credit score");
                   return;
                 }
-
-                // Try to GET existing profile first
+                // Try to GET existing profile first (teammate's improvement: fallback to calculate)
                 let creditData = null;
                 try {
                   const getRes = await axios.get(`/api/credit/${userId}`);
@@ -450,10 +454,10 @@ export default function Role1Dashboard() {
                     creditData = getRes.data.data;
                   }
                 } catch (_) {
-                  // profile not found — calculate it
+                  // profile not found — trigger calculation
                 }
 
-                // If no profile yet, trigger calculation from saved DB data
+                // If no existing profile, calculate from saved DB data
                 if (!creditData) {
                   try {
                     await axios.post("/api/credit/calculate", { userId });
@@ -467,89 +471,45 @@ export default function Role1Dashboard() {
                 }
 
                 if (creditData) {
-                  navigate('/credit-analysis', {
+                  navigate("/credit-analysis", {
                     state: {
                       creditData,
-                      financialSummary: creditData.financialSummary || {}
-                    }
+                      financialSummary: creditData.financialSummary || {},
+                    },
                   });
                 } else {
                   alert("No credit score available yet. Please upload your bank statement first.");
                 }
               } catch (error) {
-                console.error('Error loading credit report:', error);
+                console.error("Error loading credit report:", error);
                 alert("No credit score available yet. Please upload your bank statement first.");
               }
             }}
             className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
           >
-            <svg
-              className="w-5 h-5 text-blue-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-              <path
-                fillRule="evenodd"
-                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
             </svg>
-            <span
-              className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
-            >
+            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
               {t("viewCreditReport")}
             </span>
           </button>
+
+          {/* 4. Tax Summary */}
           <button
-            onClick={() => {
-              const chatbot = document.querySelector("[data-chatbot-icon]");
-              if (chatbot) {
-                chatbot.click();
-                chatbot.scrollIntoView({ behavior: "smooth", block: "center" });
-              }
-            }}
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-green-600" : "bg-white border-gray-200 hover:border-green-300"}`}
+            onClick={() => navigate("/tax-summary")}
+            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-yellow-500" : "bg-white border-gray-200 hover:border-yellow-400"}`}
           >
-            <svg
-              className="w-5 h-5 text-green-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+            <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
             </svg>
-            <span
-              className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
-            >
-              {t("learningCenter")}
-            </span>
-          </button>
-          <button
-            onClick={() => {
-              alert(
-                `${t("account")}: ${user?.name || "User"}\n${t("email")}: ${user?.email || "N/A"}\n${t("role")}: ${user?.role || "Gig Worker"}`,
-              );
-            }}
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-purple-600" : "bg-white border-gray-200 hover:border-purple-300"}`}
-          >
-            <svg
-              className="w-5 h-5 text-purple-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span
-              className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
-            >
-              {t("myAccount")}
+            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+              Tax Summary
             </span>
           </button>
         </div>
+
 
         {/* Welcome Banner with Insights */}
         <div className="bg-gradient-to-r from-blue-900 to-blue-800 rounded-lg shadow-md p-6 mb-6 text-white">
@@ -1634,8 +1594,6 @@ export default function Role1Dashboard() {
         </div>
       )}
 
-      {/* Floating Credit Policy Assistant */}
-      <CreditPolicyBot />
     </div>
   );
 }

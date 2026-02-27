@@ -3,12 +3,12 @@ import { useAuth } from "./context/AuthContext";
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import OnboardingNew from "./pages/OnboardingNew";
 import Role1Dashboard from "./pages/Dashboard";
 import CreditAnalysis from "./pages/CreditAnalysis";
 import TaxSummary from "./pages/TaxSummary";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import PlatformManagement from "./pages/PlatformManagement";
+import CreditPolicyBot from "./components/CreditPolicyBot";
 
 
 // Protected Route Component - Requires Authentication
@@ -27,9 +27,10 @@ const ProtectedRoute = ({ children }) => {
 };
 
 // Dashboard Protected Route - Requires Authentication Only
+// Renders CreditPolicyBot on every authenticated page
 const DashboardRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -37,10 +38,15 @@ const DashboardRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   if (!user) return <Navigate to="/login" />;
-  
-  return children;
+
+  return (
+    <>
+      {children}
+      <CreditPolicyBot />
+    </>
+  );
 };
 
 const App = () => {
