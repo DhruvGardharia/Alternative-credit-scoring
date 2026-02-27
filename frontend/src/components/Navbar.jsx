@@ -151,55 +151,14 @@ export default function Navbar() {
               </svg>
             )}
           </button>
-
-          {/* User Avatar with Dropdown */}
-          <div className="relative" ref={userDropdownRef}>
-            <button
-              onClick={() => setShowUserDropdown((prev) => !prev)}
-              className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-yellow-400 transition focus:outline-none"
-              aria-label="User menu"
-            >
-              <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-blue-900 font-bold text-sm select-none">
-                {initials}
-              </div>
-            </button>
-
-            {showUserDropdown && (
-              <div className="absolute right-0 mt-2 w-48 rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 z-30 overflow-hidden">
-                {/* User info header */}
-                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                  <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{user?.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
-                </div>
-
-                {/* My Account */}
-                <button
-                  onClick={() => {
-                    setShowUserDropdown(false);
-                    alert(`${t("account")}: ${user?.name || "User"}\n${t("email")}: ${user?.email || "N/A"}\n${t("role")}: ${user?.role || "Gig Worker"}`);
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition"
-                >
-                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                  {t("myAccount")}
-                </button>
-
-                {/* Logout */}
-                <button
-                  onClick={() => { setShowUserDropdown(false); handleLogout(); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition border-t border-gray-100 dark:border-gray-700"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
-                  </svg>
-                  {t("logout")}
-                </button>
-              </div>
-            )}
-          </div>
-
+          
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition text-sm"
+          >
+            {t("logout")}
+          </button>
         </div>
       </div>
     </nav>

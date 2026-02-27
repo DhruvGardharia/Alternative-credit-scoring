@@ -15,6 +15,12 @@ import ExpenseTracker from "./pages/ExpenseTracker";
 import PlatformManagement from "./pages/PlatformManagement";
 import CreditPolicyBot from "./components/CreditPolicyBot";
 
+// Redirects to /dashboard if already logged in
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingSpinner />;
+  return user ? <Navigate to="/dashboard" replace /> : children;
+};
 
 // Protected Route Component - Requires Authentication
 const ProtectedRoute = ({ children }) => {
@@ -58,6 +64,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public — redirect to dashboard if already logged in */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

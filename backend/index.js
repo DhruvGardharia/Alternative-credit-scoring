@@ -42,6 +42,7 @@ import platformRoutes from './routes/platformRoutes.js';
 import statementRoutes from './routes/statementRoutes.js';
 import incomeRoutes from './routes/incomeRoutes.js';
 import summaryRoutes from './routes/summaryRoutes.js';
+import chatRoutes from "./routes/chatRoutes.js";
 import creditRoutes from './routes/creditRoutes.js';
 
 app.use('/api/user', userRoutes);
@@ -56,6 +57,7 @@ app.use('/api/lender-auth', lenderAuthRoutes);
 app.use('/api/platform', platformRoutes);
 app.use('/api/statement', statementRoutes);
 app.use('/api/income', incomeRoutes);
+app.use("/api/ai", chatRoutes);
 app.use('/api/summary', summaryRoutes);
 app.use('/api/credit', creditRoutes);  
 
