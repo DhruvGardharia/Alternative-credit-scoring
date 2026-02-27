@@ -27,4 +27,6 @@ const financialSummarySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const FinancialSummary = mongoose.model("FinancialSummary", financialSummarySchema);
+export const FinancialSummary =
+  mongoose.models.FinancialSummary ||
+  mongoose.model("FinancialSummary", financialSummarySchema);

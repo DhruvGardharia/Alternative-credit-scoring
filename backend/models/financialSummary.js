@@ -160,4 +160,6 @@ financialSummarySchema.statics.updateSummary = async function(userId) {
   return summary;
 };
 
-export const FinancialSummary = mongoose.model("FinancialSummary", financialSummarySchema);
+export const UserFinancialSummary =
+  mongoose.models.UserFinancialSummary ||
+  mongoose.model("UserFinancialSummary", financialSummarySchema);

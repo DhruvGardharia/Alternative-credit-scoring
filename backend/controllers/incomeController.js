@@ -6,7 +6,7 @@
  */
 
 import { Income } from "../models/incomeModel.js";
-import { FinancialSummary } from "../models/financialSummary.js";
+import { UserFinancialSummary } from "../models/financialSummary.js";
 
 /**
  * POST /api/income/add
@@ -36,7 +36,7 @@ export const addIncome = async (req, res) => {
     });
 
     // Auto-update financial summary
-    await FinancialSummary.updateSummary(userId);
+    await UserFinancialSummary.updateSummary(userId);
 
     res.status(201).json({
       success: true,
@@ -79,7 +79,7 @@ export const bulkAddIncome = async (req, res) => {
       source: "api_sync"
     }));
 // Auto-update financial summary
-    await FinancialSummary.updateSummary(userId);
+  await UserFinancialSummary.updateSummary(userId);
 
     
     const result = await Income.insertMany(incomeRecords);
