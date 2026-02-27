@@ -31,9 +31,6 @@ import authRoutes from "./routes/authRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import taxRoutes from "./routes/taxRoutes.js";
 
-import userRoutes from './routes/userRoutes.js';
-import authRoutes from './routes/authRoutes.js';
-import expenseRoutes from './routes/expenseRoutes.js';
 import platformRoutes from './routes/platformRoutes.js';
 import statementRoutes from './routes/statementRoutes.js';
 import incomeRoutes from './routes/incomeRoutes.js';
