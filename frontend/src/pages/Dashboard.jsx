@@ -21,14 +21,9 @@ export default function Role1Dashboard() {
   const [savingsGoal, setSavingsGoal] = useState(10000);
   const [showEditGoal, setShowEditGoal] = useState(false);
   const [tempGoal, setTempGoal] = useState(10000);
-<<<<<<< HEAD
-
-=======
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfUploading, setPdfUploading] = useState(false);
-  
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
   const [newExpense, setNewExpense] = useState({
     category: "food",
     amount: "",
@@ -202,77 +197,12 @@ export default function Role1Dashboard() {
     }
   };
 
-<<<<<<< HEAD
-  const handleCSVUpload = async (e) => {
-    e.preventDefault();
-    if (!csvFile) {
-      alert(t("pleaseSelectCSV"));
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("bankStatement", csvFile);
-
-    setUploadLoading(true);
-    try {
-      const { data } = await axios.post(
-        "/api/user/upload-statement",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
-
-      setCreditData(data.creditScore);
-      setFinancialSummary(data.financialSummary);
-
-      navigate("/credit-analysis", {
-        state: {
-          creditData: data.creditScore,
-          financialSummary: data.financialSummary,
-        },
-      });
-    } catch (error) {
-      alert(
-        "Error uploading CSV: " +
-          (error.response?.data?.message || error.message),
-      );
-    } finally {
-      setUploadLoading(false);
-      setCsvFile(null);
-    }
-  };
-
-  const getFinancialHealth = () => {
-    if (creditData) {
-      if (creditData.score >= 75)
-        return {
-          status: t("excellent"),
-          color: "green",
-          icon: "✓",
-          detail: t("excellentDetail"),
-        };
-      if (creditData.score >= 50)
-        return {
-          status: t("stable"),
-          color: "blue",
-          icon: "→",
-          detail: t("stableDetail"),
-        };
-      return {
-        status: t("needsAttention"),
-        color: "yellow",
-        icon: "!",
-        detail: t("needsAttentionDetail"),
-      };
-=======
   const getFinancialHealth = () => {
     if (creditData) {
       const s = creditData.score;
       if (s >= 750) return { status: t("excellent"), color: "green", icon: "✓", detail: t("excellentDetail") };
       if (s >= 500) return { status: t("stable"), color: "blue", icon: "→", detail: t("stableDetail") };
       return { status: t("needsAttention"), color: "yellow", icon: "!", detail: t("needsAttentionDetail") };
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
     }
     return {
       status: t("preAssessment"),
@@ -284,30 +214,10 @@ export default function Role1Dashboard() {
 
   const getCreditReadiness = () => {
     if (creditData) {
-<<<<<<< HEAD
-      if (creditData.score >= 70)
-        return {
-          status: t("eligible"),
-          color: "green",
-          detail: `₹${creditData.eligibleCreditAmount?.toLocaleString()} pre-approved credit available`,
-        };
-      if (creditData.score >= 50)
-        return {
-          status: t("partiallyEligible"),
-          color: "yellow",
-          detail: t("partiallyEligibleDetail"),
-        };
-      return {
-        status: t("buildingEligibility"),
-        color: "orange",
-        detail: t("buildingEligibilityDetail"),
-      };
-=======
       const s = creditData.score;
       if (s >= 700) return { status: t("eligible"), color: "green", detail: `₹${creditData.eligibleCreditAmount?.toLocaleString()} pre-approved credit available` };
       if (s >= 500) return { status: t("partiallyEligible"), color: "yellow", detail: t("partiallyEligibleDetail") };
       return { status: t("buildingEligibility"), color: "orange", detail: t("buildingEligibilityDetail") };
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
     }
     return {
       status: t("uploadStatementStatus"),
@@ -422,24 +332,15 @@ export default function Role1Dashboard() {
         title: t("calculateCreditScore"),
         detail: t("calculateCreditScoreDetail"),
         action: t("uploadNow"),
-<<<<<<< HEAD
-        onClick: () => setShowUploadForm(true),
-=======
         onClick: () => setShowUploadModal(true)
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
       });
     } else if (creditData.score < 700) {
       actions.push({
         priority: "medium",
         icon: "📈",
         title: t("improveYourScore"),
-<<<<<<< HEAD
-        detail: `Current score: ${creditData.score}/100 - Track more consistent income`,
-        action: "View Tips",
-=======
         detail: `Current score: ${creditData.score}/1000 - Track more consistent income`,
         action: "View Tips"
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
       });
     }
 
@@ -509,28 +410,12 @@ export default function Role1Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Quick Actions Bar */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-<<<<<<< HEAD
-          <button
-            className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800" : "bg-white border-gray-200"}`}
-          >
-            <svg
-              className="w-5 h-5 text-blue-900 dark:text-blue-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-=======
           <button 
             onClick={() => setShowUploadModal(true)}
             className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800" : "bg-white border-gray-200"}`}
           >
             <svg className="w-5 h-5 text-blue-900 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
             </svg>
             <span
               className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
@@ -539,9 +424,6 @@ export default function Role1Dashboard() {
             </span>
           </button>
           <button
-<<<<<<< HEAD
-            onClick={() => navigate("/credit-analysis")}
-=======
             onClick={() => navigate('/platforms')}
             className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
           >
@@ -559,8 +441,6 @@ export default function Role1Dashboard() {
                   alert("Please login to view your credit score");
                   return;
                 }
-                
-                // Fetch credit data
                 const creditResponse = await axios.get(`/api/credit/${userId}`);
                 if (creditResponse.data.success && creditResponse.data.data) {
                   navigate('/credit-analysis', {
@@ -577,7 +457,6 @@ export default function Role1Dashboard() {
                 alert("No credit score available yet. Please upload your bank statement first.");
               }
             }}
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
             className={`flex items-center justify-center gap-2 p-3 rounded-lg shadow hover:shadow-md transition border ${isDark ? "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-blue-600" : "bg-white border-gray-200 hover:border-blue-300"}`}
           >
             <svg
@@ -723,62 +602,7 @@ export default function Role1Dashboard() {
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Upload Form */}
-        {showUploadForm && !creditData && (
-          <div
-            className={`rounded-lg shadow-md p-5 mb-6 border-l-4 border-yellow-400 ${isDark ? "bg-gray-900" : "bg-white"}`}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h2
-                  className={`text-lg font-bold ${isDark ? "text-blue-400" : "text-blue-900"}`}
-                >
-                  {t("uploadBankStatement")}
-                </h2>
-                <p
-                  className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
-                >
-                  {t("uploadSubtitle")}
-                </p>
-              </div>
-              <svg
-                className="w-6 h-6 text-yellow-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <form
-              onSubmit={handleCSVUpload}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-3"
-            >
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(e) => setCsvFile(e.target.files[0])}
-                className={`flex-1 text-sm px-3 py-2 border-2 rounded-lg focus:outline-none ${isDark ? "bg-gray-800 border-blue-800 text-gray-300 focus:border-blue-500" : "border-blue-200 text-gray-700 focus:border-blue-900"}`}
-              />
-              <button
-                type="submit"
-                disabled={uploadLoading || !csvFile}
-                className="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium shadow transition disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
-              >
-                {uploadLoading ? t("analyzing") : t("analyzeNow")}
-              </button>
-            </form>
-          </div>
-        )}
-=======
 
->>>>>>> 1932f093551f8b08df7493a20a57938c7f568547
 
         {/* Future Integration Note */}
         {!creditData && (

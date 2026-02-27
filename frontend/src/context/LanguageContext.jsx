@@ -31,9 +31,7 @@ const translations = {
 
     // Upload Form
     uploadBankStatement: "Upload Bank Statement",
-    uploadSubtitle: "Upload your PDF file to calculate your credit score instantly",
-    uploadSubtitle:
-      "Upload your CSV file to calculate your credit score instantly",
+    uploadSubtitle: "Upload your CSV file to calculate your credit score instantly",
     analyzeNow: "Analyze Now",
     analyzing: "Analyzing...",
     pleaseSelectCSV: "Please select a PDF file",
@@ -94,9 +92,7 @@ const translations = {
     regularActivity: "Regular Activity",
     activeDaysDetail: "active days shows commitment",
     getCreditScore: "Get Your Credit Score",
-    getCreditScoreDetail: "Upload your bank statement (PDF format) for instant credit assessment",
-    getCreditScoreDetail:
-      "Upload your bank statement (CSV format) for instant credit assessment",
+    getCreditScoreDetail: "Upload your bank statement (CSV format) for instant credit assessment",
     securePrivate: "Secure & Private Analysis",
     securePrivateDetail:
       "Your financial data is analyzed locally and never shared with third parties",
@@ -446,9 +442,7 @@ const translations = {
     regularActivity: "नियमित गतिविधि",
     activeDaysDetail: "सक्रिय दिन प्रतिबद्धता दिखाते हैं",
     getCreditScore: "अपना क्रेडिट स्कोर प्राप्त करें",
-    getCreditScoreDetail: "तत्काल क्रेडिट मूल्यांकन के लिए बैंक स्टेटमेंट (PDF) अपलोड करें",
-    getCreditScoreDetail:
-      "तत्काल क्रेडिट मूल्यांकन के लिए बैंक स्टेटमेंट (CSV) अपलोड करें",
+    getCreditScoreDetail: "तत्काल क्रेडिट मूल्यांकन के लिए बैंक स्टेटमेंट (CSV) अपलोड करें",
     securePrivate: "सुरक्षित और निजी विश्लेषण",
     securePrivateDetail:
       "आपका वित्तीय डेटा स्थानीय रूप से विश्लेषण किया जाता है और तीसरे पक्ष के साथ कभी साझा नहीं किया जाता",
@@ -800,9 +794,7 @@ const translations = {
     regularActivity: "नियमित क्रियाकलाप",
     activeDaysDetail: "सक्रिय दिवस वचनबद्धता दर्शवतात",
     getCreditScore: "तुमचा क्रेडिट स्कोर मिळवा",
-    getCreditScoreDetail: "तत्काल क्रेडिट मूल्यांकनासाठी बँक स्टेटमेंट (PDF) अपलोड करा",
-    getCreditScoreDetail:
-      "तत्काल क्रेडिट मूल्यांकनासाठी बँक स्टेटमेंट (CSV) अपलोड करा",
+    getCreditScoreDetail: "तत्काल क्रेडिट मूल्यांकनासाठी बँक स्टेटमेंट (CSV) अपलोड करा",
     securePrivate: "सुरक्षित आणि खाजगी विश्लेषण",
     securePrivateDetail:
       "तुमचा आर्थिक डेटा स्थानिक पातळीवर विश्लेषित केला जातो आणि तृतीय पक्षांशी कधीही शेअर केला जात नाही",
