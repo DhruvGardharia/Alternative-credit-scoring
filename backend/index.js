@@ -295,21 +295,24 @@ app.use('/api/credit', creditRoutes);
 app.post('/api/predict_income', async (req, res) => {
   try {
     const { profiles } = req.body;
-    const port = process.env.FASTAPI_INTERNAL_PORT || 8000;
+    const FASTAPI_URL = process.env.FASTAPI_URL || `http://127.0.0.1:${process.env.FASTAPI_INTERNAL_PORT || 8000}`;
     
-    let fetchFn = global.fetch;
-    if (!fetchFn) {
-      fetchFn = (await import('node-fetch')).default;
-    }
+    // Always use node-fetch to avoid Node 18 IPv6 localhost resolution issues
+    const fetch = (await import('node-fetch')).default;
 
-    const response = await fetchFn(`http://localhost:${port}/predict_income`, {
+    const response = await fetch(`${FASTAPI_URL}/predict_income`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ profiles })
+      body: JSON.stringify({ profiles }),
+      signal: AbortSignal.timeout(30000)
     });
 
+    if (!response.ok) {
+        throw new Error(`AI endpoint returned ${response.status}`);
+    }
+
     const data = await response.json();
-    return res.status(response.status).json(data);
+    return res.status(200).json(data);
   } catch (error) {
     console.error("AI Proxy Error:", error.message);
     return res.status(500).json({ success: false, error: "Internal AI connection refused" });
