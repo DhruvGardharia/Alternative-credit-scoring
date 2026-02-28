@@ -60,10 +60,6 @@ export default function Navbar() {
 
         {/* Right Section */}
         <div className="flex items-center space-x-4">
-          <span className="text-white text-sm hidden sm:block">
-            {t("welcome")}, {user?.name}
-          </span>
-
           {/* Nav Links */}
           <button
             onClick={() => navigate("/dashboard")}
