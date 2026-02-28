@@ -4,10 +4,14 @@ import {
   calculateCredit,
   calculateCreditManual,
   getCreditMetrics,
-  refreshCreditScore
+  refreshCreditScore,
+  verifyCreditHash
 } from "../controllers/newCreditController.js";
 
 const router = express.Router();
+
+// GET /api/credit/verify/:userId - Verify credit hash integrity
+router.get("/verify/:userId", verifyCreditHash);
 
 // POST /api/credit/calculate - Calculate credit score from DB data
 router.post("/calculate", calculateCredit);

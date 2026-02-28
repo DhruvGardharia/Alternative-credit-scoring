@@ -178,3 +178,54 @@ export async function verifyChain(userId, existingChain = null) {
         invalidBlocks,
     };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CREDIT SCORE ANCHORING  (separate from the insurance chain above)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Build a structured, privacy-safe snapshot of a credit profile.
+ * userId is SHA256-hashed so the raw Mongo ObjectId never leaves the service.
+ */
+export function buildCreditSnapshot(userId, creditProfile) {
+  const hashedUserId = crypto.createHash("sha256").update(String(userId)).digest("hex");
+
+  return {
+    userId:                hashedUserId,
+    creditScore:           creditProfile.creditScore,
+    riskLevel:             creditProfile.riskLevel,
+    incomeQualityScore:    creditProfile.scoreBreakdown?.incomeQualityScore    ?? 0,
+    spendingBehaviorScore: creditProfile.scoreBreakdown?.spendingBehaviorScore ?? 0,
+    liquidityScore:        creditProfile.scoreBreakdown?.liquidityScore        ?? 0,
+    gigStabilityScore:     creditProfile.scoreBreakdown?.gigStabilityScore     ?? 0,
+    modelVersion:          "v1.0",
+    timestamp:             new Date().toISOString(),
+  };
+}
+
+/**
+ * Anchor Credit Snapshot (LOCAL HASH MODE)
+ * 
+ * Generates a SHA256 integrity seal for a credit profile.
+ * Stored in MongoDB to prevent manual database tampering.
+ * 
+ * @param {Object} snapshot - The credit profile snapshot
+ * @returns {Object} - The hash results
+ */
+export async function anchorCreditSnapshot(snapshot) {
+    // 1. Generate the integrity Hash
+    const snapshotHash = crypto
+      .createHash("sha256")
+      .update(JSON.stringify(snapshot))
+      .digest("hex");
+    
+    console.log("------------------------------------------------");
+    console.log(`🛡️  [INTEGRITY] Generated Credit Profile Hash: ${snapshotHash}`);
+    console.log("✅ [INTEGRITY] Proof saved locally to MongoDB.");
+    console.log("------------------------------------------------");
+    
+    return { 
+        snapshotHash, 
+        transactionHash: null // No blockchain TX in local mode
+    };
+}

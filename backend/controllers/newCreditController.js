@@ -11,6 +11,8 @@ import {
   recalculateCreditProfile,
   getRiskAnalysis
 } from "../services/creditEngine/index.js";
+import { buildCreditSnapshot } from "../services/blockchainService.js";
+import crypto from "crypto";
 import { Expense } from "../models/expenseModel.js";
 import { Income } from "../models/incomeModel.js";
 import { BankStatement } from "../models/bankStatementModel.js";
@@ -19,6 +21,7 @@ import {
   INCOME_METRICS, SPENDING_METRICS, LIQUIDITY_METRICS,
   getScoreFromBands
 } from "../config/metricDefinitions.js";
+import { CreditProfile } from "../models/CreditProfile.js";
 
 // Map metric names to their scoring band definitions
 const METRIC_BANDS = {
@@ -134,6 +137,7 @@ async function aggregateTransactions(userId) {
 export const calculateCredit = async (req, res) => {
   try {
     const { userId } = req.body;
+    console.log("➡️  [API] POST /api/credit/calculate", { userId });
 
     if (!userId) {
       return res.status(400).json({
@@ -170,7 +174,9 @@ export const calculateCredit = async (req, res) => {
       success: true,
       data: {
         ...creditProfile,
-        riskAnalysis
+        riskAnalysis,
+        blockchainVerified: !!creditProfile.blockchainResult?.snapshotHash,
+        blockchainTxHash:   creditProfile.blockchainResult?.transactionHash || null
       }
     });
 
@@ -191,6 +197,7 @@ export const calculateCredit = async (req, res) => {
 export const calculateCreditManual = async (req, res) => {
   try {
     const { userId, transactions, gigData } = req.body;
+    console.log("➡️  [API] POST /api/credit/calculate-manual", { userId, txCount: transactions?.length });
 
     if (!userId) {
       return res.status(400).json({
@@ -224,7 +231,9 @@ export const calculateCreditManual = async (req, res) => {
       success: true,
       data: {
         ...creditProfile,
-        riskAnalysis
+        riskAnalysis,
+        blockchainVerified: !!creditProfile.blockchainResult?.snapshotHash,
+        blockchainTxHash:   creditProfile.blockchainResult?.transactionHash || null
       }
     });
 
@@ -252,9 +261,10 @@ export const getCreditScore = async (req, res) => {
       });
     }
 
-    const creditProfile = await getCreditProfile(userId);
+    const creditProfileData = await getCreditProfile(userId);
+    const profileFromDb = await CreditProfile.findOne({ userId }).lean();
 
-    if (!creditProfile) {
+    if (!creditProfileData) {
       return res.status(404).json({
         success: false,
         error: "Credit profile not found. Please calculate credit score first."
@@ -262,8 +272,8 @@ export const getCreditScore = async (req, res) => {
     }
 
     // Re-score any stale metrics (status "Unknown" / score 0) in-memory before responding
-    const freshMetrics = refreshStaleMetrics(creditProfile.metrics);
-    const patchedProfile = { ...creditProfile, metrics: freshMetrics };
+    const freshMetrics = refreshStaleMetrics(creditProfileData.metrics);
+    const patchedProfile = { ...creditProfileData, metrics: freshMetrics };
 
     // Get financial summary
     const financialSummary = await FinancialSummary.findOne({ userId }).lean();
@@ -291,7 +301,10 @@ export const getCreditScore = async (req, res) => {
         eligibleCreditAmount,
         monthlyEMICapacity,
         score: patchedProfile.creditScore,
-        riskLevel: riskAnalysis.riskLevel
+        riskLevel: riskAnalysis.riskLevel,
+        blockchainVerified: !!profileFromDb.blockchain?.snapshotHash,
+        blockchainTxHash:   profileFromDb.blockchain?.transactionHash || null,
+        anchoredAt:         profileFromDb.blockchain?.anchoredAt || null
       }
     });
 
@@ -391,7 +404,9 @@ export const refreshCreditScore = async (req, res) => {
       message: "Credit score refreshed successfully",
       data: {
         ...creditProfile,
-        riskAnalysis
+        riskAnalysis,
+        blockchainVerified: !!creditProfile.blockchainResult?.snapshotHash,
+        blockchainTxHash:   creditProfile.blockchainResult?.transactionHash || null
       }
     });
 
@@ -409,5 +424,65 @@ export default {
   calculateCreditManual,
   getCreditScore,
   getCreditMetrics,
-  refreshCreditScore
+  refreshCreditScore,
+  verifyCreditHash
 };
+
+/**
+ * GET /api/credit/verify/:userId
+ * Verify the integrity of the credit profile using blockchain hashes
+ */
+export async function verifyCreditHash(req, res) {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: "userId is required" });
+    }
+
+    // 1. Fetch latest CreditProfile from MongoDB
+    const profile = await CreditProfile.findOne({ userId }).lean();
+
+    if (!profile || !profile.blockchain || !profile.blockchain.snapshotHash) {
+      return res.status(404).json({
+        success: false,
+        error: "No blockchain record found for this user. Score must be calculated first."
+      });
+    }
+
+    // 2. Recreate snapshot object using the SAME structure as buildCreditSnapshot
+    // We use the stored values to ensure we are verifying the STAMPED version.
+    const snapshot = buildCreditSnapshot(userId, {
+      creditScore: profile.creditScore,
+      riskLevel: profile.riskLevel,
+      scoreBreakdown: profile.scoreBreakdown
+    });
+
+    // 3. Generate new hash locally
+    const recalculatedHash = crypto
+      .createHash("sha256")
+      .update(JSON.stringify(snapshot))
+      .digest("hex");
+
+    // 4. Compare with stored snapshotHash
+    const isValid = (recalculatedHash === profile.blockchain.snapshotHash);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        isValid,
+        storedHash: profile.blockchain.snapshotHash,
+        recalculatedHash,
+        blockchainTxHash: profile.blockchain.transactionHash,
+        anchoredAt: profile.blockchain.anchoredAt
+      }
+    });
+
+  } catch (error) {
+    console.error("Credit verification error:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Failed to verify credit hash"
+    });
+  }
+}

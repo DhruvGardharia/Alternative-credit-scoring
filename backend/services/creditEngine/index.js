@@ -12,6 +12,7 @@ import { calculateAllGigMetrics } from "./gigMetrics.js";
 import { aggregateAllScores } from "./scoreAggregator.js";
 import { analyzeRisk } from "./riskClassifier.js";
 import { CreditProfile } from "../../models/CreditProfile.js";
+import { buildCreditSnapshot, anchorCreditSnapshot } from "../blockchainService.js";
 
 /**
  * Validate transaction data format
@@ -60,8 +61,10 @@ export async function calculateCreditProfile(data) {
     throw new Error("userId is required");
   }
   validateTransactions(transactions);
-
-  console.log(`\n🔷 Starting credit calculation for user: ${userId}`);
+ 
+  console.log('================================================');
+  console.log(`🔷 [ENGINE] Starting credit calculation for user: ${userId}`);
+  console.log('================================================');
   console.log(`📊 Total transactions: ${transactions.length}`);
   console.log(`   Credits: ${transactions.filter(t => t.type === 'credit').length}`);
   console.log(`   Debits: ${transactions.filter(t => t.type === 'debit').length}`);
@@ -124,12 +127,43 @@ export async function calculateCreditProfile(data) {
     }
   );
 
-  // Step 6: Return complete profile
+  // Step 6: Blockchain anchoring (BLOCKING FOR DEBUGGING)
+  let blockchainResult = { snapshotHash: null, transactionHash: null };
+  try {
+    const snapshot = buildCreditSnapshot(userId, { 
+      creditScore, 
+      riskLevel, 
+      scoreBreakdown 
+    });
+    
+    blockchainResult = await anchorCreditSnapshot(snapshot);
+    
+    if (blockchainResult.snapshotHash) {
+      await CreditProfile.findOneAndUpdate(
+        { userId },
+        {
+          "blockchain.snapshotHash":    blockchainResult.snapshotHash,
+          "blockchain.transactionHash": blockchainResult.transactionHash,
+          "blockchain.anchoredAt":      new Date()
+        }
+      );
+      console.log(`✅ [Blockchain] Success! Hash: ${blockchainResult.snapshotHash.substring(0, 10)}...`);
+    }
+  } catch (err) {
+    console.warn("⚠️  [Blockchain] Anchoring skipped or failed:", err.message);
+  }
+
+  // Step 7: Return complete profile
   return {
     creditScore,
     riskLevel,
     scoreBreakdown,
     metrics,
+    blockchainResult: {
+      snapshotHash:    blockchainResult.snapshotHash || "Calculation failed",
+      transactionHash: blockchainResult.transactionHash || null,
+      anchoredAt:      new Date()
+    },
     profileId: creditProfile._id
   };
 }

@@ -26,6 +26,7 @@ const FASTAPI_INTERNAL_PORT = process.env.FASTAPI_INTERNAL_PORT || '8000';
 let pythonProcess = null;
 let isShuttingDown = false; // set to true during intentional Node shutdown
 let restartTimer = null;   // track pending restart so we can cancel it
+let restartAttempts = 0;   // count how many times this process slot has been restarted
 
 function cancelRestartTimer() {
   if (restartTimer !== null) {
@@ -65,12 +66,18 @@ function startPythonServer() {
   proc.stdout.on('data', (d) => process.stdout.write(`[Python] ${d}`));
   proc.stderr.on('data', (d) => process.stderr.write(`[Python] ${d}`));
 
-  let restartAttempts = 0; // count how many times this process slot has been restarted
+  proc.stderr.on('data', (d) => process.stderr.write(`[Python] ${d}`));
 
   proc.on('close', (code) => {
     // Ignore if this is a stale/replaced process, or if we're shutting down
     if (pythonProcess !== proc || isShuttingDown) return;
     pythonProcess = null;
+
+    // Check if the port was taken by another Node instance in the meantime
+    if (!isPortFree(FASTAPI_INTERNAL_PORT) && isPythonAlive()) {
+      console.log('[Python] Process closed but port is healthy (likely adopted by another instance).');
+      return;
+    }
 
     restartAttempts++;
     if (restartAttempts > 3) {
@@ -111,7 +118,7 @@ function cleanupPython() {
   }
 }
 
-// Check if anything is bound on the port (any state, not just LISTENING)
+// Check if anything is bound on the port in LISTENING state
 function isPortFree(port) {
   try {
     if (process.platform === 'win32') {
@@ -119,7 +126,8 @@ function isPortFree(port) {
         `netstat -ano | findstr " :${port} "`,
         { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
       );
-      return out.trim().length === 0;
+      // Only consider it busy if we find a line with "LISTENING"
+      return !out.toLowerCase().includes('listening');
     } else {
       execSync(`fuser ${port}/tcp 2>/dev/null`, { stdio: 'ignore' });
       return false;

@@ -107,6 +107,13 @@ const creditProfileSchema = new mongoose.Schema(
         type: metricSchema,
         default: { value: 0, score: 0, status: "Not Calculated", lastUpdated: Date.now() }
       }
+    },
+
+    // Blockchain anchoring (optional — populated after credit calculation)
+    blockchain: {
+      snapshotHash:    { type: String, default: null },
+      transactionHash: { type: String, default: null },
+      anchoredAt:      { type: Date,   default: null }
     }
   },
   {

@@ -8,8 +8,10 @@ import { calculateCreditProfile } from "../services/creditEngine/index.js";
 export const uploadStatement = async (req, res) => {
   try {
     const { userId } = req.body;
-
-    console.log('Upload statement request:', { userId, hasFile: !!req.file });
+    console.log('************************************************');
+    console.log('📂 [UPLOAD] PDF UPLOAD DETECTED!');
+    console.log(`👤 User: ${userId}`);
+    console.log('************************************************');
 
     if (!req.file) {
       return res.status(400).json({ 
@@ -89,6 +91,7 @@ export const uploadStatement = async (req, res) => {
 
     // Update statement status
     await BankStatement.findByIdAndUpdate(statement._id, { status: "processed" });
+    console.log(`📊 [UPLOAD] Parsed ${transactions.length} transactions from file.`);
 
     // Trigger financial summary recalculation (auto-updates netBalance)
     try {
@@ -124,16 +127,16 @@ export const uploadStatement = async (req, res) => {
     let creditResult = null;
     if (normalizedTransactions.length > 0) {
       try {
-        console.log(`🔄 Calculating credit profile with ${normalizedTransactions.length} transactions...`);
+        console.log(`🔄 [Upload] Triggering credit profile calculation for ${userId} with ${normalizedTransactions.length} transactions...`);
         creditResult = await calculateCreditProfile({ userId, transactions: normalizedTransactions });
-        console.log(`✅ Credit score calculated: ${creditResult.creditScore}`);
+        console.log(`✅ [Upload] Credit score calculated: ${creditResult.creditScore}`);
       } catch (creditError) {
-        console.error('❌ Credit profile calculation error:', creditError.message);
+        console.error('❌ [Upload] Credit profile calculation error:', creditError.message);
         console.error(creditError.stack);
       }
     }
 
-    console.log('Statement upload completed successfully');
+    console.log('✅ [Upload] Statement processing and anchoring initiated.');
 
     res.status(201).json({ 
       success: true,
@@ -143,6 +146,9 @@ export const uploadStatement = async (req, res) => {
         transactionsProcessed: transactions.length,
         creditScore: creditResult?.creditScore || null,
         creditProfile: creditResult || null,
+        blockchainVerified: !!creditResult?.blockchainResult?.snapshotHash,
+        blockchainTxHash:   creditResult?.blockchainResult?.transactionHash || null,
+        anchoredAt:         creditResult?.blockchainResult?.anchoredAt || null
       }
     });
 
