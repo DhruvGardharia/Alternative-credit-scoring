@@ -109,7 +109,9 @@ export default function GigIncomePrediction() {
     const profiles = platforms.map(plat => ({ ...workerData, ...plat }));
 
     try {
-      const response = await fetch("http://localhost:8000/predict_income", {
+      // Use dynamic base URL for production, hitting the new proxy in index.js
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5005';
+      const response = await fetch(`${baseUrl}/api/predict_income`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profiles }),

@@ -291,6 +291,31 @@ app.use("/api/ai", chatRoutes);
 app.use('/api/summary', summaryRoutes);
 app.use('/api/credit', creditRoutes);
 
+// ── Standalone Proxy for Python AI Service ───────────────────────────────────
+app.post('/api/predict_income', async (req, res) => {
+  try {
+    const { profiles } = req.body;
+    const port = process.env.FASTAPI_INTERNAL_PORT || 8000;
+    
+    let fetchFn = global.fetch;
+    if (!fetchFn) {
+      fetchFn = (await import('node-fetch')).default;
+    }
+
+    const response = await fetchFn(`http://localhost:${port}/predict_income`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profiles })
+    });
+
+    const data = await response.json();
+    return res.status(response.status).json(data);
+  } catch (error) {
+    console.error("AI Proxy Error:", error.message);
+    return res.status(500).json({ success: false, error: "Internal AI connection refused" });
+  }
+});
+
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
