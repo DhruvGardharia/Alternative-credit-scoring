@@ -21,7 +21,7 @@ const MyAccount = () => {
         setLoading(true);
         // Attempt to fetch all relevant data
         const [creditRes, loansRes, policiesRes] = await Promise.allSettled([
-          axios.get(`/api/users/credit-score/${user._id}`),
+          axios.get(`/api/credit/${user._id}`),
           axios.get("/api/loans/my-loans"),
           axios.get("/api/insurance/policies")
         ]);
@@ -33,7 +33,7 @@ const MyAccount = () => {
           setLoans(loansRes.value.data.data || []);
         }
         if (policiesRes.status === "fulfilled" && policiesRes.value.data.success) {
-          setPolicies(policiesRes.value.data.data || []);
+          setPolicies(policiesRes.value.data.policies || []);
         }
       } catch (error) {
         console.error("Error fetching account data:", error);
@@ -119,7 +119,9 @@ const MyAccount = () => {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">{creditData.score}</span>
-                      <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 mt-1">{creditData.healthStatus}</span>
+                      <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 mt-1">
+                        {creditData.score >= 750 ? "Excellent" : creditData.score >= 500 ? "Stable" : "Needs Attention"}
+                      </span>
                     </div>
                   </div>
                   <div className="mt-6 w-full grid grid-cols-2 gap-4 text-center">
@@ -129,7 +131,9 @@ const MyAccount = () => {
                     </div>
                     <div className={`p-3 rounded-2xl ${isDark ? "bg-gray-800/80" : "bg-white"} shadow-sm border border-gray-100 dark:border-gray-700`}>
                       <span className="block text-xs uppercase font-medium text-gray-500 dark:text-gray-400">Eligibility</span>
-                      <span className="font-bold text-sm mt-1 block">{creditData.creditReadiness}</span>
+                      <span className="font-bold text-sm mt-1 block">
+                        {creditData.score >= 700 ? "Eligible" : creditData.score >= 500 ? "Partially Eligible" : "Building Eligibility"}
+                      </span>
                     </div>
                   </div>
                 </div>
