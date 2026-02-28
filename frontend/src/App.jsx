@@ -15,6 +15,7 @@ import ExpenseTracker from "./pages/ExpenseTracker";
 import LenderAccount from "./pages/LenderAccount";
 import PlatformManagement from "./pages/PlatformManagement";
 import CreditPolicyBot from "./components/CreditPolicyBot";
+import GigIncomePrediction from "./pages/GigIncomePrediction";
 import Forgot from "./pages/Forgot";
 import Reset from "./pages/Reset";
 import VerifyOtp from "./pages/VerifyOtp";
@@ -117,6 +118,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <MicroInsurance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/income-prediction"
+          element={
+            <ProtectedRoute>
+              <GigIncomePrediction />
             </ProtectedRoute>
           }
         />

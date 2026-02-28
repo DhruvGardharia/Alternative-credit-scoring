@@ -16,6 +16,18 @@ from pydantic import BaseModel, Field
 import uvicorn
 from dotenv import load_dotenv
 
+import pickle
+import pandas as pd
+import warnings
+import sklearn.compose._column_transformer as ct
+
+# Fix for older sklearn models pickled with _RemainderColsList
+class _RemainderColsList:
+    pass
+ct._RemainderColsList = _RemainderColsList
+
+warnings.filterwarnings('ignore')
+
 from insurer_catalog import INSURER_CATALOG
 from ai_recommender import get_recommendations
 
@@ -54,6 +66,57 @@ class FilterParams(BaseModel):
     category: Optional[str] = None      # accident_health | equipment | health | income_protection | comprehensive
     max_daily_premium: Optional[float] = None
     min_coverage: Optional[float] = None
+
+
+# ── Load Income Prediction Model & Schema ─────────────────────────────────────
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "gig_income_model.pkl")
+try:
+    with open(MODEL_PATH, "rb") as f:
+        income_model = pickle.load(f)
+except Exception as e:
+    print(f"Warning: Could not load income prediction model: {e}")
+    income_model = None
+
+class GigWorkerIncomeData(BaseModel):
+    platform: str = "Swiggy"
+    age: int = 26
+    gender: str = "Male"
+    city: str = "Mumbai"
+    area_type: str = "urban"
+    years_of_experience: float = 3
+    primary_skill: str = "delivery"
+    skill_level: str = "intermediate"
+    education_level: str = "graduate"
+    owns_vehicle: int = 1
+    number_of_vehicles: int = 1
+    vehicle_type: str = "bike"
+    vehicle_age_years: float = 2
+    fuel_type: str = "petrol"
+    platform_level: str = "silver"
+    working_days_per_week: float = 6
+    avg_hours_per_day: float = 6.5
+    total_hours_worked_month: float = 170
+    gigs_completed_month: float = 210
+    acceptance_rate: float = 0.91
+    cancellation_rate: float = 0.05
+    peak_hours_work_ratio: float = 0.42
+    platform_hours_ratio: float = 0.65
+    avg_rating: float = 4.6
+    total_reviews: float = 520
+    repeat_customer_rate: float = 0.33
+    response_time_minutes: float = 4
+    base_pay_total: float = 22000
+    tips_total: float = 2100
+    bonus_earned: float = 3200
+    surge_earnings: float = 900
+    incentives_received: float = 700
+    deductions: float = 500
+    demand_index: float = 0.82
+    season: str = "monsoon"
+    festival_period: int = 0
+    fuel_price_index: float = 104
+    weather_condition: str = "rainy"
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
@@ -170,6 +233,35 @@ def get_providers():
         providers[prov]["plan_count"] += 1
 
     return {"providers": list(providers.values())}
+
+
+class IncomeBatchRequest(BaseModel):
+    profiles: list[GigWorkerIncomeData]
+
+@app.post("/predict_income")
+def predict_income(data: IncomeBatchRequest):
+    """
+    Predict gig worker monthly income based on 38 input features, aggregated for multiple platforms.
+    """
+    if income_model is None:
+        raise HTTPException(status_code=500, detail="Income prediction model not loaded.")
+    
+    try:
+        if not data.profiles:
+            return {"success": True, "predictions": [], "total_estimated_income": 0}
+
+        # Pydantic model dump to list of dicts for Pandas DataFrame
+        df = pd.DataFrame([p.model_dump() for p in data.profiles])
+        preds = income_model.predict(df)
+        
+        results = [round(float(p), 2) for p in preds]
+        return {
+            "success": True, 
+            "predictions": results,
+            "total_estimated_income": round(sum(results), 2)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 
 if __name__ == "__main__":

@@ -680,6 +680,31 @@ export default function MicroInsurance() {
                       </div>
                     </div>
                   </div>
+                  {/* Image Verification */}
+                  {latestClaimResult.llmAnalysis?.imageVerification && (
+                    <div style={{ marginTop:16, background: T.cardBg, borderRadius:10, padding:14, borderLeft:`3px solid ${latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#22c55e" : latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#ef4444" : "#f59e0b"}` }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                        <div style={{ fontSize:11, color: T.textMuted, fontWeight:600 }}>
+                          Image Verification
+                        </div>
+                        <div className="tag" style={{
+                          background: latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#166534" : latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#7f1d1d" : "#713f12",
+                          color: latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#86efac" : latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#fca5a5" : "#fde68a",
+                          fontSize: 10, padding: "2px 8px"
+                        }}>
+                          {latestClaimResult.llmAnalysis.imageVerification.matchesDescription.replace(/_/g," ")}
+                        </div>
+                      </div>
+                      <div style={{ fontSize:12, color: T.textPrimary, marginBottom:6, lineHeight:1.5 }}>
+                        <span style={{ color: T.textMuted, fontWeight:600 }}>AI Sees:</span> {latestClaimResult.llmAnalysis.imageVerification.imageDescription}
+                      </div>
+                      {latestClaimResult.llmAnalysis.imageVerification.imageNotes && (
+                        <div style={{ fontSize:11, color: T.textSecondary, fontStyle:"italic" }}>
+                          {latestClaimResult.llmAnalysis.imageVerification.imageNotes}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {/* RAG clauses */}
                   {latestClaimResult.ragRetrievedClauses?.length > 0 && (
                     <div style={{ marginTop:16 }}>
@@ -823,6 +848,30 @@ export default function MicroInsurance() {
                             {c.llmAnalysis.approvalConfidence}% confidence
                           </span>
                         </div>
+                      </div>
+                    )}
+                    {c.llmAnalysis?.imageVerification && (
+                      <div style={{ background: T.cardBg, borderRadius:10, padding:14, marginBottom:12, borderLeft:`3px solid ${c.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#22c55e" : c.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || c.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#ef4444" : "#f59e0b"}` }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                          <div style={{ fontSize:11, color: T.textMuted, fontWeight:600 }}>
+                            Image Verification
+                          </div>
+                          <div className="tag" style={{
+                            background: c.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#166534" : c.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || c.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#7f1d1d" : "#713f12",
+                            color: c.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#86efac" : c.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || c.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#fca5a5" : "#fde68a",
+                            fontSize: 10, padding: "2px 8px"
+                          }}>
+                            {c.llmAnalysis.imageVerification.matchesDescription.replace(/_/g," ")}
+                          </div>
+                        </div>
+                        <div style={{ fontSize:12, color: T.textPrimary, marginBottom:6, lineHeight:1.5 }}>
+                          <span style={{ color: T.textMuted, fontWeight:600 }}>AI Sees:</span> {c.llmAnalysis.imageVerification.imageDescription}
+                        </div>
+                        {c.llmAnalysis.imageVerification.imageNotes && (
+                          <div style={{ fontSize:11, color: T.textSecondary, fontStyle:"italic" }}>
+                            {c.llmAnalysis.imageVerification.imageNotes}
+                          </div>
+                        )}
                       </div>
                     )}
                     {c.payoutAmount > 0 && (

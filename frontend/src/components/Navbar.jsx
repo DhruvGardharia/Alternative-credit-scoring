@@ -59,28 +59,36 @@ export default function Navbar() {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center space-x-1 sm:space-x-4">
-          {/* Nav Links (Desktop) */}
-          <div className="hidden md:flex items-center space-x-2">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => navigate("/emergency-loan")}
-              className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
-            >
-              Emergency Loan
-            </button>
-            <button
-              onClick={() => navigate("/insurance")}
-              className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
-            >
-              Micro Insurance
-            </button>
-          </div>
+        <div className="flex items-center space-x-4">
+          <span className="text-white text-sm hidden sm:block">
+            {t("welcome")}, {user?.name}
+          </span>
+
+          {/* Nav Links */}
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate("/emergency-loan")}
+            className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
+          >
+            Emergency Loan
+          </button>
+          <button
+            onClick={() => navigate("/insurance")}
+            className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
+          >
+            Micro Insurance
+          </button>
+          <button
+            onClick={() => navigate("/income-prediction")}
+            className="px-3 py-1.5 text-sm text-yellow-400 hover:text-white bg-blue-800 hover:bg-blue-700 rounded-lg shadow-sm border border-yellow-400/20 transition font-medium"
+          >
+            Income Predictor
+          </button>
 
           {/* Language Selector Dropdown */}
           <div className="relative">

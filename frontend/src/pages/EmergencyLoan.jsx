@@ -33,7 +33,7 @@ const STATUS_STYLES = {
 export default function EmergencyLoan() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const [tab, setTab] = useState("apply"); // apply | history
+  const [tab, setTab] = useState(() => localStorage.getItem("emergencyLoanTab") || "apply");
   const [eligibility, setEligibility] = useState(null);
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +49,10 @@ export default function EmergencyLoan() {
     purposeDescription: "",
     urgencyLevel: ""
   });
+
+  useEffect(() => {
+    localStorage.setItem("emergencyLoanTab", tab);
+  }, [tab]);
 
   useEffect(() => {
     fetchData();
