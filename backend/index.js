@@ -295,7 +295,7 @@ app.use('/api/credit', creditRoutes);
 app.post('/api/predict_income', async (req, res) => {
   try {
     const { profiles } = req.body;
-    const FASTAPI_URL = process.env.FASTAPI_URL || `http://127.0.0.1:${process.env.FASTAPI_INTERNAL_PORT || 8000}`;
+    const FASTAPI_URL = process.env.FASTAPI_URL || `http://localhost:8000`;
     
     // Always use node-fetch to avoid Node 18 IPv6 localhost resolution issues
     const fetch = (await import('node-fetch')).default;
