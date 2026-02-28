@@ -12,6 +12,7 @@ import LenderLogin from "./pages/LenderLogin";
 import LenderRegister from "./pages/LenderRegister";
 import TaxSummary from "./pages/TaxSummary";
 import ExpenseTracker from "./pages/ExpenseTracker";
+import LenderAccount from "./pages/LenderAccount";
 import PlatformManagement from "./pages/PlatformManagement";
 import CreditPolicyBot from "./components/CreditPolicyBot";
 import Forgot from "./pages/Forgot";
@@ -138,6 +139,10 @@ const App = () => {
         <Route
           path="/lender-dashboard"
           element={<LenderDashboard />}
+        />
+        <Route
+          path="/lender-account"
+          element={<LenderAccount />}
         />
 
         <Route

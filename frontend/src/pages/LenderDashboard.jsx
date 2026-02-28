@@ -50,6 +50,7 @@ export default function LenderDashboard() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [showOfferModal, setShowOfferModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [actionMessage, setActionMessage] = useState({ type: "", text: "" });
 
   const [offerForm, setOfferForm] = useState({
@@ -177,15 +178,40 @@ export default function LenderDashboard() {
               <p className="text-blue-200 text-xs">{lender?.organization}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
+          <div className="flex items-center gap-4 relative">
+            <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-white">{lender?.name}</p>
               <p className="text-blue-200 text-xs">{lender?.email}</p>
             </div>
             <button
-              onClick={() => { lenderLogout(); navigate("/lender-login"); }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition text-sm"
-            >Logout</button>
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="w-10 h-10 bg-blue-700 hover:bg-blue-600 rounded-full flex items-center justify-center text-white font-bold transition focus:ring-2 focus:ring-yellow-400"
+            >
+              {lender?.name?.charAt(0) || "U"}
+            </button>
+            {showDropdown && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowDropdown(false)} />
+                <div className={`absolute right-0 top-12 mt-2 w-48 rounded-xl shadow-lg border z-20 py-2 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 mb-1 sm:hidden">
+                    <p className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{lender?.name}</p>
+                    <p className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>{lender?.email}</p>
+                  </div>
+                  <button
+                    onClick={() => { setShowDropdown(false); navigate("/lender-account"); }}
+                    className={`w-full text-left px-4 py-2 text-sm transition font-medium ${isDark ? "text-gray-200 hover:bg-gray-700 hover:text-blue-400" : "text-gray-700 hover:bg-gray-100 hover:text-blue-700"}`}
+                  >
+                    My Account
+                  </button>
+                  <button
+                    onClick={() => { setShowDropdown(false); lenderLogout(); navigate("/lender-login"); }}
+                    className={`w-full text-left px-4 py-2 text-sm transition font-medium text-red-600 ${isDark ? "hover:bg-gray-700 text-red-500" : "hover:bg-red-50"}`}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </nav>

@@ -1,42 +1,159 @@
-# Hackathon Template 🚀
+# 🚀 CreditFlow: Alternative Credit Scoring & Financial Platform
 
-A ready-to-use fullstack web application template for hackathon projects — with separate **frontend** and **backend**, user authentication, and deployable as a modern web app.
+CreditFlow is a modern, full-stack financial application designed to provide alternative credit scoring for individuals (such as gig workers) lacking traditional credit histories. By leveraging users' income, expenses, and platform connections, CreditFlow uses AI to score creditworthiness, recommend micro-insurance, and facilitate emergency loans.
 
-**Live Demo:** https://alternative-credit-scoring.onrender.com/
-
----
-
-## 🧠 About
-
-This is a fullstack hackathon starter template built with:
-
-- 🖥 **Frontend:** React 
-- ⚙️ **Backend:** Node.js + Express (with REST APIs)
-- 📦 Structured folders for rapid development and deployment
-
-It’s ideal for hackathons where you want to spin up a user-register/login app with minimal setup.
+**Live Demo:** [https://alternative-credit-scoring.onrender.com/](https://alternative-credit-scoring.onrender.com/)
 
 ---
 
-## 🧩 Features
+## 🏗️ Project Architecture & Scope
 
-✔ Modular frontend + backend  
-✔ Authentication routes (e.g., register, login)  
-✔ Deployable to platforms like Render
-✔ Ready for extension (APIs, database, UI pages)  
-✔ Easy to copy and customize for your own project
-✔ Mulitrole support
+The application is structured as a robust microservices-inspired monorepo consisting of three distinct modules:
+
+1. **`frontend`** (React, Vite, TailwindCSS)
+   - The user-facing application providing interactive dashboards for both Borrowers and Lenders.
+2. **`backend`** (Node.js, Express, MongoDB)
+   - The primary REST API managing users, authentication, financial records, loan applications, and core business logic.
+3. **`insurance-ai`** (Python, FastAPI, Groq/LLaMA 3)
+   - An intelligent microservice that analyzes user risk profiles to recommend tailored micro-insurance products.
+
 ---
 
+## 🧭 System Workflow & Service Graph
 
-## 📦 Required env
-PORT= 
-MONGO_URL=
-JWT_SEC=
-Cloud_Api=
-Cloud_Secret=
-Cloud_Name=
-CLOUDINARY_URL=
-MY_GMAIL=
-MY_PASS=
+The following diagram illustrates the complete user journey and available services from the moment of logging in:
 
+```mermaid
+graph TD
+    %% Styling
+    classDef start fill:#f9f,stroke:#333,stroke-width:2px,color:#333;
+    classDef auth fill:#bbf,stroke:#333,stroke-width:2px,color:#333;
+    classDef dashboard fill:#bfb,stroke:#333,stroke-width:2px,color:#333;
+    classDef service fill:#fff,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5,color:#333;
+    classDef ai fill:#fbf,stroke:#333,stroke-width:2px,color:#333;
+
+    %% Nodes
+    A([Landing Page]):::start
+    B{Role Selection}:::auth
+    
+    %% User Flow
+    UserAuth(User Login/Register):::auth
+    UserDash[User Dashboard]:::dashboard
+    
+    %% Services
+    S1[Expense Tracker<br><small>Log Income & Expenses</small>]:::service
+    S2[Platform Management<br><small>Connect External Accounts</small>]:::service
+    S3[Alternative Credit Analysis<br><small>Generate AI Credit Score</small>]:::service
+    S4[Tax Summary<br><small>View Tax Estimates</small>]:::service
+    S5[Micro Insurance<br><small>AI Plan Recommendations</small>]:::ai
+    S6[Emergency Loans<br><small>Apply for Credit</small>]:::service
+    S7[Credit Policy Bot<br><small>AI Assistant</small>]:::ai
+    S8[My Account]:::service
+
+    %% Lender Flow
+    LenderAuth(Lender Login/Register):::auth
+    LenderDash[Lender Dashboard]:::dashboard
+    L1[View Incoming Loan Applications]:::service
+    L2[Approve / Reject / Review]:::service
+
+    %% Connections
+    A --> B
+    B -->|Borrower| UserAuth
+    B -->|Lender| LenderAuth
+
+    UserAuth --> UserDash
+    LenderAuth --> LenderDash
+
+    %% Dashboard to User Services
+    UserDash --> S1
+    UserDash --> S2
+    UserDash --> S3
+    UserDash --> S4
+    UserDash --> S5
+    UserDash --> S6
+    UserDash --> S7
+    UserDash --> S8
+
+    %% Inter-service logic
+    S1 -.->|Feeds Data| S3
+    S2 -.->|Feeds Data| S3
+    S3 -.->|Updates Risk Profile| S5
+    S3 -.->|Determines Eligibility| S6
+
+    %% Lender Actions
+    S6 ==>|Submits Application| L1
+    LenderDash --> L1
+    L1 --> L2
+```
+
+---
+
+## ✨ Features & Functionality
+
+### 👤 For Users (Borrowers)
+- **Authentication**: Secure JWT-based Login & Registration (Multi-language support included).
+- **Expense Tracker**: Log daily income and expenses. Visual charts to monitor cash flow.
+- **Platform Management**: Connect gig-economy or external platform accounts to gather reliable income proof.
+- **Alternative Credit Analysis**: An advanced scoring system that bypasses CIBIL scores by analyzing app-based financial behavior, platform earnings, and expenses.
+- **Micro Insurance (AI-Powered)**: Uses the `insurance-ai` microservice to analyze a user's risk score and employment type to recommend the best insurance paths logically.
+- **Tax Summary**: Automated snapshots of estimated tax liabilities based on logged income.
+- **Emergency Loans**: Seamlessly apply for short-term emergency loans if the Alternative Credit Score passes the threshold.
+- **Credit Policy Bot**: A responsive chatbot embedded on protected routes capable of answering questions about financial policies.
+
+### 🏦 For Lenders
+- **Dedicated Portal**: Separate authentication flow for verified lenders.
+- **Loan Management Dashboard**: View incoming applications generated by users.
+- **Risk Assessment**: Lenders see the applicant's *Alternative Credit Score* alongside their application to make informed approval or rejection decisions.
+
+---
+
+## 🚀 Getting Started (Local Development)
+
+### 1. Backend Setup
+```bash
+cd backend
+npm install
+npm run dev
+```
+*Creates server at `http://localhost:5000`*
+
+**Required Environment Variables (`backend/.env`):**
+```env
+PORT=5000
+MONGO_URL=your_mongodb_connection_string
+JWT_SEC=your_jwt_secret
+```
+
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*Creates server at `http://localhost:5173`*
+
+### 3. Insurance AI Microservice Setup (Required for AI features)
+```bash
+cd insurance-ai
+python -m venv venv
+# Activate virtual environment
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
+
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+*Creates server at `http://localhost:8000`*
+
+**Required Environment Variables (`insurance-ai/.env`):**
+```env
+GROQ_API_KEY=your_groq_api_key_from_console.groq.com
+```
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend:** React 19, Vite, TailwindCSS v4, React Router DOM, Recharts, Framer Motion
+- **Backend:** Node.js, Express, MongoDB (Mongoose), JWT, Cloudinary (for uploads)
+- **AI Microservice:** Python, FastAPI, Groq (LLaMA 3)
