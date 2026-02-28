@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useLenderAuth } from "../context/LenderAuthContext";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
+import { toast } from "react-toastify"
 
 const STATUS_STYLES_DARK = {
   pending: "bg-yellow-900/30 text-yellow-400 border-yellow-700",
@@ -108,12 +109,12 @@ export default function LenderDashboard() {
         offeredAmount: Number(offerForm.offeredAmount) || selectedApp.loan.amount,
         lenderNotes: offerForm.lenderNotes
       });
-      setActionMessage({ type: "success", text: "Offer sent! Waiting for borrower's response." });
+      toast.success("Offer sent! Waiting for borrower's response.");
       setShowOfferModal(false);
       setSelectedApp(null);
       fetchData();
     } catch (err) {
-      setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+      toast.error(err.response?.data?.error || "Failed" );
     } finally {
       setActionLoading(false);
     }
@@ -124,11 +125,11 @@ export default function LenderDashboard() {
     setActionLoading(true);
     try {
       await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/pass`);
-      setActionMessage({ type: "success", text: "Passed. Loan remains open for others." });
+      toast.success("Passed. Loan remains open for others." );
       setSelectedApp(null);
       fetchData();
     } catch (err) {
-      setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+      toast.error(err.response?.data?.error || "Failed" );
     } finally {
       setActionLoading(false);
     }
@@ -139,11 +140,11 @@ export default function LenderDashboard() {
     setActionLoading(true);
     try {
       await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/withdraw`);
-      setActionMessage({ type: "success", text: "Offer withdrawn." });
+      toast.success("Offer withdrawn.");
       setSelectedApp(null);
       fetchData();
     } catch (err) {
-      setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+      toast.error( err.response?.data?.error || "Failed" );
     } finally {
       setActionLoading(false);
     }
@@ -526,10 +527,10 @@ export default function LenderDashboard() {
                                       setActionLoading(true);
                                       try {
                                         await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/confirm-payment/${p._id}`);
-                                        setActionMessage({ type: "success", text: `₹${p.amount.toLocaleString()} confirmed!` });
+                                        toast.success( `₹${p.amount.toLocaleString()} confirmed!` );
                                         viewDetail(selectedApp.loan._id);
                                         fetchData();
-                                      } catch (err) { setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" }); }
+                                      } catch (err) { toast.error( err.response?.data?.error || "Failed"); }
                                       finally { setActionLoading(false); }
                                     }}
                                     disabled={actionLoading}
@@ -541,10 +542,10 @@ export default function LenderDashboard() {
                                       setActionLoading(true);
                                       try {
                                         await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/reject-payment/${p._id}`);
-                                        setActionMessage({ type: "success", text: "Payment rejected." });
+                                        toast.success("Payment rejected." );
                                         viewDetail(selectedApp.loan._id);
                                         fetchData();
-                                      } catch (err) { setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" }); }
+                                      } catch (err) { toast.error(err.response?.data?.error || "Failed" ); }
                                       finally { setActionLoading(false); }
                                     }}
                                     disabled={actionLoading}
@@ -581,10 +582,10 @@ export default function LenderDashboard() {
                         setActionLoading(true);
                         try {
                           await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/disburse`);
-                          setActionMessage({ type: "success", text: "Loan disbursed!" });
+                          toast.success( "Loan disbursed!" );
                           setSelectedApp(null); fetchData();
                         } catch (err) {
-                          setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+                          toast.error( err.response?.data?.error || "Failed" );
                         } finally { setActionLoading(false); }
                       }}
                       disabled={actionLoading}
@@ -599,9 +600,9 @@ export default function LenderDashboard() {
                         setActionLoading(true);
                         try {
                           await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/default`);
-                          setActionMessage({ type: "success", text: "Defaulted." });
+                          toast.success( "Defaulted." );
                           setSelectedApp(null); fetchData();
-                        } catch (err) { setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" }); }
+                        } catch (err) { toast.error(err.response?.data?.error || "Failed" ); }
                         finally { setActionLoading(false); }
                       }}
                       className={`w-full py-2.5 rounded-xl text-sm font-medium transition border ${isDark ? "bg-gray-800 hover:bg-red-900/30 text-gray-400 hover:text-red-400 border-gray-700" : "bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 border-gray-200"}`}

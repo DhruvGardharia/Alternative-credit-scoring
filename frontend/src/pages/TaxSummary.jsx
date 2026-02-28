@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import Navbar from "../components/Navbar";
+import { toast } from "react-toastify";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -100,7 +101,7 @@ export default function TaxSummary() {
         if (!isMounted) return;
         const message =
           err?.response?.data?.error || "Failed to load tax summary";
-        setError(message);
+        toast.error(message);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -184,10 +185,11 @@ export default function TaxSummary() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      toast.success("PDF downloaded successfully!")
       window.URL.revokeObjectURL(url);
     } catch (err) {
       const message = err?.response?.data?.error || "Failed to download PDF";
-      setError(message);
+      toast.error(message);
     } finally {
       setDownloading(false);
     }

@@ -18,6 +18,7 @@ import {
 import Navbar from "../components/Navbar";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
+import { toast } from "react-toastify"
 
 
 export default function ExpenseTracker() {
@@ -191,12 +192,13 @@ export default function ExpenseTracker() {
         paymentMethod: editForm.paymentMethod,
       };
       await axios.put(`/api/expenses/${id}`, payload, authConfig);
+      toast.success("Expense updated!")
       setEditingId(null);
       setEditForm({});
       setRefetch((prev) => prev + 1);
     } catch (err) {
       console.error("ExpenseTracker edit error", err);
-      alert("Error updating expense: " + (err?.response?.data?.message || err.message));
+      toast.error("Error updating expense: " + (err?.response?.data?.message || err.message));
     }
   };
 

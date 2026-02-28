@@ -104,6 +104,7 @@ export default function PlatformManagement() {
           creditScore: data.data?.creditScore || null,
           today: data.data?.today || null,
         });
+        toast.success("Platform connected successfully!");
         setSelectedPlatform("");
         setPlatformId("");
         setWorkType("FULL_TIME");

@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import axios from "axios";
+import { toast } from "react-toastify"
 
 import Navbar from "../components/Navbar";
 
@@ -179,7 +180,7 @@ export default function Role1Dashboard() {
       fetchExpenses();
       fetchStats();
     } catch (error) {
-      alert(
+      toast.error(
         "Error adding expense: " +
           (error.response?.data?.message || error.message),
       );
@@ -193,7 +194,7 @@ export default function Role1Dashboard() {
       fetchExpenses();
       fetchStats();
     } catch (error) {
-      alert("Error deleting expense");
+      toast.error("Error deleting expense");
     }
   };
 
@@ -459,7 +460,7 @@ export default function Role1Dashboard() {
               try {
                 const userId = getUserId();
                 if (!userId) {
-                  alert("Please login to view your credit score");
+                  toast.warn("Please login to view your credit score");
                   return;
                 }
                 // Try to GET existing profile first (teammate's improvement: fallback to calculate)
@@ -494,11 +495,11 @@ export default function Role1Dashboard() {
                     },
                   });
                 } else {
-                  alert("No credit score available yet. Please upload your bank statement first.");
+                  toast.error("No credit score available yet. Please upload your bank statement first.");
                 }
               } catch (error) {
                 console.error("Error loading credit report:", error);
-                alert("No credit score available yet. Please upload your bank statement first.");
+                toast.error("No credit score available yet. Please upload your bank statement first.");
               }
             }}
              className={`relative flex flex-col items-start p-6 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border text-left group overflow-hidden ${isDark ? "bg-gradient-to-br from-purple-900/40 to-gray-900 border-purple-800/60 hover:border-purple-500" : "bg-gradient-to-br from-white to-purple-50/50 border-purple-100 hover:border-purple-400"}`}
@@ -1491,11 +1492,11 @@ export default function Role1Dashboard() {
                       const file = e.target.files[0];
                       if (file) {
                         if (file.type !== "application/pdf") {
-                          alert("Only PDF files allowed");
+                          toast.error("Only PDF files allowed");
                           return;
                         }
                         if (file.size > 5 * 1024 * 1024) {
-                          alert("File must be less than 5MB");
+                          toast.error("File must be less than 5MB");
                           return;
                         }
                         setPdfFile(file);
@@ -1521,13 +1522,13 @@ export default function Role1Dashboard() {
               <button
                 onClick={async () => {
                   if (!pdfFile) {
-                    alert("Please select a PDF file");
+                    toast.warn("Please select a PDF file");
                     return;
                   }
                   
                   const userId = getUserId();
                   if (!userId) {
-                    alert("User not authenticated. Please login again.");
+                    toast.error("User not authenticated. Please login again.");
                     return;
                   }
 
@@ -1593,24 +1594,24 @@ export default function Role1Dashboard() {
                             }
                           });
                         } else {
-                          alert("Statement uploaded. Click \"View Credit Report\" to load your score.");
+                          toast.success("Statement uploaded. Click \"View Credit Report\" to load your score.");
                           fetchCreditData();
                           fetchExpenses();
                           fetchStats();
                         }
                       } catch (creditError) {
                         console.error('Credit calculation error:', creditError?.response?.data || creditError.message);
-                        alert(`Statement uploaded. Credit score error: ${creditError?.response?.data?.error || creditError.message}`);
+                        toast.error(`Statement uploaded. Credit score error: ${creditError?.response?.data?.error || creditError.message}`);
                         fetchExpenses();
                         fetchStats();
                       }
                     } else {
-                      alert(data.error || "Upload failed");
+                      toast.error(data.error || "Upload failed");
                     }
                   } catch (error) {
                     console.error('Upload error:', error);
                     const errorMsg = error?.response?.data?.error || error?.message || "Upload failed. Please try again.";
-                    alert(errorMsg);
+                    toast.error(errorMsg);
                   } finally {
                     setPdfUploading(false);
                   }

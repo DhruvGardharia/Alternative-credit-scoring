@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import LandingNavbar from "../components/LandingNavbar";
+import { toast } from "react-toastify"
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -23,7 +24,7 @@ export default function LoginPage() {
       await login(formData.email, formData.password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Login failed")
     } finally {
       setLoading(false);
     }
@@ -77,11 +78,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {error && (
-              <div className={`border px-4 py-3 rounded-xl text-sm ${isDark ? "bg-red-900/30 border-red-800 text-red-400" : "bg-red-50 border-red-200 text-red-600"}`}>
-                {error}
-              </div>
-            )}
             <div className="text-right">
               <Link
                 to="/forgot"

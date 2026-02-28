@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
 import LandingNavbar from "../components/LandingNavbar";
+import { toast } from "react-toastify";
 
 export default function Reset() {
   const [otp, setOtp] = useState("");
@@ -21,7 +22,7 @@ export default function Reset() {
     const token = localStorage.getItem("resetToken");
 
     if (!token) {
-      setError("Session expired. Try again.");
+      toast.error("Session expired. Try again.");
       setLoading(false);
       return;
     }
@@ -36,7 +37,7 @@ export default function Reset() {
       alert("Password reset successful!");
       navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || "Reset failed");
+      toast.error(err.response?.data?.message || "Reset failed");
     } finally {
       setLoading(false);
     }
@@ -73,10 +74,6 @@ export default function Reset() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border rounded-xl"
             />
-
-            {error && (
-              <div className="text-red-500 text-sm">{error}</div>
-            )}
 
             <button
               type="submit"
