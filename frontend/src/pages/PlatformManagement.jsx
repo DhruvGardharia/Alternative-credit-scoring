@@ -354,7 +354,7 @@ export default function PlatformManagement() {
                     </div>
 
                     {/* ── All-time summary strip ───────────────────────────── */}
-                    <div className={`grid grid-cols-3 divide-x text-center ${
+                    <div className={`grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x text-center ${
                       isDark ? "divide-gray-800 bg-gray-800/40" : "divide-gray-100 bg-gray-50"
                     }`}>
                       <div className="px-4 py-3">
@@ -516,7 +516,7 @@ export default function PlatformManagement() {
                   <p className={`text-sm mb-5 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                     Your earnings have been synced successfully
                   </p>
-                  <div className={`grid grid-cols-2 gap-3 mb-4 text-left rounded-lg p-4 ${isDark ? "bg-gray-800" : "bg-gray-50"}`}>
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-left rounded-lg p-4 ${isDark ? "bg-gray-800" : "bg-gray-50"}`}>
                     <div>
                       <p className={`text-xs uppercase tracking-wide font-semibold ${isDark ? "text-gray-400" : "text-gray-500"}`}>Days synced</p>
                       <p className="text-2xl font-bold mt-0.5 text-blue-600">{syncResult.transactionCount}</p>
@@ -544,7 +544,7 @@ export default function PlatformManagement() {
                       <p className={`text-xs font-bold uppercase tracking-wide mb-2 ${isDark ? "text-blue-400" : "text-blue-800"}`}>
                         Today’s Activity
                       </p>
-                      <div className="grid grid-cols-3 gap-3 text-center">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                         <div>
                           <p className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>Trips</p>
                           <p className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{syncResult.today.tripsOrDeliveries}</p>
@@ -613,7 +613,7 @@ export default function PlatformManagement() {
                     <label className={`block text-sm font-semibold mb-1.5 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
                       Work Type <span className="text-red-400">*</span>
                     </label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         type="button"
                         onClick={() => setWorkType("FULL_TIME")}

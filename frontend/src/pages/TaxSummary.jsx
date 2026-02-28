@@ -221,6 +221,19 @@ export default function TaxSummary() {
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        {/* Back to Dashboard */}
+        <button
+          onClick={() => navigate("/dashboard")}
+          className={`flex items-center gap-1 text-sm font-medium mb-5 transition ${
+            isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-900 hover:text-blue-700"
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Dashboard
+        </button>
+
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
           <div>
@@ -343,8 +356,89 @@ export default function TaxSummary() {
               ))}
             </div>
 
+            {/* ── Annual Income Projection ───────────────────────────── */}
+            {financialSummary?.annualProjectedIncome > 0 && (
+              <div
+                className={`mb-6 rounded-xl overflow-hidden shadow-md border ${
+                  isDark ? "border-yellow-800" : "border-yellow-200"
+                }`}
+              >
+                {/* Section header */}
+                <div className={`px-6 py-4 ${isDark ? "bg-yellow-900/40" : "bg-gradient-to-r from-yellow-50 to-amber-50"}`}>
+                  <div className="flex items-center gap-2">
+                    <svg className={`w-5 h-5 ${isDark ? "text-yellow-400" : "text-yellow-700"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <div>
+                      <h2 className={`text-lg font-bold ${isDark ? "text-yellow-300" : "text-yellow-900"}`}>
+                        Annual Income Projection
+                      </h2>
+                      <p className={`text-xs ${isDark ? "text-yellow-500" : "text-yellow-700"}`}>
+                        Extrapolated from {financialSummary.statementMonths || "—"} month(s) of bank statement data
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Metrics grid */}
+                <div className={`grid grid-cols-2 md:grid-cols-4 gap-0 divide-x ${isDark ? "divide-gray-700 bg-gray-900" : "divide-gray-100 bg-white"}`}>
+                  {/* Projected Annual Income */}
+                  <div className="px-5 py-4">
+                    <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                      Projected Annual Income
+                    </p>
+                    <p className={`text-xl font-bold ${isDark ? "text-yellow-300" : "text-yellow-700"}`}>
+                      {formatCurrency(financialSummary.annualProjectedIncome)}
+                    </p>
+                    <p className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+                      ≈ {formatCurrency(financialSummary.monthlyAvgIncome || 0)}/mo × 12
+                    </p>
+                  </div>
+
+                  {/* Tax Slab */}
+                  <div className="px-5 py-4">
+                    <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                      Primary Tax Slab
+                    </p>
+                    <p className={`text-base font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                      {financialSummary.projectedTaxSlab || "—"}
+                    </p>
+                    <p className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>New Tax Regime</p>
+                  </div>
+
+                  {/* Projected Tax */}
+                  <div className="px-5 py-4">
+                    <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                      Projected Annual Tax
+                    </p>
+                    <p className={`text-xl font-bold ${isDark ? "text-red-400" : "text-red-600"}`}>
+                      {formatCurrency(financialSummary.annualProjectedTax)}
+                    </p>
+                    <p className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>Estimated payable</p>
+                  </div>
+
+                  {/* Effective Rate */}
+                  <div className="px-5 py-4">
+                    <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                      Projected Effective Rate
+                    </p>
+                    <p className={`text-xl font-bold ${isDark ? "text-indigo-400" : "text-indigo-700"}`}>
+                      {Number(financialSummary.projectedEffectiveRate || 0).toFixed(2)}%
+                    </p>
+                    <p className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>Of projected income</p>
+                  </div>
+                </div>
+
+                {/* Disclaimer */}
+                <div className={`px-6 py-2 text-xs ${isDark ? "bg-gray-800 text-gray-500" : "bg-yellow-50 text-yellow-800"}`}>
+                  ⚠️ Projection based on {financialSummary.statementMonths || "?"}-month average. Actual annual income may vary.
+                </div>
+              </div>
+            )}
+
             {/* ── Income by Source ──────────────────────────────────── */}
             {incomeByPlatformRows.length > 0 && (
+
               <div className={`${cardCls} mb-6`}>
                 <div className="flex items-center gap-2 mb-4">
                   <svg className={`w-5 h-5 ${isDark ? "text-green-400" : "text-green-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

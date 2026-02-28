@@ -77,7 +77,7 @@ export const retrieveRelevantKnowledge = async (embedding) => {
 export const generateAIResponse = async (retrievedDocs, conversationContext, role) => {
   const knowledgeText = retrievedDocs.map((doc) => doc.content).join("\n\n");
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `You are a Credit Intelligence Assistant for a gig worker lending platform.
 Answer questions about loans, credit scores, eligibility, interest rates, repayment, insurance, and tax.

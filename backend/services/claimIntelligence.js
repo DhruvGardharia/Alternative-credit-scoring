@@ -8,7 +8,13 @@ dotenv.config();
  * Multimodal: cross-checks uploaded proof images against claim descriptions
  */
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Lazy-initialize so a missing GROQ_API_KEY doesn't crash the backend on startup.
+let _groq = null;
+function getGroqClient() {
+    if (!process.env.GROQ_API_KEY) return null;
+    if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    return _groq;
+}
 
 // Models
 const TEXT_MODEL = "llama-3.3-70b-versatile";

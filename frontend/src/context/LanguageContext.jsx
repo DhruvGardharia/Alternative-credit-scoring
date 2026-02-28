@@ -10,7 +10,13 @@ const translations = {
 
     // Quick Actions
     uploadStatement: "Upload Statement",
+    uploadStatementDesc: "Analyze your bank statement to get instant credit insights.",
     viewCreditReport: "View Credit Report",
+    viewCreditReportDesc: "Access your detailed credit score and financial health report.",
+    managePlatforms: "Manage Platforms",
+    managePlatformsDesc: "Connect and monitor your various gig economy platforms.",
+    taxSummary: "Tax Summary",
+    taxSummaryDesc: "Get a clear breakdown of your taxes and deductible expenses.",
     learningCenter: "Learning Center",
     myAccount: "My Account",
 
@@ -367,7 +373,13 @@ const translations = {
 
     // Quick Actions
     uploadStatement: "स्टेटमेंट अपलोड करें",
+    uploadStatementDesc: "क्रेडिट इनसाइट्स प्राप्त करने के लिए बैंक स्टेटमेंट लोड करें।",
     viewCreditReport: "क्रेडिट रिपोर्ट देखें",
+    viewCreditReportDesc: "अपना विस्तृत क्रेडिट स्कोर और वित्तीय स्वास्थ्य रिपोर्ट देखें।",
+    managePlatforms: "प्लेटफॉर्म प्रबंधित करें",
+    managePlatformsDesc: "अपने विभिन्न गिग इकोनॉमी प्लेटफॉर्म को जोड़ें और ट्रैक करें।",
+    taxSummary: "कर सारांश",
+    taxSummaryDesc: "अपने करों और कटौती योग्य खर्चों का स्पष्ट विवरण प्राप्त करें।",
     learningCenter: "शिक्षा केंद्र",
     myAccount: "मेरा खाता",
 
@@ -720,7 +732,13 @@ const translations = {
 
     // Quick Actions
     uploadStatement: "स्टेटमेंट अपलोड करा",
+    uploadStatementDesc: "आर्थिक इनसाइट्स मिळवण्यासाठी बँक स्टेटमेंट लोड करा.",
     viewCreditReport: "क्रेडिट रिपोर्ट पहा",
+    viewCreditReportDesc: "आपला सविस्तर क्रेडिट स्कोर आणि आर्थिक आरोग्य रिपोर्ट पहा.",
+    managePlatforms: "प्लॅटफॉर्म व्यवस्थापित करा",
+    managePlatformsDesc: "तुमचे विविध गिग इकोनॉमी प्लॅटफॉर्म जोडा आणि ट्रॅक करा.",
+    taxSummary: "कर सारांश",
+    taxSummaryDesc: "तुमच्या करांचा आणि वजावट होणाऱ्या खर्चाचा स्पष्ट तपशील मिळवा.",
     learningCenter: "शिक्षण केंद्र",
     myAccount: "माझे खाते",
 
