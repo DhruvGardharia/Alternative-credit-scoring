@@ -26,11 +26,11 @@ The following diagram illustrates the complete user journey and available servic
 ```mermaid
 graph TD
     %% Styling
-    classDef start fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef auth fill:#bbf,stroke:#333,stroke-width:2px;
-    classDef dashboard fill:#bfb,stroke:#333,stroke-width:2px;
-    classDef service fill:#fff,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5;
-    classDef ai fill:#fbf,stroke:#333,stroke-width:2px;
+    classDef start fill:#f9f,stroke:#333,stroke-width:2px,color:#333;
+    classDef auth fill:#bbf,stroke:#333,stroke-width:2px,color:#333;
+    classDef dashboard fill:#bfb,stroke:#333,stroke-width:2px,color:#333;
+    classDef service fill:#fff,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5,color:#333;
+    classDef ai fill:#fbf,stroke:#333,stroke-width:2px,color:#333;
 
     %% Nodes
     A([Landing Page]):::start
