@@ -56,18 +56,22 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     const response = await axios.post("/api/auth/register", userData);
+
     if (response.data.success) {
-      const { token, user } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      setToken(token);
-      setUser(user);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      return response.data;
+      // DO NOT login here
+      return response.data; // return OTP token
     }
+
     throw new Error(response.data.message);
   };
-
+  
+  const loginWithToken = async (token, userData) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    setToken(token);
+    setUser(userData);
+  };
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("onboarded");
@@ -83,6 +87,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     login,
     register,
+    loginWithToken,
     logout,
   };
 

@@ -14,6 +14,9 @@ import TaxSummary from "./pages/TaxSummary";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import PlatformManagement from "./pages/PlatformManagement";
 import CreditPolicyBot from "./components/CreditPolicyBot";
+import Forgot from "./pages/Forgot";
+import Reset from "./pages/Reset";
+import VerifyOtp from "./pages/VerifyOtp";
 
 // Redirects to /dashboard if already logged in
 const PublicRoute = ({ children }) => {
@@ -68,6 +71,9 @@ const App = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot" element={<Forgot />} />
+        <Route path="/reset" element={<Reset />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
 
         {/* Protected Dashboard Routes */}
         
