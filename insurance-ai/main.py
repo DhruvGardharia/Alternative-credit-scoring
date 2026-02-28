@@ -19,12 +19,6 @@ from dotenv import load_dotenv
 import pickle
 import pandas as pd
 import warnings
-import sklearn.compose._column_transformer as ct
-
-# Fix for older sklearn models pickled with _RemainderColsList
-class _RemainderColsList:
-    pass
-ct._RemainderColsList = _RemainderColsList
 
 warnings.filterwarnings('ignore')
 
@@ -261,6 +255,9 @@ def predict_income(data: IncomeBatchRequest):
             "total_estimated_income": round(sum(results), 2)
         }
     except Exception as e:
+        import traceback
+        print("[ERROR] Prediction error traceback:")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 

@@ -1136,7 +1136,7 @@ export default function MicroInsurance() {
                 <div style={{ width:48, height:48, border:`4px solid ${T.cardBorder}`,
                   borderTop:"4px solid #8b5cf6", borderRadius:"50%",
                   animation:"spin 0.8s linear infinite", margin:"0 auto 16px" }}/>
-                <div style={{ color: T.textMuted, fontSize:14 }}>Gemini AI is matching plans to your profile...</div>
+                <div style={{ color: T.textMuted, fontSize:14 }}>AI is matching plans to your profile...</div>
                 <div style={{ color: T.hashText, fontSize:12, marginTop:6 }}>This takes about 10-15 seconds</div>
               </div>
             )}
