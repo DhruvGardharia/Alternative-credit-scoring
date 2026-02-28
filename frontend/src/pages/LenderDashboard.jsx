@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useLenderAuth } from "../context/LenderAuthContext";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
+import { toast } from "react-toastify"
 
 const STATUS_STYLES_DARK = {
   pending: "bg-yellow-900/30 text-yellow-400 border-yellow-700",
@@ -50,6 +51,7 @@ export default function LenderDashboard() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [showOfferModal, setShowOfferModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [actionMessage, setActionMessage] = useState({ type: "", text: "" });
 
   const [offerForm, setOfferForm] = useState({
@@ -107,12 +109,12 @@ export default function LenderDashboard() {
         offeredAmount: Number(offerForm.offeredAmount) || selectedApp.loan.amount,
         lenderNotes: offerForm.lenderNotes
       });
-      setActionMessage({ type: "success", text: "Offer sent! Waiting for borrower's response." });
+      toast.success("Offer sent! Waiting for borrower's response.");
       setShowOfferModal(false);
       setSelectedApp(null);
       fetchData();
     } catch (err) {
-      setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+      toast.error(err.response?.data?.error || "Failed" );
     } finally {
       setActionLoading(false);
     }
@@ -123,11 +125,11 @@ export default function LenderDashboard() {
     setActionLoading(true);
     try {
       await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/pass`);
-      setActionMessage({ type: "success", text: "Passed. Loan remains open for others." });
+      toast.success("Passed. Loan remains open for others." );
       setSelectedApp(null);
       fetchData();
     } catch (err) {
-      setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+      toast.error(err.response?.data?.error || "Failed" );
     } finally {
       setActionLoading(false);
     }
@@ -138,11 +140,11 @@ export default function LenderDashboard() {
     setActionLoading(true);
     try {
       await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/withdraw`);
-      setActionMessage({ type: "success", text: "Offer withdrawn." });
+      toast.success("Offer withdrawn.");
       setSelectedApp(null);
       fetchData();
     } catch (err) {
-      setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+      toast.error( err.response?.data?.error || "Failed" );
     } finally {
       setActionLoading(false);
     }
@@ -177,15 +179,40 @@ export default function LenderDashboard() {
               <p className="text-blue-200 text-xs">{lender?.organization}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
+          <div className="flex items-center gap-4 relative">
+            <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-white">{lender?.name}</p>
               <p className="text-blue-200 text-xs">{lender?.email}</p>
             </div>
             <button
-              onClick={() => { lenderLogout(); navigate("/lender-login"); }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition text-sm"
-            >Logout</button>
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="w-10 h-10 bg-blue-700 hover:bg-blue-600 rounded-full flex items-center justify-center text-white font-bold transition focus:ring-2 focus:ring-yellow-400"
+            >
+              {lender?.name?.charAt(0) || "U"}
+            </button>
+            {showDropdown && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowDropdown(false)} />
+                <div className={`absolute right-0 top-12 mt-2 w-48 rounded-xl shadow-lg border z-20 py-2 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 mb-1 sm:hidden">
+                    <p className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{lender?.name}</p>
+                    <p className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>{lender?.email}</p>
+                  </div>
+                  <button
+                    onClick={() => { setShowDropdown(false); navigate("/lender-account"); }}
+                    className={`w-full text-left px-4 py-2 text-sm transition font-medium ${isDark ? "text-gray-200 hover:bg-gray-700 hover:text-blue-400" : "text-gray-700 hover:bg-gray-100 hover:text-blue-700"}`}
+                  >
+                    My Account
+                  </button>
+                  <button
+                    onClick={() => { setShowDropdown(false); lenderLogout(); navigate("/lender-login"); }}
+                    className={`w-full text-left px-4 py-2 text-sm transition font-medium text-red-600 ${isDark ? "hover:bg-gray-700 text-red-500" : "hover:bg-red-50"}`}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -500,10 +527,10 @@ export default function LenderDashboard() {
                                       setActionLoading(true);
                                       try {
                                         await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/confirm-payment/${p._id}`);
-                                        setActionMessage({ type: "success", text: `₹${p.amount.toLocaleString()} confirmed!` });
+                                        toast.success( `₹${p.amount.toLocaleString()} confirmed!` );
                                         viewDetail(selectedApp.loan._id);
                                         fetchData();
-                                      } catch (err) { setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" }); }
+                                      } catch (err) { toast.error( err.response?.data?.error || "Failed"); }
                                       finally { setActionLoading(false); }
                                     }}
                                     disabled={actionLoading}
@@ -515,10 +542,10 @@ export default function LenderDashboard() {
                                       setActionLoading(true);
                                       try {
                                         await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/reject-payment/${p._id}`);
-                                        setActionMessage({ type: "success", text: "Payment rejected." });
+                                        toast.success("Payment rejected." );
                                         viewDetail(selectedApp.loan._id);
                                         fetchData();
-                                      } catch (err) { setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" }); }
+                                      } catch (err) { toast.error(err.response?.data?.error || "Failed" ); }
                                       finally { setActionLoading(false); }
                                     }}
                                     disabled={actionLoading}
@@ -555,10 +582,10 @@ export default function LenderDashboard() {
                         setActionLoading(true);
                         try {
                           await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/disburse`);
-                          setActionMessage({ type: "success", text: "Loan disbursed!" });
+                          toast.success( "Loan disbursed!" );
                           setSelectedApp(null); fetchData();
                         } catch (err) {
-                          setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" });
+                          toast.error( err.response?.data?.error || "Failed" );
                         } finally { setActionLoading(false); }
                       }}
                       disabled={actionLoading}
@@ -573,9 +600,9 @@ export default function LenderDashboard() {
                         setActionLoading(true);
                         try {
                           await lenderApi.put(`/api/lender/applications/${selectedApp.loan._id}/default`);
-                          setActionMessage({ type: "success", text: "Defaulted." });
+                          toast.success( "Defaulted." );
                           setSelectedApp(null); fetchData();
-                        } catch (err) { setActionMessage({ type: "error", text: err.response?.data?.error || "Failed" }); }
+                        } catch (err) { toast.error(err.response?.data?.error || "Failed" ); }
                         finally { setActionLoading(false); }
                       }}
                       className={`w-full py-2.5 rounded-xl text-sm font-medium transition border ${isDark ? "bg-gray-800 hover:bg-red-900/30 text-gray-400 hover:text-red-400 border-gray-700" : "bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 border-gray-200"}`}

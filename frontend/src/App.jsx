@@ -12,8 +12,14 @@ import LenderLogin from "./pages/LenderLogin";
 import LenderRegister from "./pages/LenderRegister";
 import TaxSummary from "./pages/TaxSummary";
 import ExpenseTracker from "./pages/ExpenseTracker";
+import LenderAccount from "./pages/LenderAccount";
 import PlatformManagement from "./pages/PlatformManagement";
 import CreditPolicyBot from "./components/CreditPolicyBot";
+import GigIncomePrediction from "./pages/GigIncomePrediction";
+import Forgot from "./pages/Forgot";
+import Reset from "./pages/Reset";
+import VerifyOtp from "./pages/VerifyOtp";
+import MyAccount from "./pages/MyAccount";
 
 // Redirects to /dashboard if already logged in
 const PublicRoute = ({ children }) => {
@@ -68,6 +74,9 @@ const App = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot" element={<Forgot />} />
+        <Route path="/reset" element={<Reset />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
 
         {/* Protected Dashboard Routes */}
         
@@ -113,6 +122,14 @@ const App = () => {
           }
         />
         <Route
+          path="/income-prediction"
+          element={
+            <ProtectedRoute>
+              <GigIncomePrediction />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/emergency-loan"
           element={
             <ProtectedRoute>
@@ -132,12 +149,24 @@ const App = () => {
           path="/lender-dashboard"
           element={<LenderDashboard />}
         />
+        <Route
+          path="/lender-account"
+          element={<LenderAccount />}
+        />
 
         <Route
           path="/expense-tracker"
           element={
             <DashboardRoute>
               <ExpenseTracker />
+            </DashboardRoute>
+          }
+        />
+        <Route
+          path="/my-account"
+          element={
+            <DashboardRoute>
+              <MyAccount />
             </DashboardRoute>
           }
         />

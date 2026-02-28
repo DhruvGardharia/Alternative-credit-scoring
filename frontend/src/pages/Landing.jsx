@@ -43,13 +43,13 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
                 onClick={() => navigate("/register")}
-                className="bg-yellow-400 text-blue-900 px-8 py-4 rounded-lg text-base font-bold hover:bg-yellow-500 hover:shadow-2xl transition transform hover:-translate-y-1"
+                className="w-full sm:w-auto bg-yellow-400 text-blue-900 px-8 py-4 rounded-lg text-base font-bold hover:bg-yellow-500 hover:shadow-2xl transition transform hover:-translate-y-1"
               >
                 {t("heroCta1")}
               </button>
               <button
                 onClick={scrollToHowItWorks}
-                className="bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 px-8 py-4 rounded-lg text-base font-bold hover:bg-white/20 transition"
+                className="w-full sm:w-auto bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 px-8 py-4 rounded-lg text-base font-bold hover:bg-white/20 transition"
               >
                 {t("heroCta2")}
               </button>
@@ -311,13 +311,13 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
               <button
                 onClick={() => navigate("/register")}
-                className="bg-yellow-400 text-blue-900 px-10 py-4 rounded-lg text-lg font-bold hover:bg-yellow-500 hover:shadow-2xl transition transform hover:-translate-y-1"
+                className="w-full sm:w-auto bg-yellow-400 text-blue-900 px-10 py-4 rounded-lg text-lg font-bold hover:bg-yellow-500 hover:shadow-2xl transition transform hover:-translate-y-1"
               >
                 {t("ctaBtn1")}
               </button>
               <button
                 onClick={() => navigate("/login")}
-                className="bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 px-10 py-4 rounded-lg text-lg font-bold hover:bg-white/20 transition"
+                className="w-full sm:w-auto bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 px-10 py-4 rounded-lg text-lg font-bold hover:bg-white/20 transition"
               >
                 {t("ctaBtn2")}
               </button>

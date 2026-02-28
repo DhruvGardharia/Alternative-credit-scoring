@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(user));
       setToken(token);
       setUser(user);
+      toast.success("Welcome back!");
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       return response.data;
     }
@@ -56,24 +58,30 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     const response = await axios.post("/api/auth/register", userData);
+
     if (response.data.success) {
-      const { token, user } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      setToken(token);
-      setUser(user);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      return response.data;
+      // DO NOT login here
+      toast.success("OTP sent to your email!");
+      return response.data; // return OTP token
     }
+
     throw new Error(response.data.message);
   };
-
+  
+  const loginWithToken = async (token, userData) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    setToken(token);
+    setUser(userData);
+  };
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("onboarded");
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
+    toast.success("Logged out successfully");
     delete axios.defaults.headers.common["Authorization"];
   };
 
@@ -83,6 +91,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     login,
     register,
+    loginWithToken,
     logout,
   };
 

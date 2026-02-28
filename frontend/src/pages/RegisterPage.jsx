@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import LandingNavbar from "../components/LandingNavbar";
+import { toast } from "react-toastify"
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -27,22 +28,26 @@ export default function RegisterPage() {
     setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError(t("registerPasswordMismatch"));
+      toast.error(t("registerPasswordMismatch"))
       setLoading(false);
       return;
     }
 
     try {
-      await register({
+      const res = await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         employmentType: formData.employmentType,
         phone: formData.phone,
       });
-      navigate("/dashboard");
+
+      // Store temporary token
+      localStorage.setItem("registerToken", res.token);
+
+      navigate("/verify-otp");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || "Registration failed")
     } finally {
       setLoading(false);
     }
@@ -196,6 +201,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div>  
   );
 }

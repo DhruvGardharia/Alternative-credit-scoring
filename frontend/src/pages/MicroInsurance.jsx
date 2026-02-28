@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import { toast } from "react-toastify"
 
 // ── helpers ──────────────────────────────────────────────────
 const api = (path, opts = {}) =>
@@ -325,7 +326,7 @@ export default function MicroInsurance() {
       setClaimsLoaded(false);
       setLedgerLoaded(false);
     } catch (err) {
-      alert(err.response?.data?.message || "Activation failed");
+      toast.error(err.response?.data?.message || "Activation failed");
     } finally {
       setActivating(false);
       setActivateType(null);
@@ -335,7 +336,7 @@ export default function MicroInsurance() {
   // ── File Claim ──────────────────────────────────────────────
   const handleFileClaim = async (e) => {
     e.preventDefault();
-    if (!activePolicy) return alert("No active policy. Activate insurance first.");
+    if (!activePolicy) return toast.error("No active policy. Activate insurance first.");
     setClaimLoading(true);
     try {
       const fd = new FormData();
@@ -350,10 +351,11 @@ export default function MicroInsurance() {
       setClaimForm({ incidentType:"accident", description:"" });
       setClaimFile(null);
       await fetchCore();
+      toast.success("Claim requested successful!");
       setClaimsLoaded(false);
       setLedgerLoaded(false);
     } catch (err) {
-      alert(err.response?.data?.message || "Claim submission failed");
+      toast.success(err.response?.data?.message || "Claim submission failed");
     } finally {
       setClaimLoading(false);
     }
@@ -452,10 +454,10 @@ export default function MicroInsurance() {
           <div style={{ animation:"fadeIn 0.3s ease" }}>
 
             {/* Row 1: Risk + Quick Stats */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16, marginBottom:20 }}>
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 mb-5">
 
               {/* Risk Assessment Card */}
-              <div className="card" style={{ padding:24, gridColumn:"span 1" }}>
+              <div className="card w-full lg:col-span-1" style={{ padding:24 }}>
                 <div style={{ fontWeight:700, fontSize:14, color: T.textSecondary,
                   marginBottom:16, textTransform:"uppercase", letterSpacing:1 }}>
                   AI Risk Assessment
@@ -500,7 +502,7 @@ export default function MicroInsurance() {
               </div>
 
               {/* Premium Options */}
-              <div style={{ gridColumn:"span 2", display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              <div className="w-full lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { type:"shift", label:"Per Shift", icon:"", subtitle:"8-hour coverage", color:"#1e40af" },
                   { type:"daily", label:"Per Day", icon:"", subtitle:"Full day coverage", color:"#1e40af" },
@@ -586,7 +588,7 @@ export default function MicroInsurance() {
 
               {showClaimForm && (
                 <form onSubmit={handleFileClaim} style={{ animation:"fadeIn 0.3s ease" }}>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <div>
                       <label style={{ fontSize:12, color: T.textMuted, display:"block", marginBottom:6 }}>
                         Incident Type
@@ -638,7 +640,7 @@ export default function MicroInsurance() {
                   <div style={{ fontWeight:700, color: T.bannerText, marginBottom:16, fontSize:15 }}>
                     AI Claim Analysis Complete
                   </div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <div style={{ fontSize:11, color: T.textMuted, marginBottom:4 }}>Summary</div>
                       <p style={{ fontSize:13, color: T.textPrimary, lineHeight:1.6 }}>
@@ -680,6 +682,31 @@ export default function MicroInsurance() {
                       </div>
                     </div>
                   </div>
+                  {/* Image Verification */}
+                  {latestClaimResult.llmAnalysis?.imageVerification && (
+                    <div style={{ marginTop:16, background: T.cardBg, borderRadius:10, padding:14, borderLeft:`3px solid ${latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#22c55e" : latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#ef4444" : "#f59e0b"}` }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                        <div style={{ fontSize:11, color: T.textMuted, fontWeight:600 }}>
+                          Image Verification
+                        </div>
+                        <div className="tag" style={{
+                          background: latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#166534" : latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#7f1d1d" : "#713f12",
+                          color: latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#86efac" : latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || latestClaimResult.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#fca5a5" : "#fde68a",
+                          fontSize: 10, padding: "2px 8px"
+                        }}>
+                          {latestClaimResult.llmAnalysis.imageVerification.matchesDescription.replace(/_/g," ")}
+                        </div>
+                      </div>
+                      <div style={{ fontSize:12, color: T.textPrimary, marginBottom:6, lineHeight:1.5 }}>
+                        <span style={{ color: T.textMuted, fontWeight:600 }}>AI Sees:</span> {latestClaimResult.llmAnalysis.imageVerification.imageDescription}
+                      </div>
+                      {latestClaimResult.llmAnalysis.imageVerification.imageNotes && (
+                        <div style={{ fontSize:11, color: T.textSecondary, fontStyle:"italic" }}>
+                          {latestClaimResult.llmAnalysis.imageVerification.imageNotes}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {/* RAG clauses */}
                   {latestClaimResult.ragRetrievedClauses?.length > 0 && (
                     <div style={{ marginTop:16 }}>
@@ -823,6 +850,30 @@ export default function MicroInsurance() {
                             {c.llmAnalysis.approvalConfidence}% confidence
                           </span>
                         </div>
+                      </div>
+                    )}
+                    {c.llmAnalysis?.imageVerification && (
+                      <div style={{ background: T.cardBg, borderRadius:10, padding:14, marginBottom:12, borderLeft:`3px solid ${c.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#22c55e" : c.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || c.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#ef4444" : "#f59e0b"}` }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                          <div style={{ fontSize:11, color: T.textMuted, fontWeight:600 }}>
+                            Image Verification
+                          </div>
+                          <div className="tag" style={{
+                            background: c.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#166534" : c.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || c.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#7f1d1d" : "#713f12",
+                            color: c.llmAnalysis.imageVerification.matchesDescription === "MATCH" ? "#86efac" : c.llmAnalysis.imageVerification.matchesDescription === "MISMATCH" || c.llmAnalysis.imageVerification.matchesDescription === "SUSPICIOUS" ? "#fca5a5" : "#fde68a",
+                            fontSize: 10, padding: "2px 8px"
+                          }}>
+                            {c.llmAnalysis.imageVerification.matchesDescription.replace(/_/g," ")}
+                          </div>
+                        </div>
+                        <div style={{ fontSize:12, color: T.textPrimary, marginBottom:6, lineHeight:1.5 }}>
+                          <span style={{ color: T.textMuted, fontWeight:600 }}>AI Sees:</span> {c.llmAnalysis.imageVerification.imageDescription}
+                        </div>
+                        {c.llmAnalysis.imageVerification.imageNotes && (
+                          <div style={{ fontSize:11, color: T.textSecondary, fontStyle:"italic" }}>
+                            {c.llmAnalysis.imageVerification.imageNotes}
+                          </div>
+                        )}
                       </div>
                     )}
                     {c.payoutAmount > 0 && (

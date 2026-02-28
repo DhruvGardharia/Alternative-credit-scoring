@@ -11,6 +11,7 @@ export default function Navbar() {
   const { language, changeLanguage, t } = useLanguage();
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userDropdownRef = useRef(null);
 
   const handleLogout = () => {
@@ -44,25 +45,21 @@ export default function Navbar() {
 
   return (
     <nav className="bg-blue-900 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 py-3 flex justify-between items-center">
 
         {/* Logo Section */}
-        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
-          <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-blue-900" fill="currentColor" viewBox="0 0 20 20">
+        <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-900" fill="currentColor" viewBox="0 0 20 20">
               <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
               <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
             </svg>
           </div>
-          <span className="text-xl font-bold text-white">CreditFlow</span>
+          <span className="text-lg sm:text-xl font-bold text-white">CreditFlow</span>
         </div>
 
         {/* Right Section */}
         <div className="flex items-center space-x-4">
-          <span className="text-white text-sm hidden sm:block">
-            {t("welcome")}, {user?.name}
-          </span>
-
           {/* Nav Links */}
           <button
             onClick={() => navigate("/dashboard")}
@@ -81,6 +78,12 @@ export default function Navbar() {
             className="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-lg transition font-medium"
           >
             Micro Insurance
+          </button>
+          <button
+            onClick={() => navigate("/income-prediction")}
+            className="px-3 py-1.5 text-sm text-yellow-400 hover:text-white bg-blue-800 hover:bg-blue-700 rounded-lg shadow-sm border border-yellow-400/20 transition font-medium"
+          >
+            Income Predictor
           </button>
 
           {/* Language Selector Dropdown */}
@@ -152,15 +155,85 @@ export default function Navbar() {
             )}
           </button>
           
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition text-sm"
-          >
-            {t("logout")}
-          </button>
+          {/* User Profile Dropdown */}
+          <div className="relative" ref={userDropdownRef}>
+            <button
+              onClick={() => setShowUserDropdown((prev) => !prev)}
+              className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold transition shadow-sm ring-2 ring-blue-900/20"
+            >
+              {initials}
+            </button>
+
+            {showUserDropdown && (
+              <div className="absolute right-0 mt-3 w-56 rounded-xl shadow-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 z-50 overflow-hidden transform opacity-100 scale-100 transition-all duration-200">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user?.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+                </div>
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setShowUserDropdown(false);
+                      navigate("/my-account");
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-gray-400 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    {t("myAccount") || "My Account"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowUserDropdown(false);
+                      handleLogout();
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    {t("logout")}
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* Hamburger Toggle */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg text-gray-200 hover:bg-blue-800 transition"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden px-4 pt-2 pb-4 space-y-1 bg-blue-900 border-t border-blue-800">
+          <button
+            onClick={() => { navigate("/dashboard"); setIsMobileMenuOpen(false); }}
+            className="block w-full text-left px-3 py-2 text-base font-medium text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-md"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => { navigate("/emergency-loan"); setIsMobileMenuOpen(false); }}
+            className="block w-full text-left px-3 py-2 text-base font-medium text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-md"
+          >
+            Emergency Loan
+          </button>
+          <button
+            onClick={() => { navigate("/insurance"); setIsMobileMenuOpen(false); }}
+            className="block w-full text-left px-3 py-2 text-base font-medium text-gray-200 hover:text-yellow-400 hover:bg-blue-800 rounded-md"
+          >
+            Micro Insurance
+          </button>
+        </div>
+      )}
     </nav>
   );
 }

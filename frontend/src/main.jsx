@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
 import { LenderAuthProvider } from "./context/LenderAuthContext.jsx";
+import { ToastContainer } from "react-toastify";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -13,8 +14,20 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <LenderAuthProvider>
         <ThemeProvider>
           <LanguageProvider>
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored"
+            />
             <App />
-          </LanguageProvider>  
+          </LanguageProvider>
         </ThemeProvider>
       </LenderAuthProvider>
     </AuthProvider>

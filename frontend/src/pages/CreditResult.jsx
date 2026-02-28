@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CreditMeter from "../components/CreditMeter";
+import { toast } from "react-toastify"
 
 export default function CreditResult() {
   const [credit, setCredit] = useState(null);
@@ -34,10 +35,11 @@ export default function CreditResult() {
     try {
       const response = await axios.post("/api/user/generate-score", { userId });
       if (response.data.success) {
+        toast.success("Credit score generated!")
         setCredit(response.data.creditScore);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to generate credit score");
+      toast.error(err.response?.data?.message || "Failed to generate credit score");
     } finally {
       setGenerating(false);
     }

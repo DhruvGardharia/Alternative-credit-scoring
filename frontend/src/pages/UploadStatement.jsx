@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify"
 
 export default function UploadStatement() {
   const [file, setFile] = useState(null);
@@ -15,14 +16,14 @@ export default function UploadStatement() {
       // Validate file type
       const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
       if (!allowedTypes.includes(selectedFile.type)) {
-        setError("Only PDF, JPG, and PNG files are allowed");
+        toast.error("Only PDF, JPG, and PNG files are allowed");
         setFile(null);
         return;
       }
       
       // Validate file size (5MB)
       if (selectedFile.size > 5 * 1024 * 1024) {
-        setError("File size must be less than 5MB");
+        toast.warn("File size must be less than 5MB");
         setFile(null);
         return;
       }
@@ -35,7 +36,7 @@ export default function UploadStatement() {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!file) {
-      setError("Please select a file");
+      toast.error("Please select a file");
       return;
     }
 
@@ -54,10 +55,11 @@ export default function UploadStatement() {
       });
 
       if (response.data.success) {
+        toast.success("Bank statement uploaded successfully!")
         navigate(`/dashboard/${userId}`);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to upload bank statement");
+      toast.error(err.response?.data?.message || "Failed to upload bank statement");
     } finally {
       setLoading(false);
     }
@@ -124,12 +126,6 @@ export default function UploadStatement() {
               </span>
             </label>
           </div>
-
-          {error && (
-            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
 
           <button
             type="submit"
