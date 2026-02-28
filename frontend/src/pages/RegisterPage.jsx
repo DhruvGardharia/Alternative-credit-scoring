@@ -33,14 +33,18 @@ export default function RegisterPage() {
     }
 
     try {
-      await register({
+      const res = await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         employmentType: formData.employmentType,
         phone: formData.phone,
       });
-      navigate("/dashboard");
+
+      // Store temporary token
+      localStorage.setItem("registerToken", res.token);
+
+      navigate("/verify-otp");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -196,6 +200,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div>  
   );
 }
