@@ -7,7 +7,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
-
+import { toast } from "react-toastify";
 const LenderAuthContext = createContext();
 
 export const useLenderAuth = () => {
@@ -62,6 +62,7 @@ export const LenderAuthProvider = ({ children }) => {
       localStorage.setItem("lender_token", token);
       setLenderToken(token);
       setLender(lender);
+      toast.success("Welcome back!");
       return response.data;
     }
     throw new Error(response.data.message);
@@ -74,6 +75,7 @@ export const LenderAuthProvider = ({ children }) => {
       localStorage.setItem("lender_token", token);
       setLenderToken(token);
       setLender(lender);
+      toast.success("Registration successful!");
       return response.data;
     }
     throw new Error(response.data.message);
@@ -83,6 +85,7 @@ export const LenderAuthProvider = ({ children }) => {
     localStorage.removeItem("lender_token");
     setLenderToken(null);
     setLender(null);
+    toast.success("Logged out successfully");
   };
 
   const value = {

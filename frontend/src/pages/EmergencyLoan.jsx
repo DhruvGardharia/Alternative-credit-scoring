@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import Navbar from "../components/Navbar";
 import axios from "axios";
+import { toast } from "react-toastify"
 
 const PURPOSE_OPTIONS = [
   { value: "medical", label: "🏥 Medical Emergency", color: "text-red-400" },
@@ -79,10 +80,10 @@ export default function EmergencyLoan() {
     setOfferActionLoading(offerId);
     try {
       await axios.put(`/api/loans/${loanId}/offers/${offerId}/accept`);
-      setSuccess(`✅ Offer from ${orgName} accepted! Your loan is now approved.`);
+      toast.success(`✅ Offer from ${orgName} accepted! Your loan is now approved.`);
       fetchData();
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to accept offer");
+      toast.error(err.response?.data?.error || "Failed to accept offer");
     } finally {
       setOfferActionLoading(null);
     }
@@ -93,10 +94,10 @@ export default function EmergencyLoan() {
     setOfferActionLoading(offerId);
     try {
       await axios.put(`/api/loans/${loanId}/offers/${offerId}/reject`);
-      setSuccess(`Offer from ${orgName} rejected. Your loan stays open for other offers.`);
+      toast.success(`Offer from ${orgName} rejected. Your loan stays open for other offers.`);
       fetchData();
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to reject offer");
+      toast.error(err.response?.data?.error || "Failed to reject offer");
     } finally {
       setOfferActionLoading(null);
     }
@@ -116,12 +117,12 @@ export default function EmergencyLoan() {
         urgencyLevel: form.urgencyLevel
       });
 
-      setSuccess("🎉 Application submitted! Lenders will make offers on your loan — you decide which to accept.");
+      toast.success("🎉 Application submitted! Lenders will make offers on your loan — you decide which to accept.");
       setForm({ amount: "", purpose: "", purposeDescription: "", urgencyLevel: "" });
       fetchData();
       setTimeout(() => setTab("history"), 2000);
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to submit application");
+      toast.error(err.response?.data?.error || "Failed to submit application");
     } finally {
       setSubmitting(false);
     }
@@ -646,16 +647,16 @@ export default function EmergencyLoan() {
                                 const methodInput = document.getElementById(`pay-method-${loan._id}`);
                                 const refInput = document.getElementById(`pay-ref-${loan._id}`);
                                 const amount = Number(amtInput?.value);
-                                if (!amount || amount <= 0) { setError("Enter a valid amount"); return; }
+                                if (!amount || amount <= 0) { toast.error("Enter a valid amount"); return; }
                                 setOfferActionLoading(loan._id);
                                 try {
                                   await axios.post(`/api/loans/${loan._id}/repay`, {
                                     amount, method: methodInput?.value || "upi", reference: refInput?.value || ""
                                   });
-                                  setSuccess("Payment request submitted! Waiting for lender confirmation.");
+                                  toast.success("Payment request submitted! Waiting for lender confirmation.");
                                   fetchData();
                                 } catch (err) {
-                                  setError(err.response?.data?.error || "Failed to submit");
+                                  toast.error(err.response?.data?.error || "Failed to submit");
                                 } finally { setOfferActionLoading(null); }
                               }}
                               disabled={offerActionLoading === loan._id}

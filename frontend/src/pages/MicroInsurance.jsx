@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import { toast } from "react-toastify"
 
 // ── helpers ──────────────────────────────────────────────────
 const api = (path, opts = {}) =>
@@ -325,7 +326,7 @@ export default function MicroInsurance() {
       setClaimsLoaded(false);
       setLedgerLoaded(false);
     } catch (err) {
-      alert(err.response?.data?.message || "Activation failed");
+      toast.error(err.response?.data?.message || "Activation failed");
     } finally {
       setActivating(false);
       setActivateType(null);
@@ -335,7 +336,7 @@ export default function MicroInsurance() {
   // ── File Claim ──────────────────────────────────────────────
   const handleFileClaim = async (e) => {
     e.preventDefault();
-    if (!activePolicy) return alert("No active policy. Activate insurance first.");
+    if (!activePolicy) return toast.error("No active policy. Activate insurance first.");
     setClaimLoading(true);
     try {
       const fd = new FormData();
@@ -350,10 +351,11 @@ export default function MicroInsurance() {
       setClaimForm({ incidentType:"accident", description:"" });
       setClaimFile(null);
       await fetchCore();
+      toast.success("Claim requested successful!");
       setClaimsLoaded(false);
       setLedgerLoaded(false);
     } catch (err) {
-      alert(err.response?.data?.message || "Claim submission failed");
+      toast.success(err.response?.data?.message || "Claim submission failed");
     } finally {
       setClaimLoading(false);
     }

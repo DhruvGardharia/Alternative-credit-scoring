@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
 import LandingNavbar from "../components/LandingNavbar";
+import { toast } from "react-toastify"
 
 export default function Forgot() {
   const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ export default function Forgot() {
 
       navigate("/reset");
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong");
+      toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -50,11 +51,7 @@ export default function Forgot() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border rounded-xl"
             />
-
-            {error && (
-              <div className="text-red-500 text-sm">{error}</div>
-            )}
-
+            
             <button
               type="submit"
               disabled={loading}

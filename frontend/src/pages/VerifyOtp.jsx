@@ -4,6 +4,7 @@ import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
 import LandingNavbar from "../components/LandingNavbar";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify"
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState("");
@@ -22,7 +23,7 @@ export default function VerifyOtp() {
 
     const token = localStorage.getItem("registerToken");
     if (!token) {
-      setError("Session expired. Please register again.");
+      toast.error("Session expired. Please register again.")
       setLoading(false);
       return;
     }
@@ -34,10 +35,10 @@ export default function VerifyOtp() {
 
       // ✅ This updates AuthContext so DashboardRoute sees the user immediately
       await loginWithToken(res.data.token, res.data.user);
-
+      toast.success("Email verified successfully!")
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Verification failed");
+      toast.error(err.response?.data?.message || "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -61,10 +62,6 @@ export default function VerifyOtp() {
               onChange={(e) => setOtp(e.target.value)}
               className="w-full px-4 py-3 border rounded-xl"
             />
-
-            {error && (
-              <div className="text-red-500 text-sm">{error}</div>
-            )}
 
             <button
               type="submit"
