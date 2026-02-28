@@ -175,7 +175,7 @@ function killPortThenStart(retry = 0) {
       if (orphanPids.length > 0) {
         console.log(`[Python] Killing ${orphanPids.length} orphan uvicorn process(es): ${orphanPids.join(', ')}`);
         orphanPids.forEach(pid => {
-          try { execSync(`taskkill /PID ${pid} /F /T`, { stdio: 'ignore' }); } catch (_) {}
+          try { execSync(`taskkill /PID ${pid} /F /T`, { stdio: 'ignore' }); } catch (_) { }
         });
       }
     } catch (_) {
@@ -201,7 +201,7 @@ function killPortThenStart(retry = 0) {
           execSync(`taskkill /PID ${pid} /F /T`, { stdio: 'ignore' });
           console.log(`[Python] Killed PID ${pid} from port ${FASTAPI_INTERNAL_PORT}`);
           killedAny = true;
-        } catch (_) {}
+        } catch (_) { }
       });
     } else {
       execSync(`fuser -k ${FASTAPI_INTERNAL_PORT}/tcp 2>/dev/null || true`, { stdio: 'ignore' });
@@ -281,7 +281,7 @@ app.use('/api/statement', statementRoutes);
 app.use('/api/income', incomeRoutes);
 app.use("/api/ai", chatRoutes);
 app.use('/api/summary', summaryRoutes);
-app.use('/api/credit', creditRoutes);  
+app.use('/api/credit', creditRoutes);
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
